@@ -12,7 +12,7 @@ Développement d'une balise de formation 403MHz conforme aux spécifications off
 - **Exercices** de recherche et sauvetage  
 - **Tests** de conformité T.018 (hors fréquence d'urgence 406MHz)  
 
-## 🏗️ Architecture Hardware
+## Architecture Hardware
 
 ### Microcontrôleur
 - **dsPIC33CK64MC105** Curiosity Nano (100MHz FCY)
@@ -34,7 +34,7 @@ Développement d'une balise de formation 403MHz conforme aux spécifications off
 - **LED RD10** : Indicateur status transmission
 - **UART1** : Debug et monitoring (115200 bps)
 
-## 🎛️ Modes de Fonctionnement
+## Modes de Fonctionnement
 
 ### Mode TEST (Switch = 0)
 - **Position GPS** : Fixe Grenoble (45.1885°N, 5.7245°E)
@@ -49,7 +49,7 @@ Développement d'une balise de formation 403MHz conforme aux spécifications off
   - **Phase 3** : Continues @ 28.5s ±1.5s randomisé
 - **Objectif** : Simulation crash ELT réaliste
 
-## 📋 Spécifications T.018
+## Spécifications T.018
 
 ### Trame 300 bits
 ```
@@ -73,7 +73,7 @@ Développement d'une balise de formation 403MHz conforme aux spécifications off
 - **Bits 138-154** : Type balise + spare (17 bits)
 - **Bits 155-202** : Champ rotatif (48 bits)
 
-## 🗂️ Architecture Logicielle
+## Architecture Logicielle
 
 ### Structure Consolidée (14 fichiers)
 ```
@@ -90,7 +90,7 @@ SARSAT_T018_dsPIC33CK.X/
 └── *.properties            # Configuration MPLAB X (4 fichiers)
 ```
 
-## 🔧 Configuration Pins dsPIC33CK64MC105
+## Configuration Pins dsPIC33CK64MC105
 
 ```
 Pin Assignment:
@@ -107,7 +107,7 @@ Pin Assignment:
 └── UART1 : Debug (pins défaut RA0/RA1)
 ```
 
-## 🚀 Build et Compilation
+## Build et Compilation
 
 ### Prérequis
 - **MPLAB X IDE** v6.25 ou supérieur
@@ -128,10 +128,10 @@ make clean && make
 ```
 
 ### Résultats Build
-- ✅ **Compilation réussie** sans erreurs/warnings
-- ✅ **Interrupt handlers** : `__CCP1Interrupt`, `__T1Interrupt`  
-- ✅ **Mémoire optimisée** : <33% program, <36% data
-- ✅ **Conformité T.018** : 100% spécification respectée
+- **Compilation réussie** sans erreurs/warnings
+- **Interrupt handlers** : `__CCP1Interrupt`, `__T1Interrupt`  
+- **Mémoire optimisée** : <33% program, <36% data
+- **Conformité T.018** : 100% spécification respectée
 
 ## Statut Implémentation
 
@@ -152,7 +152,7 @@ make clean && make
 - **Test RF complet** : Validation analyseur spectre 403MHz
 - **Documentation utilisateur** : Guide ADRASEC détaillé
 
-## ⚠️ Conformité et Légalité
+## Conformité et Légalité
 
 ### Fréquences d'opération
 - **403 MHz** : Fréquence de formation et test (ce projet)
