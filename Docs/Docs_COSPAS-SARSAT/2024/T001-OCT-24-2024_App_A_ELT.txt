@@ -1,0 +1,256 @@
+A-36
+
+A3.3.8
+
+C/S T.001 – Issue 4 – Rev. 12
+October 2024
+
+ELT(DT) Location Protocol (see Figure A11)
+
+A3.3.8.1
+The ELT(DT) location protocol, identified by the flags F=1, P=0 and the protocol code in series no. 8
+of Table A2-B, has the following structure:
+a)
+
+PDF-1:
+bits 37 to 40:
+
+4-bit protocol code defined as 1001;
+
+bits 41 to 42:
+
+2 bits for type of beacon identity set to “00” for Aircraft 24-bit address *, “01” for
+Aircraft operators designator and serial number†, “10” for TAC with serial
+number†, and “11” reserved for future use;
+
+bits 43 to 66:
+
+24 bits of beacon identification data:
+• (Bits 41 and 42 “00”) a 24-bit aircraft address (only one ELT per aircraft can be
+identified using this protocol); or
+• (Bits 41 and 42 “01”) a 15-bit aircraft operator designator‡ in bits 43 to 57, and
+a 9-bit serial number (1 to 511) assigned by the operator in bits 58 to 66; or
+• (Bits 41 and 42 “10”) a 10-bit Cospas-Sarsat type approval certificate number
+of the beacon (1 to 1,023) in bits 43 to 52, and a 14-bit serial number (1 to
+16,383) in bits 53 to 66; or
+• (Bits 41 and 42 “11”) reserved for future use and shall not be used for beacon
+coding.
+
+or ELT(DT) Location Test protocol when bits 43 to 66 are encoded with either all
+”0”s, or all “1”s;
+
+*
+
+This coding is compliant with the mandatory data elements defined in ICAO document 10150, "Manual on the Functional Specifications
+for the Location of an Aircraft in Distress Repository (LADR)" where bits 41 and 42 are set to “00” and the aircraft 24-bit address is
+provided in PDF-1, and the 3LD designator of the aircraft operator is provided in the rotating PDF-2 field (when bits 113 and 114 are
+set to “00” and bits 115 to 117 are set to “000” at the intervals described in section 2.2.1 of this document).
+The LADR is a facility, that will be used by Cospas-Sarsat, to support ICAO requirements for autonomous location of an aircraft in
+distress contained in Annex 6, Part I, section 6.18 to the Convention on International Civil Aviation.
+†
+
+WARNING: These coding options are NOT compliant with the mandatory data elements defined in ICAO document 10150 (no
+aircraft identifier is available) and the associated data cannot be stored in the LADR. Manufacturers wishing to comply with ICAO
+GADSS requirements and use these coding options should first consult the relevant Administration’s aviation authorities for guidance,
+prior to encoding beacons with these protocols.
+‡
+
+The aircraft operator designator (3 letters) can be encoded in 15 bits using a shortened form of the modified-Baudot code (i.e.: since
+all letters in the modified-Baudot code are coded in 6 bits, with the most significant bit = "1", this first (most significant) bit can be
+deleted to form a 5-bit code per letter).
+
+A-37
+
+C/S T.001 – Issue 4 – Rev. 12
+October 2024
+
+bits 67 to 85: 19 bits of position data to 30 minute resolution;
+
+b)
+
+A3.3.8.2
+
+PDF-2:
+bits 107 & 108:
+
+means of activation
+
+bits 109 to 112:
+
+encoded altitude
+
+bits 113 & 114
+
+encoded location freshness or PDF-2 rotating field indicator
+
+bits 115 to 132:
+
+18-bit position offset ( latitude,  longitude) to 4 second resolution or aircraft
+operator 3LD.
+
+The 19 bits of position data in PDF-1 are encoded as follows:
+
+a)
+
+bits 67 to 75:
+latitude data (9 bits) with 30 minute resolution, including:
+• bit 67:
+N/S flag (N=0, S=1)
+• bits 68 to 75:
+degrees (0 to 90) in 1/2 degree increments
+(default value of bits 67 to 75 = 0 11111111); and
+
+b)
+
+bits 76 to 85:
+longitude data (10 bits) with 30 minute resolution, including:
+• bit 76:
+E/W flag (E=0, W=1)
+• bits 77 to 85:
+degrees (0 to 180) in 1/2 degree increments
+(default value of bits 76 to 85 = 0 111111111).
+
+A3.3.8.3
+a)
+
+The 26 bits available in PDF-2 are defined as follows:
+bits 107 and 108: means of activation
+“00”: manual activation by the user
+“01”: automatic activation by the beacon
+“10”: automatic activation by external means
+“11”: spare
+If the beacon receives more than one triggering command, then the most recent triggering event is
+indicated in the bits 107-108.
+
+b)
+
+bits 109 to 112: encoded altitude
+“0000”: altitude is less than or equal to 400 m (1312 ft)
+“0001”: altitude is greater than 400 m (1312 ft) up to and including 800 m (2625 ft)
+“0010”: altitude is greater than 800 m (2625 ft) up to and including 1200 m (3937 ft)
+“0011”: altitude is greater than 1200 m (3937 ft) up to and including 1600 m (5249 ft)
+“0100”: altitude is greater than 1600 m (5249 ft) up to and including 2200 m (7218 ft)
+
+A-38
+
+C/S T.001 – Issue 4 – Rev. 12
+October 2024
+
+“0101”: altitude is greater than 2200 m (7218 ft) up to and including 2800 m (9186 ft)
+“0110”: altitude is greater than 2800 m (9186 ft) up to and including 3400 m
+(11155 ft)
+“0111”: altitude is greater than 3400 m (11155 ft) up to and including 4000 m
+(13123 ft)
+“1000”: altitude is greater than 4000 m (13123 ft) up to and including 4800 m
+(15748 ft)
+“1001”: altitude is greater than 4800 m (15748 ft) up to and including 5600 m
+(18373 ft)
+“1010”: altitude is greater than 5600 m (18373 ft) up to and including 6600 m
+(21654 ft)
+“1011”: altitude is greater than 6600 m (21654 ft) up to and including 7600 m
+(24934 ft)
+“1100”: altitude is greater than 7600 m (24934 ft) up to and including 8800 m
+(28871 ft)
+“1101”: altitude is greater than 8800 m (28871 ft) up to and including 10000 m
+(32808 ft)
+“1110”: altitude is greater than 10000 m (32808 ft)
+“1111”: default value if altitude information is not available
+c)
+
+bits 113 & 114: encoded location freshness or PDF-2 rotating field indicator:
+• “00”: PDF-2 rotating field indicator,
+• “01”: encoded location in message is more than 60 seconds old, or the default encoded
+position is transmitted,
+• “10”: encoded location in message is greater than 2 seconds and equal to or less than
+60 seconds old,
+• “11”: encoded location in message is current (i.e., the encoded location freshness is less than
+or equal to 2 seconds);
+
+d)
+
+bits 115 to 123:  latitude with 4 second resolution:
+• bit 115:
+• bit 116 to 119:
+• bits 120 to 123:
+
+e)
+
+bits 124 to 132:  longitude with 4 second resolution:
+• bit 124:
+• bits 125 to 128:
+
+*
+
+ sign (0 = minus, 1 = plus)
+minutes (0 to 15) in 1 minute increments*
+seconds (0 to 56) in 4 second increments
+(default value of bits 115 to 123 = 1 0000 1111);
+
+ sign (0 = minus, 1 = plus)
+minutes (0 to 15) in 1 minute increments*
+
+Section A3.3.8 defines the coding scheme for the ELT(DT) Location Protocol. For these new beacons the coarse position in PDF-1 is
+always selected to be as close as possible to the actual position and will have a maximum offset in PDF-2 of +/- 15 minutes.
+
+A-39
+
+• bits 129 to 132:
+
+C/S T.001 – Issue 4 – Rev. 12
+October 2024
+
+seconds (0 to 56) in 4 second increments
+(default value of bits 124 to 132 = 1 0000 1111)
+
+OR when bits 113 and 114 are set to “00”;
+
+f)
+
+bits 115 to 117: PDF-2 rotating field type
+• 000: aircraft operator 3LD
+• other combinations: spare;
+
+g)
+
+bits 118 to 132: when PDF-2 rotating field type is 000, then bits 118 to 132 indicate aircraft
+operator 3LD*, coded using the Modified Baudot Code in Table A3 (3 letters, each using 5 bits,
+omitting the most significant bit in Table A3; if there is no 3LD for the aircraft operator, then the
+3LD is coded as “ZGA”, i.e., bits 115 to 132 are set to 000 10001 01011 11000).
+
+A3.3.8.4
+Users should utilize the ELT(DT) Location Test protocol identified with bits 43-66 described in
+section A3.3.8.1 when testing an ELT(DT).
+
+A3.3.8.5
+
+Cancellation message
+
+In case of alert cancellation, a specific message shall be sent with the following bit assignment:
+bits 37 to 40:
+bits 41 to 42:
+bits 43 to 66:
+bits 67 to 75:
+bits 76 to 85:
+bits 86 to 106:
+bits 107 to 114:
+bits 115 to 123:
+bits 124 to 132:
+bits 133 to 144:
+
+*
+
+4-bit protocol code as defined as 1001;
+2-bits for type of beacon identity;
+24 bits of beacon identification data, or ELT(DT) Location Test protocol;
+fixed sequence “1 11111010”;
+fixed sequence “1 111111010”;
+BCH-1;
+fixed sequence “00111100”;
+fixed sequence “0 1111 0000”;
+fixed sequence “0 1111 0000”;
+BCH-2.
+
+3LD is a 3-Letter aircraft operator Designator from the list of "Designators for Aircraft Operating Agencies, Aeronautical Authorities
+and Services" published by the International Civil Aviation Organization (ICAO) as document 8585.
+
+

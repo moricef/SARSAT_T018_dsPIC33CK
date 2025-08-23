@@ -1,0 +1,58 @@
+#include <stdint.h>
+
+// Polynôme générateur BCH (49 bits) pour le code (250,202)
+const uint64_t BCH_POLY = ((1ULL << 48) | (1ULL << 47) | (1ULL << 46) | 
+                          (1ULL << 42) | (1ULL << 41) | (1ULL << 40) | 
+                          (1ULL << 39) | (1ULL << 38) | (1ULL << 37) | 
+                          (1ULL << 35) | (1ULL << 33) | (1ULL << 32) | 
+                          (1ULL << 31) | (1ULL << 26) | (1ULL << 24) | 
+                          (1ULL << 23) | (1ULL << 22) | (1ULL << 20) | 
+                          (1ULL << 19) | (1ULL << 18) | (1ULL << 17) | 
+                          (1ULL << 16) | (1ULL << 13) | (1ULL << 12) | 
+                          (1ULL << 11) | (1ULL << 10) | (1ULL << 7) | 
+                          (1ULL << 4) | (1ULL << 2) | (1ULL << 1) | 
+                          (1ULL << 0));
+
+// Fonction principale de calcul BCH
+void bch_compute(const uint8_t *data, uint8_t *bch) {
+    uint64_t rem = 0;  // Registre de reste (49 bits)
+
+    // Parcours des 250 bits (202 données + 48 zéros)
+    for (int i = 0; i < 250; i++) {
+        uint8_t b;
+        if (i < 202) {
+            // Extraction bit par bit (MSB first)
+            uint8_t byte = data[i >> 3];
+            uint8_t bit_pos = 7 - (i & 0x07);
+            b = (byte >> bit_pos) & 0x01;
+        } else {
+            b = 0;  // Bits de padding
+        }
+
+        // Décalage et mise à jour du reste
+        rem = (rem << 1) | b;
+        if (rem & (1ULL << 48)) {
+            rem ^= BCH_POLY;
+        }
+    }
+
+    // Extraction des 48 bits de reste (LSB first pour la sortie)
+    uint64_t bch_val = rem & 0xFFFFFFFFFFFF;
+    for (int i = 0; i < 6; i++) {
+        bch[i] = (bch_val >> (8 * i)) & 0xFF;
+    }
+}
+
+// Wrapper 1 (utilise les variables globales)
+void bch1_compute(void) {
+    extern uint8_t bch1_data[26];    // 202 bits d'entrée (26 octets)
+    extern uint8_t bch1_result[6];   // 48 bits de sortie (6 octets)
+    bch_compute(bch1_data, bch1_result);
+}
+
+// Wrapper 2 (utilise les variables globales)
+void bch2_compute(void) {
+    extern uint8_t bch2_data[26];    // 202 bits d'entrée (26 octets)
+    extern uint8_t bch2_result[6];   // 48 bits de sortie (6 octets)
+    bch_compute(bch2_data, bch2_result);
+}

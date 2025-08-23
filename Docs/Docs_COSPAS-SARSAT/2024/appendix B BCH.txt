@@ -1,0 +1,237 @@
+APPENDIX B - SAMPLE BOSE-CHAUDHURI-HOCQUENGHEM ERROR-
+CORRECTING CODE AND 23 HEX ID CALCULATIONS
+NOTE: The information in the Appendix is not aligned with the current text in the main body of
+this document and requires an update.
+B.1
+ Sample 48-Bit BCH Code Calculation
+The error-correcting code used in 406 MHz messages is a shortened form of a (255,207) Bose-
+Chaudhuri-Hocquenghem (BCH) code. The shortened form (250,202) consists of 202 bits of data
+followed by a 48-bit sextuple error-correcting code. The code is used to detect and correct up to
+six errors in the entire 250-bit pattern (bits 1 through 250 of the 406 MHz message).
+Note: For the purpose of error correction, all calculations shall be performed with the full
+255 length code. Therefore, 5 zeros are placed before the 202 data bits to form the 207-bit pattern
+of the (255,207) BCH code. These padding zeros do not affect the generation of the BCH code as
+described below.
+For the (250,202) BCH code, a generator polynomial g(X) (the same as for (255,207) BCH code)
+is defined as follows:
+𝑔(𝑋) = 𝐿𝐶𝑀(𝑚1(𝑋), 𝑚3 (𝑋), 𝑚5 (𝑋), 𝑚7 (𝑋), 𝑚9(𝑋), 𝑚 11 (𝑋))
+where LCM = Least Common Multiple.
+In the above case:
+𝑚1(𝑋) = 𝑋 8 + 𝑋 4 +𝑋 3 +𝑋 2 + 1
+𝑚3 (𝑋) = 𝑋8 + 𝑋 6 + 𝑋 5 + 𝑋 4 + 𝑋 2 + 𝑋 + 1
+𝑚5 (𝑋) = 𝑋8 + 𝑋 7 + 𝑋 6 + 𝑋 5 + 𝑋 4 + 𝑋 + 1
+𝑚7 (𝑋) = 𝑋8 + 𝑋 6 + 𝑋 5 + 𝑋 3 + 1
+𝑚9 (𝑋) = 𝑋 8 + 𝑋 7 + 𝑋 5 + 𝑋 4 + 𝑋 3 + 𝑋 2 + 1
+𝑚11(𝑋) = 𝑋 8 + 𝑋 7 + 𝑋 6 + 𝑋 5 + 𝑋 2 + 𝑋 + 1
+from which
+𝑔(𝑋) = 𝑚 1 (𝑋), 𝑚3 (𝑋), 𝑚5 (𝑋), 𝑚7 (𝑋), 𝑚9 (𝑋), 𝑚11(𝑋)
+= 𝑋 48 + 𝑋 47 + 𝑋 46 + 𝑋 42 + 𝑋 41 + 𝑋 40 + 𝑋 39 + 𝑋38 + 𝑋37 + 𝑋 35 + 𝑋 33 + 𝑋 32 +𝑋 31
++ 𝑋 26 + 𝑋 24 +𝑋23+𝑋 22+𝑋 20 +𝑋19 +𝑋 18 +𝑋 17 +𝑋 16 +𝑋 13 +𝑋 12+𝑋 11+𝑋 10+𝑋 7 +𝑋4+𝑋 2
++𝑋+1
+B-2
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+a determination of g(X) results in the following 49-bit binary number
+𝑔(𝑋) = 1110001111110101110000101110111110011110010010111
+To generate the BCH code, an information polynomial, m(x) is formed from the 202 data bits as
+follows:
+𝑚(𝑋) = 𝑏 1 𝑋 201 + 𝑏 2 𝑋 200 + ⋯ + 𝑏201 𝑋 + 𝑏 202
+where b1 - is the first bit and b202 - is the last bit of the digital message.
+m (X) is then extended to 250 bits by filling the least significant bits with 48 "0". The resulting
+250-bit binary string is then divided by g(X) and the remainder, r(X), becomes the BCH code (the
+quotient portion of the result of the module-2 binary division is discarded).
+The above process may be clarified by the following example. Suppose, that the digital message
+in the Minimum Requirement main field consists of the following data (decimal notation):
+Digital Message
+ Decimal Data
+ Binary Data
+ Bits in Message
+TAC number
+ 230
+ 0000000011100110
+ 1 to 16
+Serial Number
+ 573
+ 00001000111101
+ 17 to 30
+Country code
+ 201
+ 0011001001
+ 31 to 40
+Status of homing device
+ 1
+ 1
+ 41
+RLS function
+ 0
+ 0
+ 42
+Test protocol
+ 0
+ 0
+ 43
+Encoded GNSS Location
+ See below
+ See below
+ 44 to 90
+Vessel ID
+ 0
+ 47 Bits all 0’s
+ 91 to 137
+Beacon Type
+ 0
+ 000
+ 138 to 140
+Spare bits
+ 16383 (all 1’s)
+ 11111111111111
+ 141 to 154
+Message also contains encoded GNSS location. This example uses the following values of position
+data:
+Current latitude
+ 48,793153539336956 °N
+Current longitude
+ 69,00875866413116 °E
+Encoded GNSS location in binary notation (converted in accordance with Appendix C):
+Current latitude
+ 0 0110000 110010110000110
+Current longitude
+ 0 01000101 000000100011111
+B-3
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+In this example Rotating Field 1 (C/S G.008 Objective Requirements) is used, containing the following
+data:
+Digital Message
+ Decimal Data
+ Binary Data
+ Bits in Message
+Rotating Field Identifier
+ 0
+ 0000
+ 155 to 158
+Elapsed Time since activation
+ 1 hour 27 mins
+ 000001
+ 159 to 164
+Time from last encoded location
+ 6 mins 24 sec
+ 00000000110
+ 165 to 175
+Altitude of encoded location
+ 430,24 metres
+ 0000110100
+ 176 to 185
+Dilution of precision
+ HDOP<1 VDOP <2
+ 00000001
+ 186 to 193
+Activation notification
+ Manual
+ 00
+ 194 to 195
+Remaining battery capacity
+ >75%
+ 101
+ 196 to 198
+GNSS status
+ 3D
+ 10
+ 199 to 200
+Spare bits
+ 0
+ 00
+ 200 to 202
+Thus, digital message in binary and hexadecimal notation will be the following:
+Bits 1-202
+0000 0000 1110 0110 0000 1000 1111 0100
+1100 1001 1000 0110 0001 1001 0110 0001
+1000 1000 1010 0000 0100 0111 1100 0000
+0000 0000 0000 0000 0000 0000 0000 0000
+0000 0000 0000 1111 1111 1111 1100 0000
+0001 0000 0000 1100 0001 1010 0000 0000
+1001 0110 00
+Hex Message
+From 202 bits
+ 00E608F4C986196188A047C000000000000FFFC0100C1A00960
+Cospas-Sarsat Ground
+ 0039823D32618658622811F0000000000003FFF004030680258
+Segment
+ (two leading 0 bits plus bits 1-202)
+Representation*
+(MF #90 Ref. C/S A.002)
+* As the length of the message in bits is not divisible by 4, the message is augmented, for ground
+processing purposes, with two leading binary ‘0’s, which results in this revised hexadecimal message.
+The division * described above is shown in Figure A1, and results in a 49-bit remainder of:
+0010010010010101001001111110001010111101001001001
+The most significant bit position of the remainder will always be a "0" and is deleted to obtain the 48-
+bit BCH code.
+Thus BCH Error-Correcting Code:
+010010010010101001001111110001010111101001001001
+REFERENCE
+*
+ Modulo 2 division prohibits a "borrow" in the subtraction portion of the long division.
+
+ B.2
+ Sample 23 Hex ID Calculation
+Using the same data as above the 23 Hex ID can be generated as shown below. It should be noted
+that the 23 Hex ID cannot be formed directly from the transmitted message as additional bits have to
+be added to it and the order of the digital message data has to be changed.
+Referring to T.018 Section 3.6 and Table 3.9 and using the digital message data from above results in
+the following:
+23 Hex ID Bit
+ No Bits
+ Data Content
+ Message Content
+1
+ 1
+ Fixed Binary ‘1’
+ 1
+2 to 11
+ 10
+ C/S Country Code ‘201’
+ 0011001001
+12
+ 1
+ Fixed Binary ‘1’
+ 1
+13
+ 1
+ Fixed Binary ‘0’
+ 0
+14
+ 1
+ Fixed Binary ‘1’
+ 1
+15 to 30
+ 16
+ C/S TAC No ‘230’
+ 0000000011100110
+31 to 44
+ 14
+ Beacon Serial Number ‘573’
+ 00001000111101
+45
+ 1
+ Test Protocol Flag
+ 0
+46 to 48
+ Aircraft / Vessel ID Type
+ 000
+3
+‘N/A’
+49 to 92
+ 44
+ Aircraft / Vessel ID
+ 44 Bits all ‘0’s
+1001 1001 0011 0100 0000 0011 1001 1000 0010 0011 1101 0000
+0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
+Which in turn gives a final 23 Hex ID of:
+23 Hex ID
+ 9934039823D000000000000
+Which it can be seen is very different to the first 23 Hex characters of the Digital Message Data
+00E608F4C986196188A047C
+Finally, for completeness it can be noted that the unique 15 Hex ID for the same beacon is obtained
+by truncating the 23 Hex ID, as described in section 3.6, which would give a 15 Hex ID of:
+9934039823D0000
+- END OF APPENDIX B -

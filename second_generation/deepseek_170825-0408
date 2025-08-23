@@ -1,0 +1,131 @@
+### Analyse des fichiers CSV et synthèse de la structure de bits
+
+Après analyse détaillée des fichiers CSV et comparaison avec l'annexe E, voici la structure complète des bits avec leurs positions exactes et descriptions :
+
+---
+
+### **Structure fixe (Bits 1-154, 203-250)**
+
+| Plage de bits | Description                      | Taille (bits) | Détails |
+|---------------|----------------------------------|---------------|---------|
+| **1-16**      | TAC Number                       | 16            | Code d'approbation type (partie du 23 HEX ID) |
+| **17-30**     | Serial Number                    | 14            | Numéro de série (partie du 23 HEX ID) |
+| **31-40**     | Country Code                     | 10            | Code pays (partie du 23 HEX ID) |
+| **41**        | Homing Status                    | 1             | Statut du dispositif de guidage |
+| **42**        | RLS Function                     | 1             | Capacité de service de liaison retour |
+| **43**        | Test Protocol                    | 1             | Indicateur de mode test |
+| **44-90**     | Encoded Location                 | 47            | Position GNSS encodée (latitude + longitude) |
+| **91-137**    | Vessel ID                        | 47            | Identifiant du navire/aéronef (partie du 23 HEX ID) |
+| **138-140**   | Beacon Type                      | 3             | Type de balise (ELT, PLB, EPIRB) |
+| **141-154**   | Spare Bits                       | 14            | Réservé (conditionnel pour les messages d'annulation) |
+| **203-250**   | BCH (250,202)                    | 48            | Code de correction d'erreur |
+
+---
+
+### **Champ tournant (Bits 155-202) - Structure dynamique**
+
+#### **Type 0 (0000) : Exigences C/S G.008**
+| Bits | Champ                          | Taille | Description |
+|------|--------------------------------|--------|-------------|
+| 155-158 | Rotating Field ID            | 4      | "0000"      |
+| 159-164 | Elapsed Time since Activation | 6      | Heures depuis activation |
+| 165-175 | Time from last location      | 11     | Minutes depuis dernière position |
+| 176-185 | Altitude                     | 10     | Altitude (mètres) |
+| 186-193 | DOP (HDOP/VDOP)              | 8      | Dilution de précision |
+| 194-195 | Activation                   | 2      | Méthode d'activation |
+| 196-198 | Remaining Battery            | 3      | Niveau batterie |
+| 199-200 | GNSS Status                  | 2      | Qualité du signal |
+| 201-202 | Spare                        | 2      | Réservé |
+
+#### **Type 1 (0001) : ELT(DT)**
+| Bits | Champ                          | Taille | Description |
+|------|--------------------------------|--------|-------------|
+| 155-158 | Rotating Field ID            | 4      | "0001"      |
+| 159-169 | Time of last location        | 11     | Temps de la dernière position |
+| 170-179 | Altitude                     | 10     | Altitude (mètres) |
+| 180-183 | Triggering Events            | 4      | Événement de déclenchement |
+| 184-185 | GNSS Status                  | 2      | Qualité du signal |
+| 186-188 | Remaining Battery            | 3      | Niveau batterie |
+| 189-197 | Spare                        | 9      | Réservé |
+| 198-202 | *Non documenté*              | 5      | Espace non assigné |
+
+> **Note** : Correction critique pour l'altitude (bits 170-179 au lieu de 170 dans le code initial)
+
+#### **Type 15 (1111) : Message d'annulation**
+| Bits | Champ                   | Taille | Description |
+|------|-------------------------|--------|-------------|
+| 155-158 | Rotating Field ID     | 4      | "1111"      |
+| 159-160 | Method of Deactivation| 2      | Méthode de désactivation |
+| 161-202 | Fixed Bits            | 42     | Tous à '1' (0x3FFFFFFFFFFFF) |
+
+---
+
+### **Validations critiques**
+1. **Bits 141-154** :  
+   - Doivent être **tous à 0 ou tous à 1** pour les messages d'annulation (Type 15)
+   - Valeur libre pour les autres types
+
+2. **Champ tournant** :  
+   - L'ID (bits 155-158) détermine l'interprétation des bits 159-202
+   - Positions variables selon le type (ex: altitude à 170-179 pour ELT(DT), 176-185 pour G.008)
+
+3. **Représentation hexadécimale** :  
+   - 2 bits ajoutés (PRN + `0`) + 250 bits = 252 bits → **63 caractères hexadécimaux**
+   - Format : `[PRN:1bit] + [0:1bit] + [Message:250bits]`
+
+---
+
+### **Recommandations d'implémentation**
+```c
+// Dans protocol_data.h
+typedef enum {
+    ROTATING_FIELD_G008 = 0,   // "0000"
+    ROTATING_FIELD_ELTDT,      // "0001"
+    ROTATING_FIELD_RLS,        // "0010"
+    ROTATING_FIELD_NATIONAL,   // "0011"
+    ROTATING_FIELD_CANCEL      // "1111"
+} RotatingFieldType;
+
+// Configuration pour ELT(DT)
+#define ELTDT_TIME_START 159
+#define ELTDT_TIME_LENGTH 11
+#define ELTDT_ALTITUDE_START 170  // Correction critique
+#define ELTDT_ALTITUDE_LENGTH 10
+
+// Configuration pour Annulation
+#define CANCEL_METHOD_START 159   // Bits 159-160
+#define CANCEL_FIXED_BITS_START 161 // Bits 161-202 (42 bits)
+```
+
+```c
+// Dans build_compliant_frame.c
+void configure_rotating_field(uint8_t* info_bits, RotatingFieldType type) {
+    switch(type) {
+        case ROTATING_FIELD_ELTDT:
+            set_bit_field(info_bits, ELTDT_TIME_START, ELTDT_TIME_LENGTH, get_location_time());
+            set_bit_field(info_bits, ELTDT_ALTITUDE_START, ELTDT_ALTITUDE_LENGTH, encode_altitude());
+            break;
+            
+        case ROTATING_FIELD_CANCEL:
+            set_bit_field(info_bits, CANCEL_METHOD_START, 2, deactivation_method);
+            set_bit_field(info_bits, CANCEL_FIXED_BITS_START, 42, 0x3FFFFFFFFFFFF);
+            break;
+        // ... autres types ...
+    }
+}
+```
+
+### **Points d'attention**
+1. **Validation TAC** :  
+   ```c
+   if (tac_value <= 10000) 
+       log_warning("TAC non conforme (doit être >10000)");
+   ```
+   
+2. **Bits 141-154** :  
+   ```c
+   if (type == ROTATING_FIELD_CANCEL) 
+       set_bit_field(info_bits, 141, 14, 0x3FFF); // Tous à 1
+   ```
+
+Cette structure garantit la conformité avec la norme C/S T.018 Issue 1 Rev. 12 et les spécifications SGB.

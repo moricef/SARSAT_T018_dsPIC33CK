@@ -1,0 +1,40 @@
+Decoded Beacon Message
+
+Hexadecimal code: 00E608F4C986196188A047C000000000000FFFC0100C1A00960
+
+Hex data entered is a length of 51 characters representing a 204 bit (00 + 202 bit) consistent with SGB specifications, excluding BCH (as per T.018 Issue 1 - Rev.8). The decoded message below computes the BCH portion of the message and associated hex characters for information purposes.
+
+Errors in Message:
+E4D40E608F4000000000000
+
+    ERROR: Bits 141-154 should be set to all 1 or all 0 in the case that the rotating field is a cancellation message 
+
+    TAC # 920 Warning: SGB specifications stipulate TAC No should be greater than 10,000 
+
+Binary Range 	Binary Content 	Field Name 	Decoded Value
+Left pad 	00 		Normal mode transmission (i.e., operational mode)
+1-16 	0000001110011000 	Type Approval Cert No: 	TAC # 920 Warning: SGB specifications stipulate TAC No should be greater than 10,000
+17-30 	00100011110100 	Beacon serial number: 	2292
+31-40 	1100100110 	Country code: 	806 Unknown MID
+41 	0 	Status of homing device: 	Beacon is not equipped with any homing signals or they have been deliberately disabled. If beacon has been activated, no homing device is functional or it has been deliberately disabled
+42 	0 	RLS function capability: 	RLS capability disabled
+43 	0 	Test protocol flag: 	Normal beacon operation
+44-66 	11000011001011000011000 	Latitude: 	67.17261 S
+67-90 	100010100000010001111100 	Longitude: 	20.03503 W
+91-93 	000 	Vessel ID Type 	No aircraft or maritime identity (may be for national use; default bits 94-137 all 0)
+94-137 	00000000000000000000000000000000000000000000 	Vessel ID 	With vessel id type set to none (000), bits 94-137 all 0. Valid
+138-140 	011 	Beacon Type: 	ELT(DT)
+141-154 	11111111111100 	Cancellation message status: 	ERROR: Bits 141-154 should be set to all 1 or all 0 in the case that the rotating field is a cancellation message
+155-158 (Rotating field 1-4) 	0000 	Rotating Field Type: 	(#0) C/S G.008 Objective Requirements
+159-164 (Rotating field 5-10) 	000100 	Elapsed time since activation (hours): 	4 hours
+165-175 (Rotating field 11-21) 	00000011000 	Elapsed time since last encoded location (minutes): 	24 minutes
+176-185 (Rotating field 22-31) 	0011010000 	Altitude of encoded location: 	2928 m
+186-189 (Rotating field 32-34) 	0000 	HDOP: 	DOP <=1
+190-193 (Rotating field 35-39) 	0100 	VDOP: 	DOP >4 and <=5
+194-195 (Rotating field 40-41) 	10 	Automated/manual activation notification 	Automatic activation by external means
+196-198 (Rotating field 42-44) 	110 	Remaining battery capacity 	reserved for future use
+199-200 (Rotating field 45-46) 	00 	GNSS location fix type: 	No fix
+201-202 (Rotating field 47-48) 	00 	Spare 	OK
+203-250 	NA 	Encoded BCH 	Not provided in a 51 Hex. Computed below
+203-250 	111000110100001010111010110010101101010110110011 	Calculated BCH 	Hex Value: E342BACAD5B3
+Complete Message 		Hex Value: 00E608F4C986196188A047C000000000000FFFC0100C1A00960E342BACAD5B3 	

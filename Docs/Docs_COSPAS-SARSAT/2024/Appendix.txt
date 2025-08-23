@@ -1,0 +1,3394 @@
+
+A-1
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+APPENDIX A - LIST OF ACRONYMS
+
+A full list of all Acronyms can be found in document C/S S.011 – Glossary.
+- END OF APPENDIX A -
+
+B-1
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+APPENDIX B - SAMPLE BOSE-CHAUDHURI-HOCQUENGHEM ERRORCORRECTING CODE AND 23 HEX ID CALCULATIONS
+NOTE: The information in the Appendix is not aligned with the current text in the main body of
+this document and requires an update.
+
+B.1
+
+Sample 48-Bit BCH Code Calculation
+
+The error-correcting code used in 406 MHz messages is a shortened form of a (255,207) BoseChaudhuri-Hocquenghem (BCH) code. The shortened form (250,202) consists of 202 bits of data
+followed by a 48-bit sextuple error-correcting code. The code is used to detect and correct up to
+six errors in the entire 250-bit pattern (bits 1 through 250 of the 406 MHz message).
+Note: For the purpose of error correction, all calculations shall be performed with the full
+255 length code. Therefore, 5 zeros are placed before the 202 data bits to form the 207-bit pattern
+of the (255,207) BCH code. These padding zeros do not affect the generation of the BCH code as
+described below.
+For the (250,202) BCH code, a generator polynomial g(X) (the same as for (255,207) BCH code)
+is defined as follows:
+𝑔(𝑋) = 𝐿𝐶𝑀(𝑚1 (𝑋), 𝑚3 (𝑋), 𝑚5 (𝑋), 𝑚7 (𝑋), 𝑚9 (𝑋), 𝑚11 (𝑋))
+where LCM = Least Common Multiple.
+In the above case:
+𝑚1 (𝑋) = 𝑋 8 + 𝑋 4 +𝑋 3 +𝑋 2 + 1
+𝑚3 (𝑋) = 𝑋 8 + 𝑋 6 + 𝑋 5 + 𝑋 4 + 𝑋 2 + 𝑋 + 1
+𝑚5 (𝑋) = 𝑋 8 + 𝑋 7 + 𝑋 6 + 𝑋 5 + 𝑋 4 + 𝑋 + 1
+𝑚7 (𝑋) = 𝑋 8 + 𝑋 6 + 𝑋 5 + 𝑋 3 + 1
+𝑚9 (𝑋) = 𝑋 8 + 𝑋 7 + 𝑋 5 + 𝑋 4 + 𝑋 3 + 𝑋 2 + 1
+𝑚11 (𝑋) = 𝑋 8 + 𝑋 7 + 𝑋 6 + 𝑋 5 + 𝑋 2 + 𝑋 + 1
+from which
+𝑔(𝑋) = 𝑚1 (𝑋), 𝑚3 (𝑋), 𝑚5 (𝑋), 𝑚7 (𝑋), 𝑚9 (𝑋), 𝑚11 (𝑋)
+= 𝑋 48 + 𝑋 47 + 𝑋 46 + 𝑋 42 + 𝑋 41 + 𝑋 40 + 𝑋 39 + 𝑋 38 + 𝑋 37 + 𝑋 35 + 𝑋 33 + 𝑋 32 +𝑋 31
++ 𝑋 26 + 𝑋 24 +𝑋 23 +𝑋 22 +𝑋 20 +𝑋 19 +𝑋18 +𝑋 17 +𝑋 16 +𝑋 13 +𝑋12 +𝑋 11 +𝑋10 +𝑋 7 +𝑋 4 +𝑋 2
++𝑋+1
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+B-2
+
+a determination of g(X) results in the following 49-bit binary number
+𝑔(𝑋) = 1110001111110101110000101110111110011110010010111
+To generate the BCH code, an information polynomial, m(x) is formed from the 202 data bits as
+follows:
+𝑚(𝑋) = 𝑏1 𝑋 201 + 𝑏2 𝑋 200 + ⋯ + 𝑏201 𝑋 + 𝑏202
+where b1 - is the first bit and b202 - is the last bit of the digital message.
+m (X) is then extended to 250 bits by filling the least significant bits with 48 "0". The resulting
+250-bit binary string is then divided by g(X) and the remainder, r(X), becomes the BCH code (the
+quotient portion of the result of the module-2 binary division is discarded).
+The above process may be clarified by the following example. Suppose, that the digital message
+in the Minimum Requirement main field consists of the following data (decimal notation):
+Digital Message
+TAC number
+Serial Number
+Country code
+Status of homing device
+RLS function
+Test protocol
+Encoded GNSS Location
+Vessel ID
+Beacon Type
+Spare bits
+
+Decimal Data
+230
+573
+201
+1
+0
+0
+See below
+0
+0
+16383 (all 1’s)
+
+Binary Data
+0000000011100110
+00001000111101
+0011001001
+1
+0
+0
+See below
+47 Bits all 0’s
+000
+11111111111111
+
+Bits in Message
+1 to 16
+17 to 30
+31 to 40
+41
+42
+43
+44 to 90
+91 to 137
+138 to 140
+141 to 154
+
+Message also contains encoded GNSS location. This example uses the following values of position
+data:
+Current latitude
+Current longitude
+
+48,793153539336956 °N
+69,00875866413116 °E
+
+Encoded GNSS location in binary notation (converted in accordance with Appendix C):
+Current latitude
+Current longitude
+
+0 0110000 110010110000110
+0 01000101 000000100011111
+
+B-3
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+In this example Rotating Field 1 (C/S G.008 Objective Requirements) is used, containing the following
+data:
+Digital Message
+Rotating Field Identifier
+Elapsed Time since activation
+Time from last encoded location
+Altitude of encoded location
+Dilution of precision
+Activation notification
+Remaining battery capacity
+GNSS status
+Spare bits
+
+Decimal Data
+0
+1 hour 27 mins
+6 mins 24 sec
+430,24 metres
+HDOP<1 VDOP <2
+Manual
+>75%
+3D
+0
+
+Binary Data
+0000
+000001
+00000000110
+0000110100
+00000001
+00
+101
+10
+00
+
+Bits in Message
+155 to 158
+159 to 164
+165 to 175
+176 to 185
+186 to 193
+194 to 195
+196 to 198
+199 to 200
+200 to 202
+
+Thus, digital message in binary and hexadecimal notation will be the following:
+
+Bits 1-202
+
+0000 0000 1110 0110 0000 1000 1111 0100
+1100 1001 1000 0110 0001 1001 0110 0001
+1000 1000 1010 0000 0100 0111 1100 0000
+0000 0000 0000 0000 0000 0000 0000 0000
+0000 0000 0000 1111 1111 1111 1100 0000
+0001 0000 0000 1100 0001 1010 0000 0000
+1001 0110 00
+
+Hex Message
+From 202 bits
+00E608F4C986196188A047C000000000000FFFC0100C1A00960
+Cospas-Sarsat Ground
+0039823D32618658622811F0000000000003FFF004030680258
+Segment
+(two leading 0 bits plus bits 1-202)
+Representation*
+(MF #90 Ref. C/S A.002)
+* As the length of the message in bits is not divisible by 4, the message is augmented, for ground
+processing purposes, with two leading binary ‘0’s, which results in this revised hexadecimal message.
+The division * described above is shown in Figure A1, and results in a 49-bit remainder of:
+0010010010010101001001111110001010111101001001001
+The most significant bit position of the remainder will always be a "0" and is deleted to obtain the 48bit BCH code.
+Thus BCH Error-Correcting Code:
+010010010010101001001111110001010111101001001001
+REFERENCE
+*
+
+Modulo 2 division prohibits a "borrow" in the subtraction portion of the long division.
+
+B-4
+
+An Introduction to Error Correcting Codes, Shu Lin, Prentice Hall 1970
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+B-5
+
+5 “0”
+m(x)=
+g(X)=
+
+Bits 0-202
+(Data bits)
+
+00000 0000000011100110000010001111010011001001100001100001100101100001100010001010000001000111
+1110001111110101110000101110111110011110010010111
+000001011111110100110110001001100001100001010010111000
+1110001111110101110000101110111110011110010010111
+01011100010100110000011000101100100101000001011110
+1110001111110101110000101110111110011110010010111
+01011011010100111100111010110110101101100110010011
+1110001111110101110000101110111110011110010010111
+01010101010100100101111110000010111100101000001001
+1110001111110101110000101110111110011110010010111
+01001001010100010111110111101010011110110100111100
+1110001111110101110000101110111110011110010010111
+01110001010101110011100100111011011010001101010110
+1110001111110101110000101110111110011110010010111
+00000001010110111011000010011001010011111110000010100010
+1110001111110101110000101110111110011110010010111
+01001110001011011000111001001000011011100001101011
+1110001111110101110000101110111110011110010010111
+01111111101011101101111001111111010000100111111000
+1110001111110101110000101110111110011110010010111
+0001110010101000011111100001000100011010101101111000
+1110001111110101110000101110111110011110010010111
+000001101011011000110010011001110100101111110111100100
+1110001111110101110000101110111110011110010010111
+001101010011001110001110000001101110000010111001101
+1110001111110101110000101110111110011110010010111
+001101110011101111111010111101000001110010101101011
+
+Bits (203-250)
+48 «0»
+…
+
+…
+
+010000000001001011000 000000000000000000000000000000000000000000000000
+
+…
+
+01110000011000011010000011010100110011001010010110
+1110001111110101110000101110111110011110010010111
+0000001100110110100000110100011000000111000000001000000
+1110001111110101110000101110111110011110010010111
+001011100101010100010011011011100101111001101011100
+1110001111110101110000101110111110011110010010111
+01011010101000011000111101010110111001111110010110
+1110001111110101110000101110111110011110010010111
+01010110101101101101110001000010010100011000000010
+1110001111110101110000101110111110011110010010111
+01001110100110000111101001101011001111010100101010
+1110001111110101110000101110111110011110010010111
+01111110110001010011011000111001111001001101111010
+1110001111110101110000101110111110011110010010111
+0001111001111111101011101001110001010111111101101000
+1110001111110101110000101110111110011110010010111
+0001000000001000101101100000110100100001111111111000
+1110001111110101110000101110111110011110010010111
+01100011101100000111001010000110100100011011011110
+1110001111110101110000101110111110011110010010111
+49 bits remainder =
+0010010010010101001001111110001010111101001001001
+-------- BCH Code (last 48 bits) -------→
+
+Figure B-1: Sample 48-Bit BCH Error-Correcting Code Calculation
+(for easier viewing the calculation is reduced and divided into 2 parts)
+
+B-6
+
+B.2
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Sample 23 Hex ID Calculation
+
+Using the same data as above the 23 Hex ID can be generated as shown below. It should be noted
+that the 23 Hex ID cannot be formed directly from the transmitted message as additional bits have to
+be added to it and the order of the digital message data has to be changed.
+Referring to T.018 Section 3.6 and Table 3.9 and using the digital message data from above results in
+the following:
+23 Hex ID Bit
+1
+2 to 11
+12
+13
+14
+15 to 30
+31 to 44
+45
+46 to 48
+49 to 92
+
+No Bits
+1
+10
+1
+1
+1
+16
+14
+1
+3
+44
+
+Data Content
+Fixed Binary ‘1’
+C/S Country Code ‘201’
+Fixed Binary ‘1’
+Fixed Binary ‘0’
+Fixed Binary ‘1’
+C/S TAC No ‘230’
+Beacon Serial Number ‘573’
+Test Protocol Flag
+Aircraft / Vessel ID Type
+‘N/A’
+Aircraft / Vessel ID
+
+Message Content
+1
+0011001001
+1
+0
+1
+0000000011100110
+00001000111101
+0
+000
+44 Bits all ‘0’s
+
+1001 1001 0011 0100 0000 0011 1001 1000 0010 0011 1101 0000
+0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
+Which in turn gives a final 23 Hex ID of:
+23 Hex ID
+
+9934039823D000000000000
+
+Which it can be seen is very different to the first 23 Hex characters of the Digital Message Data
+00E608F4C986196188A047C
+Finally, for completeness it can be noted that the unique 15 Hex ID for the same beacon is obtained
+by truncating the 23 Hex ID, as described in section 3.6, which would give a 15 Hex ID of:
+9934039823D0000
+- END OF APPENDIX B -
+
+C-1
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+APPENDIX C - BEACON ENCODED LOCATION CODING
+
+C.1
+
+ENCODED LOCATION PROTOCOL
+
+This section defines the encoded location protocol which can be used with the 406 MHz beacon message
+formats for encoding beacon position data in the digital message transmitted by a 406 MHz distress
+beacon.
+
+C.2
+
+Summary
+
+Encode location is represented differently in second generation beacons. In first generation beacons,
+degrees, minutes and seconds were used. For second generation beacons, degrees and decimal part of the
+degrees are used. Moreover, there is no coarse and fine offset fields: all information appears in one field.
+Moreover, there is no separate return link location protocol. Instead, RLS data is contained in one of the
+rotating fields.
+
+C.3
+
+Default Values in Position Data
+
+The following default values shall be used in all encoded position data fields of the location protocols,
+when no valid data is available:
+a) all bits in the degrees are set to "1", with N/S, E/W flags set to "0"; and
+b) the bits in the decimal parts of the degrees are set to the following patterns:
+i. Latitude: 000001111100000 (Note the first five decimal parts of degrees bits are set to “0”s,
+the middle five bits are set to “1” s and the last 5 bits are set to “0”s)
+ii. Longitude: 111110000011111 (Note the first five decimal parts of degrees bits are set to
+“1”s, the middle five bits are set to “0” s and the last 5 bits are set to “1”s)
+
+The default pattern shall also be transmitted in the self-test mode. Additionally, if a location protocol
+beacon includes an optional GNSS self-test and this fails to provide a valid location to encode into the
+transmitted self-test message, then the beacon may radiate a single self-test message with the above default
+data. However if a location protocol beacon with optional GNSS self-test obtains a location, then the
+beacon shall radiate a single self-test message with encoded position.
+
+C-2
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+This default bit pattern is different from first generation beacons. The degree bits are all set to “1”s as in
+first generation beacons. But it is not easy to set the minutes bit to “0”s and the seconds bits to “1”s as the
+decimal parts do not fall on integer minute or second boundaries.
+
+C.4
+
+Definition of Location Data Fields
+
+The general structure of encoded location data is illustrated below.
+C.4.1
+
+Encoded Location field
+
+The 47 bits available in the main digital message are defined as follows:
+a)
+
+bits 44-66:
+•
+•
+•
+
+b)
+
+•
+•
+
+C.4.2
+
+bit 44:
+bits 45-51:
+bits 52-66:
+
+bits 67-90:
+•
+
+latitude data (23 bits), including:
+N/S flag (N=0, S=1)
+degrees (0 to 90) in 1 degree increments
+decimal parts of degrees
+longitude data (24 bits), including:
+
+bit 67:
+bits 68-75:
+bits 76-90
+
+E/W flag (E=0, W=1)
+degrees (0 to 180) in 1 degree increments
+decimal parts of degrees
+
+Encoded Location Data (1)
+
+All position information is encoded as degrees, and decimal parts of latitude or longitude. Latitude
+and longitude data are rounded off (i.e., not truncated) to the available resolution. All rounding shall
+follow normal rounding conventions, for example with a resolution of 4, 0.000 to 1.999 shall be
+rounded down to 0 and 2.000 to 3.999 shall be rounded up to 4. In each location field the Most
+Significant Bit (MSB) is the lowest numbered bit in the message which is not a N/S, or E/W flag bit.
+The following table illustrates the bit assignments for the degrees portion of the encoded location
+field.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+C-3
+
+Latitude Bit
+assignment
+N/A
+45 (MSB)
+46
+47
+48
+49
+50
+51
+
+Longitude Bit
+assignment
+68 (MSB)
+69
+70
+71
+72
+73
+74
+75
+
+Bit value
+degrees
+128
+64
+32
+16
+8
+4
+2
+1
+
+in
+
+The following table illustrates the bit assignments for the decimal parts of the degrees portion of the
+encoded location field. The equivalent in minutes and seconds is also provided. The resolution in
+meters of each bit of longitude at the equator is also given, with the resolution of each latitude bit
+0.169% less than for the longitude bit (at the equator). This reflects the fact that the circumference
+around the earth at the equator is 40,075.16 Km and 40,008 Km for each meridian.
+Latitude bit Longitude
+assignment Bit
+assignment
+52
+76
+53
+77
+54
+78
+55
+79
+56
+80
+57
+81
+58
+82
+59
+83
+60
+84
+61
+85
+62
+86
+63
+87
+64
+88
+65
+89
+66
+90
+
+C.5
+
+Bit value of
+decimal parts
+in degrees
+0.5
+0.25
+0.125
+0.0625
+0.03125
+0.015625
+0.0078125
+0.00390625
+0.001953125
+0.000976563
+0.000488281
+0.000244141
+0.00012207
+6.10352E-05
+3.05176E-05
+
+Bit value of
+decimal parts
+in minutes
+30
+15
+7.5
+3.75
+1.875
+0.9375
+0.46875
+0.234375
+0.1171875
+0.05859375
+0.029296875
+0.014648438
+0.007324219
+0.003662109
+0.001831055
+
+Bit value of
+decimal parts
+in seconds
+1800
+900
+450
+225
+112.5
+56.25
+28.125
+14.0625
+7.03125
+3.515625
+1.7578125
+0.87890625
+0.439453125
+0.219726563
+0.109863281
+
+Resolution
+in meters
+(equator)
+55566.67
+27783.33
+13891.67
+6945.833
+3472.917
+1736.458
+868.2292
+434.1146
+217.0573
+108.5286
+54.26432
+27.13216
+13.56608
+6.78304
+3.39152
+
+Instructions for converting Latitudes and Longitudes to a Binary Number
+
+Global Navigation Satellite System receivers (e.g., GPS, Glonass, Galileo, BDS, etc.) normally output
+position data using an IEC 61162-1 (NMEA 0183) formatted sentence. This will provide a position in
+decimal degrees, minutes and parts of a minute as a decimal fraction in a defined format for example
+“3546.295, N, 14821.291, W”. That is 35 degrees and 46.295 minutes North by 148 degrees and 21.291
+
+C-4
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+minutes West. The size of the decimal fraction is not defined In IEC 61162-1, but in order to ensure
+adequate accuracy initially and during subsequent rounding processes the number of digits after the
+decimal point should not be less than 3.
+In order to transmit this as a part of a Second Generation Beacon message it is necessary to convert the
+position into a binary number expressed as degrees and a decimal fraction of a degree. The following
+text provides an example of how this can be achieved.
+Referring to C/S T.018 Table 3.1 Encoded GNSS Location we can see that the required message format
+is as follows:
+
+No of Bits
+Content
+1
+N/S flag (N=0, S=1)
+7
+Degrees (0 to 90) in 1 degree increments
+15
+Decimal parts of a degree (0.5 to 0.00003)
+1
+E/W flag (E=0. W=1)
+8
+Degrees (0 to 180) in 1 degree increments
+15
+Decimal parts of a degree (0.5 to 0.00003)
+The use of the bits for the N/S or E/W flags and the encoding of Degrees is straightforward and no
+further explanation is deemed necessary. But converting minutes and a decimal fraction of a minute to
+decimal parts of a degree and then to binary is less obvious, so an example of this is provided below.
+Using the example above “3546.295, N” in binary would appear as follows:
+N/
+Degrees
+Decimal Parts of a Degree
+S
+6 3 1
+1/ 1/ 1/ 1/1 1/3 1/6 . . . . . . . . .
+0/1
+8 4 2 1
+4 2 6
+2
+4
+8
+6
+2
+4
+. . . . . . . . .
+0
+0 1 0 0 0 1 1 1
+1
+0
+0
+0
+1
+0 1 1 0 0 0 0 1 1
+Initially the minutes and decimal fraction of minutes must be converted into a decimal fraction of a
+degree, this is achieved by simply dividing the whole number by 60 e.g., 46.295 Minutes divided by
+60 equals 0.77158333 Degrees. Again in order to maintain accuracy this number should be rounded to
+no less than [5] decimal places e.g., [0.77158]. So 35 Degrees and 46.295 Minutes becomes [35.77158]
+Degrees.
+Two procedures for converting decimal parts of a degree to binary are provided below, the first uses
+the Successive Multiplication Method while the second uses the Integral Number Conversion Method.
+Successive Multiplication Method
+1) Start with the decimal fraction part and multiply it by 2 (add it to itself)
+2) If the result is greater than 1 then the first decimal fraction is a 1, if the result is less than 1
+then the first decimal fraction is a 0
+3) If the result was greater than 1 then subtract 1 from the result
+4) Multiply the remaining number by 2
+5) Repeat step 2) to obtain the second decimal fraction and then repeat steps 3) and 4)
+6) Repeat step 5) for all the remaining decimal fractions
+
+C-5
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+7) On completing the final step to obtain the fifteenth digit again repeat step 3), if the remainder
+is 0.5 or greater then increase the computed binary number by one to round to the closest
+possible number, or if the remaining number is less than 0.5 then use the binary number as
+computed
+The above example is provided below:
+1) 0.77158 x 2 = 1.54316 thus the first digit is a 1
+2) 1.54316 – 1 = 0.54316
+3) 0.54316 x 2 = 1.08632 thus the second digit is a 1
+4) 1.08632 – 1 = 0.08632
+5) 0.08632 x 2 = 0.1728 thus the third digit is a 0
+6) 0.17264 x 2 = 0.34528 thus the fourth digit is a 0
+7) 0.34528 x 2 = 0.69056 thus the fifth digit is a 0
+8) 0.69056 x 2 = 1.38112 thus the sixth digit is a 1
+9) 1.38112 – 1 = 0.38112
+10) 0.38112 x 2 = 0.76224 thus the seventh digit is a 0
+11) Keep going as above
+12) 0.78336 x 2 = 1.56672 thus the fourteenth digit is a 1
+13) 1.56672 – 1 = 0.56672
+14) 0.56672 x 2 = 1.13344 thus the last digit is a 1
+15) 1.13344 – 1 = 0.13344
+16) If the remaining number is 0.5 or greater then increase the computed binary number above by
+one to round to the closest possible number, or if the remaining number is less than 0.5 then
+use the binary number computed above
+17) In this example, one computed 110001011000011, applying the rounding rule above means
+that in this instance the actual binary number to use is the same
+Integral Number Conversion Method
+1) Start with the decimal fraction part and multiply it by 215 (2 to the power of 15)
+2) Round the result to the nearest whole number
+3) Convert this number to binary
+4) The result is the binary fraction of the decimal fraction
+The above example is provided below:
+1) 0.77158 x 215 = 25283.13344
+2) Rounding gives us 25283
+3) Converting 25283 to binary gives 110001011000011
+- END OF APPENDIX C -
+
+D-1
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+APPENDIX D - EXAMPLE OF LINEAR FEEDBACK SHIFT REGISTER
+(LFSR) IMPLEMENTATION
+
+The spreading PRN sequences are generated by a method equivalent to a Linear Feedback Shift
+Register (LFSR) using the generator polynomial G(x) = X23 + X18 + 1. The generator polynomial
+initialization values for I and Q components for beacon normal mode operation and for beacon selftest mode operation are given in Table 2.2.
+This appendix details the generation of the 64 first chips of the normal I-component using the LSFR
+implementation described in section 2.2.3 with the initialization value 000 0000 0000 0000 0000 0001
+(see Table 2.2).
+The last column gives the result of the PRN sequence generation (here 8000 0108 4212 84A1, as per
+Table 2.2).
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+D-2
+
+Figure D-1: Example of LSFR with the generation of the 64 first chips of the normal Icomponent
+
+22 21 20 19 18 17 16 15 14 13 12 11 10
+0 0 0 0 0 0 0 0 0 0 0 0 0
+1 0 0 0 0 0 0 0 0 0 0 0 0
+0 1 0 0 0 0 0 0 0 0 0 0 0
+0 0 1 0 0 0 0 0 0 0 0 0 0
+0 0 0 1 0 0 0 0 0 0 0 0 0
+0 0 0 0 1 0 0 0 0 0 0 0 0
+1 0 0 0 0 1 0 0 0 0 0 0 0
+0 1 0 0 0 0 1 0 0 0 0 0 0
+0 0 1 0 0 0 0 1 0 0 0 0 0
+0 0 0 1 0 0 0 0 1 0 0 0 0
+0 0 0 0 1 0 0 0 0 1 0 0 0
+1 0 0 0 0 1 0 0 0 0 1 0 0
+0 1 0 0 0 0 1 0 0 0 0 1 0
+0 0 1 0 0 0 0 1 0 0 0 0 1
+0 0 0 1 0 0 0 0 1 0 0 0 0
+0 0 0 0 1 0 0 0 0 1 0 0 0
+1 0 0 0 0 1 0 0 0 0 1 0 0
+0 1 0 0 0 0 1 0 0 0 0 1 0
+0 0 1 0 0 0 0 1 0 0 0 0 1
+0 0 0 1 0 0 0 0 1 0 0 0 0
+0 0 0 0 1 0 0 0 0 1 0 0 0
+1 0 0 0 0 1 0 0 0 0 1 0 0
+0 1 0 0 0 0 1 0 0 0 0 1 0
+0 0 1 0 0 0 0 1 0 0 0 0 1
+1 0 0 1 0 0 0 0 1 0 0 0 0
+0 1 0 0 1 0 0 0 0 1 0 0 0
+1 0 1 0 0 1 0 0 0 0 1 0 0
+0 1 0 1 0 0 1 0 0 0 0 1 0
+0 0 1 0 1 0 0 1 0 0 0 0 1
+0 0 0 1 0 1 0 0 1 0 0 0 0
+0 0 0 0 1 0 1 0 0 1 0 0 0
+1 0 0 0 0 1 0 1 0 0 1 0 0
+0 1 0 0 0 0 1 0 1 0 0 1 0
+0 0 1 0 0 0 0 1 0 1 0 0 1
+1 0 0 1 0 0 0 0 1 0 1 0 0
+
+9
+
+8
+
+7
+
+6
+
+5
+
+4
+
+3
+
+2
+
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+
+Out
+
+8
+
+0
+
+0
+
+0
+
+0
+
+1
+
+0
+
+8
+
+4
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+D-3
+
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+0
+1
+0
+1
+0
+0
+0
+0
+1
+
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+0
+1
+0
+1
+0
+0
+0
+0
+
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+0
+1
+0
+1
+0
+0
+0
+
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+0
+1
+0
+1
+0
+0
+
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+0
+1
+0
+1
+0
+
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+0
+1
+0
+1
+
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+0
+1
+0
+
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+0
+1
+
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+0
+
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+1
+
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+1
+
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+0
+
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+0
+
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+0
+
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+1
+
+- END OF APPENDIX D -
+
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+
+0
+0
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+0
+0
+1
+0
+1
+0
+0
+0
+0
+1
+
+2
+
+1
+
+2
+
+8
+
+4
+
+A
+
+1
+
+
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+E-1
+
+APPENDIX E - BIT ASSIGNMENT NUMBERS
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+Homing Status 41
+RLS Function 42
+45 Test Protocol 43
+
+Bits 1 to 43 of 202 Information bits
+1 to 43 of 154 bit Main Field
+
+TAC Number
+(16 bits)
+(Part of 23 HEX ID)
+
+Country Code
+(10 bits)
+(Part of 23 HEX ID)
+
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+
+Serial Number
+(14 bits)
+(Part of 23 HEX ID)
+
+23 HEX ID bit numbers
+
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+
+Bits 44 to 90 of 202 Information bits
+44 to 90 of 154 bit Main Field
+Encoded Location
+(47 bits)
+
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+
+Bits 91 to 137 of 202 Information bits
+91 to 137 of 154 bit Main Field
+
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+
+Vessel ID
+(47 bits) (Part of 23 HEX ID)
+23 HEX ID bit numbers
+
+138
+Beacon Type
+139
+(3 bits)
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+
+Bits 138 to 154 of 202 Information bits
+138 to 154 of 154 bit Main Field
+
+Spare Bits
+(14 bits)
+
+Bits 155 to 202 of 202 Information bits
+Rotating Field Information (48 bits)
+
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+
+Bits 203 to 250 of message bits (Error Correction Code)
+48 bits
+BCH (250,202)
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+E-2
+
+155
+1
+156
+2
+157
+3
+158
+4
+159
+5
+160
+6
+161
+7
+162
+8
+163
+9
+164
+10
+165
+11
+166
+12
+167
+13
+168
+14
+169
+15
+170
+16
+171
+17
+172
+18
+173
+19
+174
+20
+175
+21
+176
+22
+177
+23
+178
+24
+179
+25
+180
+26
+181
+27
+182
+28
+183
+29
+184
+30
+185
+31
+186
+32
+187
+33
+188
+34
+189
+35
+190
+36
+191
+37
+192
+38
+193
+39
+40 Activation 194
+41 (2 bits) 195
+42 Remaining 196
+43 Battery 197
+44 (3 bits) 198
+45 GNSS Status 199
+46 (2 bits) 200
+201
+Spare
+47
+48 (2 bits) 202
+
+Bits 155 to 202 of 202 Information bits
+Rotating Field #0 (C/S G.008 Requirements) (48 bits)
+Rotating
+Field ID
+"0000"
+(4 bits)
+
+Elapsed Time
+Time from last encoded location Altitude of encoded location
+since Activation
+(11 bits)
+(10 bits)
+(6 bits)
+
+Dilution of Precision
+(8 bits)
+
+Rotating Field bit number
+
+155
+1
+156
+2
+157
+3
+158
+4
+159
+5
+160
+6
+161
+7
+162
+8
+163
+9
+164
+10
+165
+11
+166
+12
+167
+13
+168
+14
+169
+15
+170
+16
+171
+17
+172
+18
+173
+19
+174
+20
+175
+21
+176
+22
+177
+23
+178
+24
+179
+25
+180
+26
+181
+27
+182
+28
+183
+29
+184
+30
+185
+31
+186
+32
+187
+33
+188
+34
+189
+35
+36 GNSS Status 190
+37 (2 bits) 191
+38 Remaining 192
+39 Battery (2 bits) 193
+194
+40
+195
+41
+196
+42
+197
+43
+198
+44
+199
+45
+200
+46
+201
+47
+202
+48
+
+Bits 155 to 202 of 202 Information bits
+Rotating Field #1 (ELT(DT)) (48 bits)
+Rotating
+Field ID
+"0001"
+(4 bits)
+
+Time of last encoded location
+(11 bits)
+
+Altitude of encoded location
+(10 bits)
+
+Triggering
+Event
+(4 bits)
+
+Spare
+(9 bits)
+
+Rotating Field bit number
+
+155
+1
+156
+2
+157
+3
+158
+4
+5 Unassigned 159
+6
+(2 bits) 160
+161
+7
+162
+8
+163
+9
+164
+10
+165
+11
+166
+12
+RLS
+167
+13
+14 Provider ID 168
+15 (3 bits) 169
+170
+16
+171
+17
+172
+18
+173
+19
+174
+20
+175
+21
+176
+22
+177
+23
+178
+24
+179
+25
+180
+26
+181
+27
+182
+28
+183
+29
+184
+30
+185
+31
+186
+32
+187
+33
+188
+34
+189
+35
+190
+36
+191
+37
+192
+38
+193
+39
+194
+40
+195
+41
+196
+42
+197
+43
+198
+44
+199
+45
+200
+46
+201
+47
+202
+48
+
+Bits 155 to 202 of 202 Information bits
+Rotating Field #2 (RLS) (48 bits)
+Rotating
+Field ID
+"0010"
+(4 bits)
+
+Beacon RLS
+Capability
+(6 bits)
+
+Beacon Feedback
+(acknowledgement of RLM reception)
+(22 bits)
+
+Unassigned
+(11 bits)
+
+Rotating Field bit number
+
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+
+Bits 155 to 202 of 202 Information bits
+Rotating Field #3 (National Use) (48 bits)
+
+National Use
+(44 bits)
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+
+Rotating
+Field ID
+"0011"
+(4 bits)
+
+Rotating Field bit number
+
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+
+Bits 155 to 202 of 202 Information bits
+Rotating Field #15 (Cancellation Message) (48 bits)
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47 Method of
+48 Deactivation
+
+Rotating
+Field ID
+"1111"
+(4 bits)
+
+Fixed (all 1's)
+(42 bits)
+
+Rotating Field bit number
+
+NOTE: When displaying a message as 63 hex characters, one bit is inserted at the beginning of the
+message to indicate the PRN sequence (0 = Normal, 1 = self-test), followed by one zero, to form the 63
+hexadecimal representation (2 bits + 250 bit message) for processing by the Cospas-Sarsat ground
+segment.
+
+- END OF APPENDIX E -
+
+F-1
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+APPENDIX F - MOFFSET CALCULATIONS AND CRC CODE SAMPLE
+Note that the computation of the CRC for the MOffset uses an initial value of 0000 (hexadecimal),
+which does not affect the computation shown below.
+1001100100110100000000111001100000100011110110000000000000000000000000000000
+11000000000000101
+CRC-polynomial: x16+x15+x2+1
+15 Hex ID: 9934039823D8000
+010110010011011010
+11000000000000101
+011100100110111110
+11000000000000101
+0010010011011101100
+11000000000000101
+010100110111010010
+11000000000000101
+011001101110101111
+11000000000000101
+000011011101010101100
+11000000000000101
+00011101010101001110
+11000000000000101
+0010101010100101100
+11000000000000101
+011010101001010010
+11000000000000101
+00010101001010111010
+11000000000000101
+011010010101111110
+11000000000000101
+00010010101111011011
+11000000000000101
+010101011110111101
+11000000000000101
+011010111101110001
+11000000000000101
+00010111101110100011
+11000000000000101
+011111011101001100
+11000000000000101
+0011101110100100100
+11000000000000101
+0010111010010000100
+11000000000000101
+011110100100000010
+11000000000000101
+0011010010000011100
+11000000000000101
+00010010000011001000
+11000000000000101
+010100000110011010
+11000000000000101
+011000001100111110
+11000000000000101
+000000011001110110000000
+11000000000000101
+000011101100001010000
+11000000000000101
+0010110000101010100
+11000000000000101
+011100001010100010
+11000000000000101
+0010000101010011100
+11000000000000101
+010001010100110010
+11000000000000101
+010010101001101110
+11000000000000101
+01010101001101011
+
+CRC-16(9934039823D8000) = 0xAA6B
+and Moffset=BIN2DEC(CRC-16(9934039823D8000)) mod 60 = 7
+
+Figure F-1: Example of calculation of Moffset
+
+F-2
+
+- END OF APPENDIX F -
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+G-1
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+APPENDIX G - EXAMPLES OF RLS GNSS RECEIVER TIMING
+The operation of the RLS GNSS Receiver is defined in section 4.5.9.2 of this document. A set of examples
+of RLS operation are provided in Table G.1, which cover a range of conditions to clarify the interpretation
+of the Moffset timing, and are summarized below:
+1)
+2)
+3)
+4)
+5)
+
+UTC + Moffset of 59 minutes - No RLM received;
+No UTC + Moffset of 1 minute - UTC acquired at 2:34 - RLM received at 4:07;
+UTC + Moffset of 17 minutes - No RLM received;
+UTC + Moffset of 20 minutes - RLM received at 2:29; and
+UTC + Moffset of 11 minutes - RLM received at 0:45.
+
+These examples are provided to ensure a common understanding of the expected functioning of the Moffset
+capability and are intended to be used as the basis for the development test scenarios. The above five
+examples are believed to cover all of the timing scenarios that can exist, between the activation of the RLS
+GNSS Receiver and various values of Moffset, and specifically cover the following situations:
+•
+•
+•
+•
+•
+•
+
+UTC acquired soon after beacon activated;
+UTC not acquired until sometime after the beacon is activated;
+no RLM received within the 6-hour RLS operational timeframe;
+GNSS timing changes between the Moffset timing and the regular GNSS receiver timing;
+correct occurrence of the first Moffset GNSS Receiver timing versus beacon activation time; and
+ideal functioning of the RLS system.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+G-2
+
+Table G.1:
+
+Example Scenarios for RLS GNSS Timing
+
+Description of GNSS and
+Beacon Operation
+Time at which Beacon
+is Activated
+Time of first RLM
+Request transmission
+GNSS Receiver first
+30 minute on period
+
+Beacon
+RLM
+Attempt
+
+Example 1
+UTC + Moffset 59 minutes,
+No RLM received
+
+Example 2
+No UTC + Moffset 1 minutes,
+UTC acquired at 2:34,
+RLM received at 4:07
+
+0:00
+
+0:17
+
+0:01
+
+0:18
+
+0:30
+
+0:47*
+
+1
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+2
+
+0:59
+1:14
+
+1:02
+1:05
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+3
+
+1:59
+2:14
+
+1:17
+1:20
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+4
+
+2:59
+3:14
+
+1:32
+1:35
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+5
+
+3:59
+4:14
+
+1:47
+2:02
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+6
+
+4:59
+5:14
+
+2:32
+2:34†
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+7
+
+5:59
+6:00‡
+
+3:01
+3:16
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+8
+
+GNSS Receiver reverts to nonRLS operation
+
+4:01
+4:07§
+6:00
+
+4:07
+
+Note that interleaved with the GNSS Receiver timings, the GNSS receiver also turns on in accordance
+with section 4.5.5.2, as well in Examples 1, 3 and 4, but these GNSS 'on' periods are omitted for clarity
+in the tables.
+
+*
+
+Timing reverts to schedule per document C/S T.018, section 4.5.5.2.
+UTC acquired, back to RLS schedule
+‡
+Last ‘on’ period, 1-minute duration, as 6 hours have elapsed from beacon turn-on.
+§
+With no UTC reference, receiver reverts to document C/S T.018 section 4.5.5.2 timing, until UTC is obtained.
+†
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+G-3
+
+Table G.1 (Continued):
+
+Example Scenarios for RLS GNSS Timing
+Example 3
+
+Description of GNSS and
+Beacon Operation
+Time at which Beacon
+is Activated
+Time of first RLM
+Request transmission
+GNSS Receiver first
+30 minute on period
+
+Beacon
+RLM
+Attempt
+
+1
+
+Example 4
+UTC + Moffset
+20 minutes,
+RLM received at
+2:29
+
+Example 5
+UTC + Moffset
+11 minutes,
+RLM received at
+0:45
+
+0:58
+
+0:14
+
+0:40
+
+0:59
+
+0:15
+
+0:41
+
+1:28
+
+0:44
+
+0:45*
+
+UTC + Moffset
+17 minutes,
+No RLM received
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+2
+
+2:17
+2:32
+
+1:20
+1:35
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+3
+
+3:17
+3:32
+
+2:20
+2:29†
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+4
+
+4:17
+4:32
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+5
+
+5:17
+5:32
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+6
+
+6:17
+6:32
+
+GNSS Receiver next turns on at
+GNSS Receiver next turns off at
+
+7
+
+GNSS Receiver reverts to
+non-RLS operation
+
+‡
+
+6:32
+
+– END OF APPENDIX G –
+
+GNSS only ‘on’ for 4 min until RLM received, Moffset never needed.
+GNSS only ‘on’ for 9 min, until RLM received.
+‡
+6 hours up at 6:58, so no seventh attempt is initiated for this case.
+*
+†
+
+2:29
+
+0:45
+
+H-1
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+APPENDIX H - RLS INFORMATION
+H.1 Information to be Included in the User Manual of an RLS Type-1 Automatic Acknowledgement
+Capable Beacon
+
+This beacon has the Return Link Service (RLS) feature. The RLS feature is an indication on the
+beacon that confirms to the beacon user that the distress signal from an activated beacon has been
+localised by the Cospas-Sarsat system and is being sent to the responsible search-and-rescue (SAR)
+authorities. It does NOT mean that a search and rescue has yet been organized/launched, but only
+confirms that the distress alert has been received by the Cospas-Sarsat System and is being routed
+to the appropriate SAR agencies.
+The RLS is designed to send an acknowledgment to the beacon user in less than 30 minutes from
+beacon activation (actual acknowledgement times are typically much quicker). Alerting of the
+distress to SAR authorities is independent of (and may occur before) the RLS acknowledgment
+indication on the beacon. The RLS specification is described in the Galileo SAR Service Definition
+Document:
+(https://www.gsc-europa.eu/sites/default/files/sites/all/files/Galileo-SAR-SDD.pdf).
+RLS is an optional function and may not be permitted in all countries or for all beacon types. You
+may visit the web page Where Can I Buy an RLS-Enabled Beacon?
+(https://cospas-sarsat.int/en/beacon-ownership/rls-enabled-beacon-purchase) to learn the most
+recent information about national support for RLS.
+Cospas-Sarsat strongly recommends that you appropriately register your beacon. It only is possible
+to register a beacon in the registry operated by the country matching the “country code”
+electronically programmed into the beacon (or the International Beacon Registration Database
+(IBRD) (https://www.406registration.com/) if the country uses the IBRD for their registrations).
+For example, it only is possible to register a beacon with a French country code in France’s national
+registry. However, owners of Belgian-coded beacons must register in the IBRD. The country code
+is encoded in the beacon’s unique identification number (UIN, also called Hex ID), which is used
+to register the beacon. Visit the web page Beacon Registration Contacts
+(https://www.406registration.com/countriessupported.aspx) to see where you can register your
+beacon.
+
+H-2
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+H.2
+Information to be Included in the User Manual of an RLS Type 3 TWC-Capable
+Beacon
+This beacon features the Two-Way Communication (TWC) capability.
+The TWC function provides the beacon user with a confirmation indication that the distress signal
+from an activated beacon has been detected by the Cospas-Sarsat System and is being transmitted to
+the responsible Search-And-Rescue (SAR) Authorities.
+It is important to note that this confirmation does NOT imply that a search and rescue operation has
+been organized or initiated. In addition, the TWC feature enables the beacon user to establish
+communication with the appropriate SAR Authorities.
+TWC functionality relies on the exchange of information between beacon user and SAR Authorities,
+aiming to facilitate and enhance SAR operations by allowing the beacon user to provide valuable
+information to, or receive instructions from, SAR Authorities.
+Upon beacon activation, a series of initial automatic questions will be displayed for the beacon user
+to respond to. The answers encoded by the user will be transmitted to the SAR Authorities as soon as
+possible. SAR Authorities have the capability to send new or previously asked questions and
+instructions to the beacon user.
+New messages sent from SAR Authorities will take priority over the initial automatic questions
+should the user not have completed answering them.
+The TWC is designed to send an acknowledgment to the beacon user in less than 30 minutes from
+beacon activation (actual acknowledgement times are typically in the order of few minutes).
+It is important to highlight that alerting the distress to SAR authorities is independent of, and may
+occur before, the TWC acknowledgment indication on the beacon. The TWC specification is detailed
+in the Galileo SAR Service Definition Document Issue (TBD).
+TWC is an optional function and may not be permitted in all countries or for all beacon types. You
+may visit the web page Where Can I Buy an TWC-Enabled Beacon? (TBD) to learn the most recent
+information about national support for TWC.
+Cospas-Sarsat strongly recommends that you appropriately register your beacon. It only is possible to
+register a beacon in the registry operated by the country matching the “country code” electronically
+programmed into the beacon or the International Beacon Registration Database (IBRD)
+(https://www.406registration.com/) if the country uses the IBRD for their registrations. For example,
+it only is possible to register a beacon with a French country code in France’s national registry.
+However, owners of Belgian-coded beacons must register in the IBRD. The country code is encoded
+in the beacon’s unique identification number (UIN, also called Hex ID), which is used to register the
+beacon. Visit the web page Beacon Registration Contacts to see where you can register your beacon.
+(https://www.406registration.com/countriessupported.aspx)
+– END OF APPENDIX H –
+
+I-1
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+APPENDIX I - BASIC BEACON PROGRAMMING GUIDANCE
+The following text provides basic guidance on programming an SGB, further details can be found in
+document C/S G.005 and in Table 3.1 of this document.
+TAC Number – The Type Approval Certificate number between 10,000 and 17,999 assigned to the
+beacon by the Secretariat excluding the suffixes ‘M’ and ‘m’, see document C/S T.021 Section 2.2.1
+for further details.
+Serial Number – A numerical serial number between 0 and 16,383 assigned by the beacon
+manufacturer to a beacon during production.
+The TAC and Serial Number together form a unique identity for each beacon produced and shall not
+be capable of being changed once programmed by the manufacturer. Once a manufacturer uses up all
+available serial numbers, they shall apply to the Secretariat for an Extension TAC in order to continue
+inserting a unique identity into every beacon that they produce. Identities shall never be reused, if for
+example a beacon is scrapped, then that identity is not reused.
+Country Code – The three-digit decimal country code based on the ITU MID related to the country
+of beacon registration, or the normal place of residence of the beacon owner. Note that the Country
+Code is not necessarily the same as the first 3 digits of the Maritime Mobile Service Identity (MMSI)
+that may be assigned to a beacon associated with a vessel. The country code may be changed as
+necessary during the life of a beacon to reflect changes of beacon registration or place of residence.
+Vessel ID – If a Vessel (Aircraft or Ship) Identity is available / known then it should be included in
+the beacon message using one of the following options:
+SHIPS – In addition to the TAC and Serial Number ships may also be coded with either the MMSI of
+the vessel or its Radio Call Sign, with preference being given to the former, if neither are available
+then these fields are set to default values.
+MMSI – An identity allocated to a beacon associated with a vessel in accordance with
+Recommendation ITU-R M.585. This may be the MMSI assigned to a ship station as defined in ITUR M.585 Annex 1 Section 1 or the MMSI assigned to a craft associated with a parent ship as defined
+in ITU-R M.585 Annex 1 Section 5. It shall not be the freeform number identity as defined in ITU-R
+M.585 Annex 2 Section 2, commencing with 970, 972 or 974 which is only used to identify an AIS
+locating signal transmitter if one is included as part of a 406 MHz beacon. However, if the beacon
+includes an AIS locating signal, then the AIS identity commencing with 974 should be added in bits
+94-123 AFTER the ships MMSI.
+Note that if during the life of a beacon a vessel on which it is provided changes flag state and as a result
+is allocated a different MMSI, then the MMSI in the beacon must be updated accordingly. This will
+not affect the identity of the AIS locating signal, however, as this is not linked to the vessel identity.
+Radio Call Sign – If an MMSI for the vessel is not available then the ships Radio Call Sign may be
+inserted here instead. Radio Call Signs of up to 7 characters may be inserted.
+
+I-2
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+AIRCRAFT – In addition to the TAC and Serial Number aircraft may also be coded with one of three
+forms of identity, either the Aircraft Registration Marking (commonly referred to as the Tail Number),
+the Aviation 24-Bit Address (as used by the ADS-B system) or the Aircraft Operator designator
+followed by a serial number. The Aviation 24-Bit Address may also be followed by the 3-letter Aircraft
+Operator Designator (3LD), which is essential for ELT(DT)s.
+Aircraft Registration Marking – This identity, often referred to as the aircraft Tail Number can be
+encoded in up to 7 alphanumerical characters.
+Aviation 24-Bit Address – This identity is becoming more common in larger aircraft as it is allocated
+to an aircraft for use with systems such as the ADS-B. For ELT(DT)s required to meet the Automatic
+Distress Tracking (ADT) requirements of the ICAO GADSS system, it is essential to code the
+ELT(DT) with the aircraft 24-Bit address followed by the 3-letter Aircraft Operator Designator, as both
+of these data items are required by the ICAO Location of an Aircraft in Distress Repository (LADR).
+Note that the Aircraft 24-Bit address followed by the Aircraft Operator Designator can also be used to
+code ELTs other than ELT(DT)s if required.
+Aircraft Operator and Serial Number – This identity is less common but can be used to identify an
+aircraft it consists of the identity of the aircraft operator followed by a serial number allocated to the
+beacon by the aircraft operator to create a unique identity for that aircraft.
+– END OF DOCUMENT –
+
+Cospas-Sarsat Secretariat
+1250 René-Lévesque Blvd. West, Suite 4215, Montreal (Quebec) H3B 4W8 Canada
+Telephone: +1 514 500 7999
+Fax: +1 514 500 7996
+Email: mail@cospas-sarsat.int
+Website: http://www.cospas-sarsat.int
+
+

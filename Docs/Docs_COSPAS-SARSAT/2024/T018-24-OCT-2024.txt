@@ -1,0 +1,4492 @@
+SPECIFICATION FOR
+SECOND-GENERATION COSPAS-SARSAT
+406-MHz DISTRESS BEACONS
+C/S T.018
+Issue 1 – Revision 12
+October 2024
+
+-i-
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+SPECIFICATION FOR SECOND-GENERATION COSPAS-SARSAT
+406-MHz DISTRESS BEACONS
+
+History
+
+Issue
+
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+1
+
+Revision
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+
+Date
+
+Comments
+
+December 2016
+May 2017
+February 2018
+June 2018
+February 2019
+November 2019
+May 2020
+March 2021
+June 2021
+March 2022
+November 2022
+October 2023
+October 2024
+
+Approved by CSC-57
+Approved by CSC-58
+Approved by CSC-59
+Approved by CSC-60
+Approved by CSC-61
+Approved by CSC-62
+Approved by CSC-63
+Approved by CSC-64
+Approved by CSC-65
+Approved by CSC-66
+Approved by CSC-67
+Approved by CSC-69
+Approved by CSC-71
+
+- ii -
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+TABLE OF CONTENTS
+Page
+History ....................................................................................................................................................... i
+Table of Contents ...................................................................................................................................... ii
+List of Figures
+..................................................................................................................................... iv
+List of Tables
+..................................................................................................................................... iv
+Introduction ............................................................................................................1-1
+
+1.
+1.1
+1.2
+1.3
+1.4
+1.5
+
+Purpose ....................................................................................................................... 1-1
+Scope .......................................................................................................................... 1-1
+Type of Beacon .......................................................................................................... 1-2
+Optional Features ....................................................................................................... 1-3
+Additional Features .................................................................................................... 1-4
+Technical Requirements ........................................................................................2-1
+
+2.
+2.1
+2.2
+
+2.3
+
+2.4
+
+2.5
+
+Beacon Functional Elements ...................................................................................... 2-1
+2.1.1 Transmitter Notional Functional Block Diagram ..........................................2-1
+Digital Message Generator ......................................................................................... 2-2
+2.2.1 Burst Transmission Interval ...........................................................................2-2
+2.2.2 Total Transmission Time ...............................................................................2-4
+2.2.3 Direct Sequence Spread Spectrum .................................................................2-4
+2.2.4 Preamble ........................................................................................................2-6
+2.2.5 Digital Message .............................................................................................2-6
+2.2.6 Message Content ............................................................................................2-6
+2.2.7 In-Phase (I) and Quadrature-Phase (Q) Components ....................................2-7
+Modulator and 406 MHz Transmitter ........................................................................ 2-9
+2.3.1 Transmitted Frequency ..................................................................................2-9
+2.3.2 Spurious Emissions ......................................................................................2-10
+2.3.3 Modulation and Waveform ..........................................................................2-10
+2.3.4 Voltage Standing-Wave Ratio .....................................................................2-11
+2.3.5 Maximum Continuous Transmission ...........................................................2-11
+Transmitter Power Output ........................................................................................ 2-11
+2.4.1 Transmitter Rise Time .................................................................................2-11
+2.4.2 Effective Isotropic Radiated Power (EIRP) .................................................2-11
+2.4.3 Antenna Characteristics ...............................................................................2-12
+406 MHz Homing Transmitter ................................................................................. 2-14
+DIGITAL MESSAGE CONTENT .......................................................................3-1
+
+3.
+3.1
+3.2
+3.3
+
+Basic Structure............................................................................................................ 3-1
+Beacon Message Content – Main Field ...................................................................... 3-1
+Beacon Message Content – Rotating Fields ............................................................... 3-7
+
+- iii -
+
+3.4
+3.5
+3.6
+3.7
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Beacon Transmission Scheduling of Rotating Fields............................................... 3-15
+Beacon Message Content – Error Correcting Field.................................................. 3-16
+Beacon Coding and Hex ID...................................................................................... 3-17
+Programming Adapters............................................................................................. 3-18
+ENVIRONMENTAL AND OPERATIONAL REQUIREMENTS ...................4-1
+
+4.
+4.1
+4.2
+
+4.3
+4.4
+4.5
+
+General ....................................................................................................................... 4-1
+Thermal Environment................................................................................................. 4-1
+4.2.1 Operating Temperature Range .......................................................................4-1
+4.2.2 Temperature Gradient ....................................................................................4-1
+4.2.3 Thermal Shock ...............................................................................................4-1
+Mechanical Environment ........................................................................................... 4-2
+Other Environmental Requirements ........................................................................... 4-3
+Operational Requirements .......................................................................................... 4-3
+4.5.1 Duration of Continuous Operation ................................................................4-3
+4.5.2 Other Operational Requirements ...................................................................4-3
+4.5.3 Radio-Locating Signal (for Homing and on-Scene Locating) .......................4-3
+4.5.4 Beacon Self-Test Mode .................................................................................4-4
+4.5.5 Encoded Position Data ...................................................................................4-6
+4.5.6 Beacon Activation........................................................................................4-11
+4.5.7 Beacon Activation Cancellation Function ...................................................4-13
+4.5.8 Verification of Registration .........................................................................4-14
+4.5.9 RLS Functions .............................................................................................4-15
+4.5.10 Battery Status Indication ..............................................................................4-18
+4.5.11 Beacon Labelling .........................................................................................4-18
+4.5.12 Beacon Instruction Manual ..........................................................................4-19
+4.5.13 Beacon Data Requirements ..........................................................................4-19
+4.5.14 External Power Source for ELT(DT)s .........................................................4-19
+4.5.15 ELT(DT)s Specifically Designed to Withstand a Crash Impact ..................4-19
+4.5.16 ELT(DT)s Combined with Automatic ELTs ...............................................4-21
+4.5.17 RLS Type 3 TWC (message) Functionality ................................................4-24
+
+APPENDIX A - LIST OF ACRONYMS........................................................................................ A-1
+APPENDIX B - SAMPLE BOSE-CHAUDHURI-HOCQUENGHEM ERRORCORRECTING CODE AND 23 HEX ID CALCULATIONs ........................... B-1
+B.1
+B.2
+
+Sample 48-Bit BCH Code Calculation ...................................................................... B-1
+Sample 23 Hex ID Calculation .................................................................................. B-6
+
+APPENDIX C - BEACON ENCODED LOCATION CODING ................................................... C-1
+C.1
+C.2
+C.3
+C.4
+
+ENCODED LOCATION PROTOCOL .................................................................... C-1
+Summary ................................................................................................................... C-1
+Default Values in Position Data ................................................................................ C-1
+Definition of Location Data Fields ............................................................................ C-2
+
+- iv -
+
+C.5
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+C.4.1 Encoded Location field ................................................................................. C-2
+C.4.2 Encoded Location Data (1) ............................................................................ C-2
+Instructions for converting Latitudes and Longitudes to a Binary Number .............. C-3
+
+APPENDIX D - EXAMPLE OF LINEAR FEEDBACK SHIFT REGISTER (LFSR)
+IMPLEMENTATION ........................................................................................... D-1
+APPENDIX E - BIT ASSIGNMENT NUMBERS ........................................................................ E-1
+APPENDIX F - MOFFSET CALCULATIONS AND CRC CODE SAMPLE................................ F-1
+APPENDIX G - EXAMPLES OF RLS GNSS RECEIVER TIMING ....................................... G-1
+APPENDIX H - RLS INFORMATION ........................................................................................ H-1
+APPENDIX I - BASIC BEACON PROGRAMMING GUIDANCE............................................ I-1
+
+LIST OF FIGURES
+Figure 2-1: Notional DSSS-OQPKS Transmitter Functional Block Diagram......................................2-2
+Figure 2-2: Linear Feedback Shift Register ..........................................................................................2-5
+Figure 2-3: Burst general structure .......................................................................................................2-7
+Figure 2-4: I and Q Component Message Structure .............................................................................2-8
+Figure 2-5: Spurious emission mask ...................................................................................................2-10
+Figure 2-6: OQPSK modulation illustration .......................................................................................2-11
+Figure 2-7: Ideal Antenna Pattern .......................................................................................................2-12
+Figure 3-1: Message content bits ..........................................................................................................3-1
+Figure 4-1: Temperature Gradient ........................................................................................................4-2
+Figure 4-2: RF#4 bit assignment representation with the FLAM .......................................................4-24
+Figure B-1: Sample 48-Bit BCH Error-Correcting Code Calculation ................................................. B-5
+Figure D-1: Example of LSFR with the generation of the 64 first chips of the normal I-component . D-2
+Figure F-1: Example of calculation of Moffset....................................................................................... F-1
+
+-v-
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+LIST OF TABLES
+Table 2.1: Transmission Schedule ........................................................................................................2-4
+Table 2.2: PRN Sequence Initialization Values ....................................................................................2-6
+Table 2.3: Logic to Signal Level Assignment.......................................................................................2-6
+Table 2.4: Bit to PRN Sequence Assignment .......................................................................................2-9
+Table 2.5: Required EIRP ...................................................................................................................2-12
+Table 3.1: Minimum Requirement main field in the beacon message (transmitted in every burst) ....3-2
+Table 3.2: Modified Baudot Code.........................................................................................................3-6
+Table 3.3: C/S G.008 Objective Requirements Rotating Field (#0) .....................................................3-8
+Table 3.4: ELT(DT) In-Flight Emergency Rotating Field (#1) ..........................................................3-10
+Table 3.5: RLS Type 1 Automatic and Type 2 Manual Acknowledgment Rotating Field (#2) .........3-11
+Table 3.6: National Use Rotating Field (#3) .......................................................................................3-12
+Table 3.7: RLS Type 3 TWC (Message) Rotating Field (#4) .............................................................3-13
+Table 3.8: Spare Rotating Fields (for future use) (#5 - #14)...............................................................3-14
+Table 3.9: Cancellation Message Rotating Field (#15).......................................................................3-15
+Table 3.10: Rotating Field Transmission Conditions .........................................................................3-15
+Table 3.11: Hex ID Contents ..............................................................................................................3-17
+Table 4.1: Expected Stand-alone ELT(DT) Behaviour ......................................................................4-12
+Table 4.2: Expected Crash Survivable ELT(DT) Behaviour ..............................................................4-19
+Table 4.3: Expected ELT(DT) Combined with Automatic ELT Behaviour.......................................4-21
+
+1-1
+
+1.
+
+INTRODUCTION
+
+1.1
+
+Purpose
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+The purpose of this document is to define the minimum requirements to be used for the development and
+manufacture of Second Generation 406 MHz Emergency Locator Transmitters (ELTs), Emergency
+Position-Indicating Radio Beacons (EPIRBs), and Personal Locator Beacons (PLBs). In this document,
+the term ELT indicates an aviation distress beacon, an EPIRB a maritime distress beacon, and a PLB a
+distress beacon for personal use.
+Specifications that are critical to the Cospas-Sarsat System are defined in detail. Specifications which
+could be developed by the national authorities are identified in more general terms.
+1.2
+
+Scope
+
+This document contains the minimum requirements that apply to Cospas-Sarsat 406 MHz distress
+beacons. It is divided into the following sections:
+a) Section 2 gives the technical requirements applicable to all types of beacons. When met,
+these requirements will enable the beacons to provide the intended service in terms of
+location probability and accuracy and will not disturb the system operation.
+b) Section 3 deals with the beacon message content. Basic message structure as well as the
+assignment and meaning of the available data bits are defined in this section.
+c) Section 4 defines a set of environmental and operational requirements. These
+requirements are not intended to be exhaustive and may be complemented by more
+detailed national or international standards (e.g., RTCA standards for ELTs). However,
+they represent the minimum environmental and operational performance requirements
+for a 406 MHz beacon to be compatible with the Cospas-Sarsat System.
+d) Appendix A provides a list of acronyms used in this document.
+e) Appendix B provides a sample Bose-Chaudhuri-Hocquenghem error-correcting code
+calculation.
+f) Appendix C provides an example of beacon encoded location coding.
+g) Appendix D provides an example of the first 64 bits of a Linear Feedback Shift Register
+(LFSR) Implementation.
+h) Appendix E provides a map of the BIT assignment numbers.
+i) Appendix F provides an Moffset calculation and CRC code sample.
+
+1-2
+
+1.3
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Type of Beacon
+
+There are four different types of Cospas-Sarsat 406 MHz beacons; Emergency Locator Transmitters
+(ELTs), Emergency Position Indicating Radio Beacons (EPIRBs), Personal Locator Beacons (PLBs) and
+Ship Security Alert System (SSAS) Beacons. This standard does not address requirements for Second
+Generation SSAS Beacons.
+In addition to the four different types of beacon there are up to three Classes of operating temperature
+range for 406 MHz beacons as follows:
+Class 0:
+Class 1:
+Class 2:
+
+-55°C to +70°C
+-40°C to +55°C
+-20°C to +55°C
+
+Any type of beacon can be supplied with a Class 0, Class 1 or Class 2 operating temperature range.
+Unless otherwise stated herein this specification applies to all types and classes of 406 MHz beacons
+identified in this section apart from SSAS beacons.
+Emergency Locator Transmitters (ELTs)
+Are designed for aviation distress purposes and are available as the following types; Automatic Fixed
+(ELT (AF)), Automatic Portable (ELT (AP)), Survival (ELT (S)), Automatic Deployable (ELT (AD)),
+and Distress Tracking ELT (ELT (DT)).
+Automatic Fixed (ELT (AF))
+This type of ELT is intended to be permanently attached to the aircraft before and after a crash and is
+designed to aid SAR teams in locating a crash site.
+Automatic Portable (ELT (AP))
+This type of ELT is intended to be rigidly attached to the aircraft before a crash, but readily removable
+from the aircraft after a crash. It functions as an ELT (AF) during the crash sequence. If the ELT does
+not employ an integral antenna, the aircraft-mounted antenna may be disconnected and an auxiliary
+antenna connected in its place. This type of ELT is intended to aid SAR teams in locating the crash site
+or survivor(s).
+Survival (ELT (S))
+This type of ELT is intended to survive the crash forces, and then to be generally manually activated
+by survivors. There are two sub categories of ELT(S) Category A which is buoyant and designed to
+operate when floating in water and Category B which is non buoyant and may be manually or
+automatically activated. This type of ELT is intended to aid SAR teams in locating survivor(s).
+
+1-3
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Automatic Deployable (ELT(AD))
+This type of ELT is intended to be rigidly attached to the aircraft before a crash and automatically
+deployed after the crash sensor has determined that a crash has occurred. This type of ELT should float
+in water and is intended to aid SAR teams in locating the crash site.
+Distress Tracking (ELT (DT))
+This is a specific type of ELT designed to be activated prior to a crash and to function in compliance
+with the ICAO GADSS* requirements for the Location of an Aeroplane in Distress, aimed at
+establishing, to a reasonable extent, the location of an accident site within a 6 NM radius. It may be
+activated automatically upon detection of a distress condition while in-flight or it may also be activated
+manually.
+Emergency Position Indicating Radio Beacons (EPIRBs)
+Are designed for maritime distress purposes and are available as Float free and Non Float Free types of
+EPIRB.
+Float Free EPIRB
+This type of EPIRB is intended to float free of the vessel on which it is fitted if the vessel sinks, in which
+case it will automatically activate, it can also be manually activated.
+Non Float Free EPIRB
+This type of EPIRB is intended to be manually released from its mounting bracket and then either
+manually activated or dropped in the water so that it will then activate automatically. Some national
+administrations permit the use of manually activated EPIRBs only without the automatic activation in
+water feature.
+Personal Locator Beacons (PLBs)
+Are designed for use by persons in distress who may be on land, in the air or at sea.
+1.4
+
+Optional Features
+
+Beacons may contain optional features that are defined in this specification.
+Encoded location capability is optional, however in the case of ELT (DT) devices intended for in-flight
+automatic activation the inclusion of a GNSS capability is mandatory.
+All types of beacons (except current ELT(DT)s) may also be provided with the Return Link Service
+capabilities (e.g., RLS Type 1 automatic acknowledgement and/or RLS Type 3 two-way communication
+(message) service capability).
+All types of beacons may be provided with one or more additional radio-locating transmitters for Homing
+and On-scene Locating purposes.
+*
+
+See ICAO Convention on International Civil Aviation Annex 6, Part 1.
+
+1-4
+
+1.5
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Additional Features
+
+Beacons may contain additional functionality that may change the transmitted 406 MHz satellite
+signal or affect other beacon parameters such as operating lifetime. For example, a beacon may
+contain a flashing strobe light that while it probably has no effect on the transmitted signal, would reduce
+the battery life.
+Any additional functionality that is not defined in this specification shall not adversely degrade the
+performance of the beacon to the extent that it no longer complies with this specification.
+- END OF SECTION 1 -
+
+2-1
+
+2.
+
+TECHNICAL REQUIREMENTS
+
+2.1
+
+Beacon Functional Elements
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+This section defines requirements for the functional elements of spread-spectrum 406 MHz distress
+beacons.
+2.1.1
+
+Transmitter Notional Functional Block Diagram
+
+This section contains a notional functional diagram which describes the features which are described
+in greater detail by later sections of this document.
+Figure 2-1 illustrates a notional Direct Sequence Spread Spectrum - Offset QPSK (DSSS-OQPSK)
+high level transmitter functional block diagram which may be used to better understand one possible
+implementation of the beacon signal design. In this figure:
+•
+
+D(t) is the linear bit stream for each beacon burst running at 300 bits/second.
+
+•
+
+D(t) is split into parallel bit streams Ib(t) and Qb(t) made up of odd and even bits from D(t)
+running at 150 bps each
+
+•
+
+A Linear Feedback Shift Register (LFSR) function produces the two different chipping
+segments Ci(t) and Cq(t) using the common generator polynomial G(X). Each chipping
+segment runs at 38,400 chips/second. Each of Ci(t) and Cq(t) is produced by the LFSR
+function using the specified unique I or Q channel LFSR initialization, and is reproduced
+identically for each beacon burst for a given beacon mode of operation.
+
+•
+
+Ib(t) and Qb(t) are separately mixed with their respective different chipping segments. The
+resultant on each channel can change state every chip period.
+
+•
+
+The resultant of the mixing on the Q component is then delayed by ½ chip period.
+
+•
+
+Both I and Q channels may then be low pass filtered (if necessary) and modulated onto
+cosine and sine sinusoids.
+
+•
+
+The two modulated sinusoids are then summed.
+
+•
+
+The summation resultant is amplified, band pass filtered (if necessary), and then
+transmitted as the outgoing beacon burst signal S(t).
+
+Because the I and Q resultants are offset by ½ chip period from each other, when summed, the
+resulting signal S(t) is bounded to a maximum phase shift of 90 degrees to help minimize amplitude
+envelope variation.
+
+2-2
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Figure 2-1: Notional DSSS-OQPKS Transmitter Functional Block Diagram
+2.2
+
+Digital Message Generator
+
+The digital message generator will key the modulator and transmitter so that the message defined
+in section 3 is transmitted. This section describes the structure of the proposed signal.
+2.2.1
+
+Burst Transmission Interval
+
+From beacon activation a total of 6 initial transmissions shall be made separated by fixed*
+5s +0 /-0.2s intervals. The first transmission shall commence within 5 seconds of beacon activation†,
+except for EPIRBs, where it shall commence within 8 seconds of beacon activation.
+The beacon shall then transmit 59 bursts at nominally 30 second intervals. The time between the start
+of two successive transmissions (TR) shall be randomized with uniform (flat) distribution around the
+stated nominal value, so that intervals between the start of two successive transmissions are randomly
+distributed over ± 5 seconds. The standard deviation over the 59 successive bursts of TR shall be
+greater than 2.5 seconds. The minimum value of TR observed over the 59 successive bursts shall be
+
+In this context, “fixed” refers to a repetition period which may vary within the tolerances allocated, and that no
+deliberate randomization within this range is required.
+†
+Beacon activation is defined as the point in time at which the initiation of the activation event of the beacon occurs.
+E.g., the activation events include pressing of the “ON” button, water sensor immersion, the start of a shock, or
+deformation.
+*
+
+2-3
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+between 25.0 and 25.2 seconds, the maximum value of TR observed over the 59 successive bursts
+shall be between 34.8 and 35.0 seconds.
+Transmissions shall then occur at nominally 120 second intervals. The time between the start of two
+successive transmissions (TR) shall be randomized with uniform (flat) distribution around the stated
+nominal value, so that intervals between the start of two successive transmissions are randomly
+distributed over ± 5 seconds. The standard deviation over the first 50 successive bursts of TR shall be
+greater than 2.5 seconds. The minimum value of TR observed over the 50 successive bursts shall be
+between 115.0 and 115.2 seconds, the maximum value of TR observed over the 50 successive bursts
+shall be between 124.8 and 125.0 seconds.
+For ELT DT transmission the first transmission shall commence within 5 seconds of beacon
+activation. From beacon activation a total of 24 initial transmissions shall be made separated by fixed*
+5 seconds + 0.0 / - 0.2 intervals. These transmissions shall be followed by 18 transmissions separated
+by fixed 10 seconds + 0.0 / - 0.2. After the first 42 transmissions, ELT (DT) transmissions shall
+continue at nominal intervals of 28.5 seconds until the end of the ELT (DT) operating lifetime. The
+time between the start of two successive transmissions (TR) shall be randomized with uniform (flat)
+distribution around the stated nominal value, so that intervals between the start of two successive
+transmissions are randomly distributed over ± 1.5 seconds. The standard deviation over the first 73
+successive bursts of TR shall be greater than 0.8 seconds. The minimum value of TR observed over
+the 73 successive bursts shall be between 27.0 and 27.2 seconds, the maximum value of TR observed
+over the 73 successive bursts shall be between 29.8 and 30.0 seconds.
+
+For RLS Type 3 two-way communication (TWC) (message) capable beacons, from beacon
+activation a total of 6 initial transmissions shall be made separated by fixed 5s +0 /-0.2s intervals.
+The first transmission shall commence within 5 seconds of beacon activation, except for EPIRBs,
+where it shall commence within 8 seconds of beacon activation.
+The beacons with RLS Type 3 TWC functionality shall then transmit 119 bursts at nominally 30
+second intervals. The time between the start of two successive transmissions shall be randomized
+with uniform distribution around the stated nominal value, so that intervals between the start of
+two successive transmissions are randomly distributed over ± 5 seconds.
+Transmissions shall then occur at nominally 120 second intervals. The time between the start of
+two successive transmissions (TR) shall be randomized with uniform (flat) distribution around
+the stated nominal value, so that intervals between the start of two successive transmissions are
+randomly distributed over ± 5 seconds.
+The transmission schedule is summarized in Table 2.1.
+
+In this context, “fixed” refers to a repetition period which may vary within the tolerances allocated, and that no
+deliberate randomization within this range is required.
+*
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+2-4
+
+Table 2.1: Transmission Schedule
+IAMSAR Stage
+Initial
+Action / Planning
+
+ELT (DT)
+RLS Type 3 TwoWay
+Communication
+(Message) service
+
+2.2.2
+
+Nominal Time from
+Activation
+0 to 30* Seconds
+30* Seconds to
+30 minutes
+30 minutes +
+0 to 120 Seconds
+120 to 300 Seconds
+300 Seconds +
+0 to 30* Seconds
+30* Seconds to
+60 minutes
+60 minutes +
+
+Transmission Nominal
+Repetition Interval
+5 Seconds
+
+Randomization
+0
+
+30 Seconds
+
+± 5 Seconds
+
+120 Seconds
+5 Seconds
+10 Seconds
+28.5 Seconds
+5 Seconds
+
+± 5 Seconds
+0
+0
+± 1.5 Seconds
+0
+
+30 Seconds
+
+± 5 Seconds
+
+120 Seconds
+
+± 5 Seconds
+
+Total Transmission Time
+
+The total transmission time of each burst, measured at the 90 percent power points, shall be 1000 ms
+±1 ms.
+
+2.2.3
+
+Direct Sequence Spread Spectrum
+
+The digital message shall be spread using two truncated segments of a common PRN (PseudoRandom Noise) maximum length sequence (m-sequence) producing symbols known as "chips".
+These sequence segments shall be deterministic and must be known by the receiver.
+The two truncated spreading PRN segments shall:
+
+*
+
+a)
+
+be applied separately to the full duration of each beacon burst transmission with one
+segment applied to the in-phase (I) component and the other applied to the quadrature (Q)
+component of the signal;
+
+b)
+
+be transmitted as separate odd and even bits, starting with 1 as the first bit. Odd bits are
+transmitted through the I channel and even bits the Q channel. For each bit, 256 chips are
+taken from the PRN sequence such that a 0 bit is represented by the non-inverted sequence
+and a 1 by the inverted sequence, equivalent to an exclusive-OR operation (XOR). The I
+and Q signal components are spread separately, each by a factor of 256 (with half-chip
+offset as shown in section 2.3.3). Then when the I and Q channels are combined the overall
+spreading factor is 128 chips/bit.
+
+c)
+
+be generated by a method equivalent to a Linear Feedback Shift Register (LFSR) using
+the same generator polynomial G(x) = X23 + X18 +1 (see Figure 2-2);
+
+d)
+
+be generated in matched pairs for the I and Q components defined in Table 2.2 for each
+beacon mode;
+
+For EPIRBs this value is 33 seconds.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+2-5
+
+e)
+
+be truncated to the first 38,400 chips of the m-sequence generated using the prescribed
+initialization values for each of the I and Q components with a 1/2 chip period delay
+imposed on the Q component relative to the I component (refer to section 2.3.3);
+
+f)
+
+be applied to both I and Q components for the full one second duration of each beacon
+burst transmission including preamble, information bits, and error correction bits, to give
+a chipping rate of 38,400 chips/second for each component (see 2.3.1.2 for further details);
+and
+
+g)
+
+be identical for each beacon burst transmission for any given burst mode.
+
+Note that this spreading scheme method in fact allows for multiple possible non-overlapping matched
+I and Q component chipping segment pairs, with each segment in each pair truncated to 38,400 chips.
+The number of possible segments, 218, is determined by dividing the full m-sequence length for the
+generator polynomial, by the truncated segment length, ((223)-1)/38,400 = 218 segments.
+Non-overlapping pairs of segments can be selected from this set of 218 segments.
+
++
+
+Data in
+
++
+X22
+
+X21
+
+X20
+
+X19
+
+X18
+
+X17
+
+X16
+
+...
+
+X1
+
+X0
+
+Linear Feedback Shift Register for X23+X18+1:
+(1) X0 Ꚛ data output
+(2) X0 Ꚛ X18→ temp
+(3) Shift Xn→ Xn-1 Ɐ n
+(4) temp→ X22
+
+Figure 2-2: Linear Feedback Shift Register
+
+The beacon shall be able to generate multiple PRN sequences segments, such as normal mode and
+self-test mode, according to Table 2.2. In order to generate these PRN sequences segments, the
+beacon may use a LFSR with multiple initialization values for PRN sequence segment generation.
+Table 2.2 provides the generator polynomial initialization LFSR values for I and Q components for
+beacon normal mode operation and for beacon self-test mode operation. In this table, registers are
+labelled from 0 to 22. The registers shift from left to right the output from register 0. For clarity, the
+feedback taps to be XOR’d are indicated in the table and match with the characteristic polynomial. The
+output chip is taken from register 0. The table also provides the first 64 chips in the order of generation
+from the LFSR. The 64 chip binary sequence has been displayed in hexadecimal format as
+demonstrated in the example below the table with the leftmost chip in sequence being the first output.
+The LFSR implementation (with associated initialization) leads to the correct generation of the whole
+38 400 chips sequence, which can be verified to a high degree of confidence by confirming a perfect
+match of the first 64 chips given in Table 2.2.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+2-6
+
+Table 2.2: PRN Sequence Initialization Values
+
+Register
+
+22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0
+
+XOR
+
+1
+
+1
+
+Register Initial Setting
+
+Output chip sequence
+1st
+
+64th
+
+Normal I
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0
+
+0 0 0 0 0 0 0 0 0 0 1 → 8000
+
+0108
+
+4212 84A1
+
+Normal Q
+
+0
+
+0
+
+1
+
+1
+
+0
+
+1
+
+0
+
+1
+
+1
+
+0
+
+0
+
+0
+
+0 0 1 1 1 1 1 1 1 0 0 →
+
+3F83 58BA D030 F231
+
+Self Test I
+
+1
+
+0
+
+1
+
+0
+
+0
+
+1
+
+0
+
+1
+
+1
+
+0
+
+0
+
+1
+
+0 0 1 1 1 1 1 0 0 0 0 →
+
+0F93 4A4D 4CF3 028D
+
+Self Test Q
+
+0
+
+1
+
+1
+
+1
+
+1
+
+0
+
+0
+
+1
+
+1
+
+1
+
+0
+
+1
+
+0 0 1 0 0 1 0 1 0 0 0 → 1497 3DC7 16CD E124
+
+An example of the generation of the 64 first chips of the normal I-component is given in Appendix D.
+The correspondence between the logic level of the chips used to modulate the signal and the signal
+level is given in Table 2.3:
+Table 2.3: Logic to Signal Level Assignment
+Logic Level
+1
+0
+2.2.4
+
+Signal Level
+-1.0
++1.0
+
+Preamble
+
+The initial 166.7 ms of the transmitted signal shall consist of the combination of the first 6400 chips
+of the two PRN code segments (each segment 38,400 chips long for the entire burst) used to spread
+the I and Q message components as illustrated in Figure 2-3. There will be no useful information
+encoded on either the I or Q components during the preamble. I and Q component information bits
+shall all be set to ‘0’ during the preamble.
+
+2.2.5
+
+Digital Message
+
+The remaining 833.3 ms of the transmitted signal shall contain a 250-bit message and will be at a
+nominal bit rate of 300 bps.
+2.2.6
+
+Message Content
+
+The content of the 250 bit message is defined in section 3.
+The 250 bit message is composed of two parts:
+a) the useful message: 202 bits containing the information transmitted by the beacon.
+b) the error correction bits: 48 bits BCH(250,202) containing bits used for error correction
+at reception.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+2-7
+
+Preamble
+
+Useful message
+
+Correcting bits
+
+166.7 ms
+
+673.3 ms
+
+160 ms
+
+1s
+
+Figure 2-3: Burst general structure
+2.2.7
+
+In-Phase (I) and Quadrature-Phase (Q) Components
+
+The odd bits of the 250-bit message are used to generate the in-phase (I) component of the message,
+while the even bits are used to generate the quadrature-phase (Q) component of the message. The bit
+rate for each channel will nominally be 150 bits/sec.
+Each component starts with a 6400 chip preamble described in section 2.2.4 and is spread with the
+PRN code segment described in section 2.2.3 as shown in Figure 2-4.
+
+2-8
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Figure 2-4: I and Q Component Message Structure*
+*
+
+The 50 bits included in the preamble contain no data and are set to “0”
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+2-9
+
+The preamble and any bits allocated as ‘0’ are represented by the PRN sequence, and bits allocated
+as ‘1’ are sent as the PRN sequence inverted for the duration of the bit as shown in Table 2.4. This is
+the method of modulating data onto the PRN sequence.
+Table 2.4: Bit to PRN Sequence Assignment
+Bit
+1
+0
+
+2.3
+
+PRN Sequence
+Inverted
+Normal
+
+Modulator and 406 MHz Transmitter
+2.3.1
+
+Transmitted Frequency
+
+The following sections define the frequency stability requirements for the Carrier Frequency and the
+Chip Rate. The specifications for the carrier frequency and the chip rate may be decoupled by using
+separate oscillators.
+2.3.1.1 Carrier Frequency Offset/Drift over aging, thermal, shock and vibration
+a)
+
+Long Term Stability Requirement
+The carrier frequency tolerance shall be 406.05 MHz ±1200 Hz over 5 years or the
+manufacturers’ declared beacon maintenance period*, whichever is greater; and
+
+b)
+
+Short Term Stability Requirement
+This requirement applies throughout the operating temperature range and during
+situations of temperature shock.
+The maximum allowable carrier frequency variation shall be 7.4 ppb when measured
+over 166.7 msec within the burst.
+
+2.3.1.2 Chip Rate Accuracy and Variation
+The average chip rate shall be 38 400 ± 0.6 chips/s.
+The variation of the chip rate shall be ± 0.6 chips/s².
+These values shall be met both when measuring over the preamble and on the entire burst.
+
+*
+
+The beacon maintenance should include validation of the frequency stability of the beacon.
+
+2-10
+
+2.3.2
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Spurious Emissions
+
+The in-band spurious emissions shall not exceed the levels specified by the signal mask in Figure 2-5,
+when measured in a 100 Hz resolution bandwidth.
+
+Figure 2-5: Spurious emission mask
+Furthermore, out of band emissions must be limited to less than 1% of the total transmitted power*.
+2.3.3
+
+Modulation and Waveform
+
+The RF modulation is Offset Quadrature Phase Shift Keying (OQPSK). The PRN sequences for the
+in-phase (I) and quadrature (Q) components of the signal are defined in section 2.2.3. The chips of
+the I and Q components shall have an average offset of half a chip period ± 1% of the chip period
+over the entire burst with I leading Q by one-half a chip period. In the constellation diagram shown
+below, it can be seen that this will limit the phase-change to no more than 90° at a time. The peak to
+peak amplitude of the I and Q components shall be on average within 15% of each other over the
+entire burst. The Error Vector Magnitude (EVM) of the constellation points away from ideal,
+measured at symbol level, shall be less than 2.5 % when measured over the entire burst.
+Acceptable types of filters that may be used to produce an output waveform include half-sine (i.e.,
+IEEE 802.15.4, Section 12.2.6), or root-raised cosine ([0.8 +/- TBD] roll-off factor may be used). If
+other output filters are being considered for use, the Cospas-Sarsat Secretariat must be consulted in
+advance so that they can consult with the Parties regarding the filter’s acceptability.
+The figure below illustrates the OQPSK modulation mid-burst including the one-half chip delay on
+the Q channel. In this figure, T represents the chip period.
+
+*
+
+The 1% out of band emission is extracted from the recommendation ITU-R SM.1541-4, article 1.153
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+2-11
+
+T
+
+In-Phase
+Component
+(I)
+
+Quadrature
+Component
+(Q)
+
+T/2
+
+Figure 2-6: OQPSK modulation illustration
+2.3.4
+
+Voltage Standing-Wave Ratio
+
+The modulator and 406 MHz transmitter shall be able to meet all requirements within this standard
+at any VSWR between 1:1 and 3:1, and shall not be damaged by any load from open circuit to short
+circuit.
+2.3.5
+
+Maximum Continuous Transmission
+
+The distress beacon shall be designed to limit any inadvertent continuous 406 MHz transmission to a
+maximum of 45 seconds.
+2.4
+
+Transmitter Power Output
+2.4.1
+
+Transmitter Rise Time
+
+The transmitter RF output power shall not exceed -10 dBm prior to 25 ms before the commencement
+of, or 25 ms after the end of, any 406 MHz burst. Power output rise time shall be less than 0.5 ms
+measured between the 10% and 90% power points. Preamble content shall be transmitted during the
+power rise time. Power output fall time shall be less than 0.5 ms between the 90% and the 10% power
+points.
+Between 25 ms after the end of any 406 MHz burst until 25 ms before the commencement of the next
+406 MHz burst the power level in the 406.0 to 406.1 MHz frequency band shall not exceed -10 dBm.
+
+2.4.2
+
+Effective Isotropic Radiated Power (EIRP)
+
+Power output is defined in terms of EIRP, not power into a 50-ohm load. Required EIRP varies with
+elevation angle according to the table below. Greater than 65% of measured EIRP values shall meet
+the limits shown. In addition, 90% of the measured EIRP values shall meet the limits shown at
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+2-12
+
+elevation angles below 55 degrees, except for ELT(DT)s, or ELTs used in combination with
+automatic deployable flight recorders.
+Table 2.5: Required EIRP
+Elevation 10
+(°)
+Max dBm 45
+
+15
+
+20
+
+25
+
+30
+
+35
+
+40
+
+45
+
+50
+
+55
+
+60
+
+65
+
+70
+
+75
+
+80
+
+85
+
+45
+
+45
+
+45
+
+45
+
+45
+
+45
+
+45
+
+45
+
+44
+
+44
+
+44
+
+44
+
+44
+
+44
+
+44
+
+Min dBm
+
+34
+
+34
+
+34
+
+34
+
+34
+
+34
+
+34
+
+34
+
+34
+
+34
+
+33
+
+33
+
+33
+
+33
+
+33
+
+34
+
+The horizontal (azimuth) antenna pattern should be substantially omnidirectional and shall remain
+within the minimum and maximum values of EIRP provided in the above table.
+Power output shall be maintained within the above limits throughout the minimum operating lifetime
+of the beacon at any temperature throughout the operating temperature range. Changes in beacon
+output power due to for example temperature and operation over the beacons minimum lifetime when
+operating into a 50-ohm test load shall be taken into account during determination of compliance with
+the minimum and maximum EIRP limits.
+2.4.3
+
+Antenna Characteristics
+
+Antenna polarization shall be either circular (RHCP) or linear. Antenna pattern should be
+hemispherical and should include coverage at high elevation angles, subject to the EIRP limits given
+in section 2.4.2 (effective isotropic radiated power). An ideal antenna pattern is shown below for
+illustration purposes.
+
+Example
+antenna
+
+45
+max
+n
+37
+35
+min
+33
+
+Figure 2-7: Ideal Antenna Pattern
+
+Remote antennas or detachable antennas shall always be approved with a beacon.
+The following different types of antenna may be specified for use with a 406 MHz beacon:
+External Antenna
+An antenna that is external to the casing of the beacon and that is permanently attached to the beacon
+and that cannot be removed by the user.
+
+2-13
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Detachable Antenna
+An antenna that is external to the casing of the beacon and that is attached directly to the beacon by
+such means as an RF connector without any intermediate cable which can be removed and replaced
+by the user.
+Detachable antennas when measured directly at the antenna feed point shall achieve a VSWR not
+greater than 1.5:1 referred to 50Ω.
+Internal Antenna
+An antenna that is contained within the case of the beacon where the user has no access to the antenna.
+Remote Antenna
+An antenna that is external to the casing of the beacon and which is remote from the beacon, being
+attached to it by means of an RF cable. The antenna and the RF cable may be permanently attached
+to the beacon (in this case the type and length of the antenna cable is fixed and is as supplied by the
+beacon manufacturer) or one or both parts (antenna or cable) may be varied by the user or the installer
+(in this case the type and length of the antenna cable may vary).
+In either case, remote antennas, when measured directly at the antenna feed point, shall achieve a
+VSWR not greater than 1.5:1 referred to 50Ω.
+Remote Antenna without an Integrated Cable
+In this configuration (e.g., an ELT installed in an aircraft) there may be more than one type of
+approved antenna and the length and type of cable between the antenna and beacon may vary.
+The characteristic impedance and minimum and maximum loss of the antenna feed cable shall be
+specified by the beacon manufacturer. The combined beacon, antenna and cable shall meet the EIRP
+requirements in section 2.4.2 (effective isotropic radiated power) when operating with the minimum
+and maximum stated cable loss between the antenna and the beacon.
+Remote Antenna with an Integrated Cable
+In this configuration (e.g., a military PLB with a body worn antenna) the antenna and cable
+combination is fixed and supplied by the beacon manufacturer (although there maybe more than one
+approved combination for different applications) and the length and type of cable between the antenna
+and beacon cannot be changed.
+This combination utilising a specific manufacturer supplied integrated antenna cable shall be tested
+with that cable.
+All antennas and cabling arrangements to be approved with a beacon shall be specified by the
+manufacturer and shall meet all the requirements of section 2.4.
+
+2-14
+
+2.5
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+406 MHz Homing Transmitter
+
+The distress beacon may transmit a 406 MHz Homing signal as defined in this section*. However
+ELT (DT)s are not required to provide a 406-MHz homing signal.
+
+- END OF SECTION 2 -
+
+*
+
+A CW unmodulated 406-MHz homing and on-scene locating signal is under development with details to be provided
+in a future update to T.018 and will be centered at 406.050 MHz, ± 2 kHz, at a power level, repetition rate, and pulse
+width to be determined.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-1
+
+3.
+
+DIGITAL MESSAGE CONTENT
+
+3.1
+
+Basic Structure
+
+The digital message which is transmitted by the 406 MHz beacon consists of:
+a) 202 information bits; and
+b) 48 bits for BCH (250,202) error correction.
+The 202 information bits are further divided into:
+• 154 bits within the main data field (transmitted in every burst),
+• 48 bits within a rotating data field (may be 1 of 16 different content types).
+Message content structure is shown in Figure 3-1 below. Data transmission starts with bit 1, the
+left-hand (most significant) bit of the 154 bit main field.
+
+202 information bits
+
+48 error correction bits
+
+154 bit main field
+
+250
+
+…………….
+
+249
+
+204
+
+203
+
+48 bit BCH field
+202
+
+….……
+
+201
+
+156
+
+155
+
+…
+
+154
+
+141
+
+…
+
+48 bit rotating field
+
+Spare
+
+140
+
+1
+
+Main Message
+
+Figure 3-1: Message content bits
+
+3.2
+
+Beacon Message Content – Main Field
+
+The main field provides for the minimum requirements of document C/S G.008 using sub-fields as
+shown in Table 3.1 below. Note: additional coding guidance is included in Appendix I.
+Unless stated otherwise all sub-fields are separately binary encoded, with the Least Significant Bit to the
+right (i.e., the highest numbered bit in that particular message field).
+
+3-2
+
+C/S
+G.008
+reqmt
+Para.
+3.7.1a
+3.7.1a
+3.7.1a
+
+3.7.1d
+
+N/A
+
+*
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Table 3.1: Minimum Requirement main field in the beacon message
+(transmitted in every burst)
+Bit
+Number numbers
+Description
+Content
+of bits
+in
+message
+TAC Number
+16
+1-16
+16-bit TAC # (0 to 65,535)*†
+(MSB=1)
+Serial Number
+14
+17-30
+14-bit serial number (0 to 16,383)*
+Country code
+10
+31-40
+A three-digit decimal country code number (0 to 999).
+(MSB=
+Country codes are based on the International
+31)
+Telecommunication
+Union
+(ITU)
+Maritime
+Identification Digit (MID) country code available on the
+ITU website:
+(www.itu.int/cgi-bin/htsh/glad/cga_mids.sh).
+Status of homing 1
+41
+On beacon activation a ‘1’ indicates that the beacon is
+device
+equipped with at least one homing signal and a ‘0’
+indicates that the beacon is not equipped with any
+homing signals or that they have been deliberately
+disabled. Once the homing signal in the beacon has been
+activated, a ‘1’ indicates that at least one homing device
+is functional and transmitting. A ‘0’ indicates that no
+homing device is functional, or it has been deliberately
+disabled.
+RLS function(s) 1
+42
+A ‘0’ indicates a beacon without RLS capability or with
+this capability disabled.
+A ‘1’ indicates a beacon with RLS capability enabled
+(e.g., RLS Type-1 automatic acknowledgement, RLS
+Type-2 manual acknowledgement, or RLS Type 3 twoway communication (message) service).
+Test Protocol
+1
+43
+A ‘0’ indicates normal beacon operation. A ‘1’ indicates
+a Test Protocol message for non-operational use.
+Selection of test protocol is not an end-user capability.
+
+The TAC and serial number combination shall be unique (see section 3.6).
+TAC value range 65,521 - 65,535 is reserved for System beacons (e.g., reference and QMS beacons, calibration
+beacon, simulators, etc.) – See document C/S T.022.
+†
+
+3-3
+
+C/S
+G.008
+reqmt
+Para.
+3.7.1g
+
+3.7.1h
+
+*
+
+Description
+
+1
+7
+15
+
+Bit
+numbers
+in
+message
+(MSB=
+45, 52,
+68, 76)
+44
+45-51
+52-66
+
+1
+8
+15
+
+67
+68-75
+76-90
+
+3
+
+91-93
+
+Number
+of bits
+
+Encoded GNSS
+location
+
+Vessel ID
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Content
+Location* is provided to 3.4 m resolution max in the
+following order:
+N/S flag (N=0, S=1);
+Degrees (0 to 90) in 1-degree increments;
+Decimal parts of a degree (0.5 to 0.00003);
+(Default value of bits = 0 1111111
+000001111100000).
+If the beacon does not have encoded location
+capability†, then these bits shall be set to the following
+default value:
+Bits = 1 1111111 000001111100000.
+E/W flag (E=0, W=1);
+Degrees (0 to 180) in 1-degree increments;
+Decimal parts of a degree (0.5 to 0.00003);
+(Default value of bits = 0 11111111
+111110000011111).
+If the beacon does not have encoded location
+capability†, then these bits shall be set to the following
+default value:
+Bits = 1 11111111 111110000011111.
+A three-digit binary field identifier is first transmitted to
+identify the following message content:
+000 - No aircraft or maritime identity (may be defined
+for national use‡; default content for bits 94-137 is all
+0’s);
+001 – Maritime MMSI;
+010 – Radio call sign;
+011 – Aircraft Registration Marking (Tail Number);
+100 – Aircraft aviation 24 Bit Address;
+101 – Aircraft operator and serial number;
+110 – Spare;
+111 – Reserved for System Testing (may contain
+
+All position information is encoded as degrees and decimal parts of a degree, or as fractions of these units to be as
+close as possible to the actual position. Latitude and longitude data are rounded off (i.e. not truncated) to the available
+resolution. All rounding shall follow normal rounding conventions, for example with a resolution of 4, 0.000 to 1.999
+shall be rounded down to 0 and 2.000 to 3.999 shall be rounded up to 4.
+†
+If a beacon model has an external navigation input capability but is installed in a configuration in which a navigation
+signal will never be supplied to the interface (i.e., an ELT in a GA aircraft which cannot supply the navigation signal
+to the beacon), then this (no capability) is the preferred default that should be used under those circumstances.
+However, if the external navigation connection in the installed configuration is uncertain, then the alternate default
+(no position available at this time) should be used.
+‡
+The information contained in this field shall be static even when defined for national use, otherwise the 23-Hex ID
+will be affected, and such a beacon would need to be considered under of letter of compatibility (LoC).
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-4
+
+C/S
+G.008
+reqmt
+Para.
+
+Description
+
+Number
+of bits
+
+Bit
+numbers
+in
+message
+
+Content
+additional information; default content for bits 94-137 is
+all 0’s)*.
+This is followed by the vessel or aircraft identity. The
+following coding schemes are permitted:
+
+30
+
+94-123
+
+1 - Maritime Mobile Service Identity:
+A unique ship station identity in the format
+M1I2D3X4X5X6X7X8X9 where MID indicates the flag
+state of the vessel and XXXXXX is the unique vessel
+number in accordance with ITU-R M.585 Annex 1
+Section 1 encoded as a 9-digit number in binary format
+or for Craft Associated with a Parent Ship a unique
+identification in the format 98MIDXXXX where MID
+represents the administration having jurisdiction over the
+identity for the craft associated with a parent ship and
+XXXX represents a unique number assigned by the
+administration for that craft in accordance with ITU-R
+M.585 Annex 1 Section 5 encoded as a 9-digit number in
+binary format. If no MMSI is available, then insert the
+default decimal number 000111111.
+
+14
+
+124-137
+
+Followed if applicable by the Maritime Mobile Service
+Identity for the EPIRB-AIS system in the format
+917243X4X5Y6Y7Y8Y9 in accordance with ITU-R
+M.585 Annex 2 Section 2 where only the last 4 digits
+(Y6Y7Y8Y9) are encoded here as a number in binary
+format. If there is no EPIRB-AIS device, then insert the
+default binary number 10101010101010 (10922).
+
+44
+
+94-137
+
+2 - Radio call sign:
+Is encoded using the modified-Baudot code shown in
+Table 3.2. This code enables 7 characters to be encoded
+using 42 bits (6x7=42), 94 to 135 (1 to 42 within the
+field). Two bits (136 and 137 (43 and 44 within the
+field)) are spare and shall be coded as 00. The modifiedBaudot characters will be left justified with a modifiedBaudot space (100100) being used where no character
+exists. If no Radio call sign is available, then insert a
+series of 7 spaces (100100).
+
+Vessel ID
+(continued)
+
+*
+
+This value is invalid when the test protocol flag, bit-43, is set to ‘0’.
+
+3-5
+
+C/S
+G.008
+reqmt
+Para.
+
+Description
+
+Number
+of bits
+44
+
+Bit
+numbers
+in
+message
+94-137
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Content
+3 - Aircraft Registration Marking*:
+Is encoded using the modified-Baudot code shown in
+Table 3.2. This code enables 7 characters to be encoded
+using 42 bits (6x7=42), 94 to 135 (1 to 42 within the
+field). Two bits (136 and 137 (43 and 44 within the
+field)) are spare and shall be coded as 00. The modifiedBaudot characters will be right justified with a modifiedBaudot space (100100) being used where no character
+exists. If no Aircraft Registration Mark is available, then
+insert a series of 7 spaces (100100).
+
+44
+
+94-137
+
+4 – Aviation 24 Bit Address†:
+Shall either be encoded as a 24-Bit Binary Number,
+followed by 20 spare bits all of which are coded as 0 or
+shall be encoded as a 24-Bit Binary Number, followed
+by the 3-letter aircraft operator designator‡. The 3 letters
+are encoded using the modified-Baudot code shown in
+Table 3.2‡ (3x5 = 15 Bits) followed by 5 spare bits all of
+which are coded as 0. If there is no 3LD for the aircraft
+operator, then the 3LD is coded as “ZGA”, i.e., bits 118
+to 137 are set to 10001 01011 11000 00000.
+
+44
+
+94-137
+
+5 - Aircraft operator and serial number*:
+A 3-letter aircraft operator designator†. The 3 letters are
+encoded using the modified-Baudot code shown in
+Table 3.2§ (3x5 = 15 Bits).
+
+Vessel ID
+(continued)
+
+WARNING: These coding schemes when used in an ELT(DT) (i.e., bits 138-140 are '011’), are NOT compliant with
+the mandatory data elements defined in ICAO document 10150 (either no 3LD aircraft operator (for 3 - Aircraft
+Registration Marking) or no aircraft identifier is available (for 5 - Aircraft operator and serial number)) and the
+associated data cannot be stored in the LADR. Manufacturers wishing to comply with ICAO GADSS requirements
+and use these coding options should consult the relevant Administration’s aviation authorities for guidance prior to
+coding a beacon with these coding options.
+†
+This coding (when the aircraft 24-bit address and the 3LD designator of the aircraft operator are provided in the
+"Vessel ID" field) is compliant with the mandatory data elements defined in ICAO document 10150, "Manual on the
+Functional Specifications for the Location of an Aircraft in Distress Repository (LADR)".
+The LADR is a facility, that will be used by Cospas-Sarsat, to support ICAO requirements for autonomous location
+of an aircraft in distress contained in Annex 6, Part I, section 6.18 to the Convention on International Civil Aviation.
+‡
+A 3-letter aircraft operator designator (3LD) from the list of "Designators for Aircraft Operating Agencies,
+Aeronautical Authorities and Services" published by the International Civil Aviation Organization (ICAO) as
+document 8585.
+§
+The aircraft operator designator (3 letters) can be encoded in 15 bits using a shortened form of the modified-Baudot
+code (i.e.: all letters in the modified-Baudot code are coded in 6 bits, with the first bit = "1". This first bit can, therefore,
+be deleted to form a 5-bit code).
+*
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-6
+
+C/S
+G.008
+reqmt
+Para.
+
+Description
+
+Number
+of bits
+
+Bit
+numbers
+in
+message
+
+Content
+Followed by a serial number (in the range of 1 up to
+4095) as designated by the aircraft operator, encoded in
+binary, with the least significant bit on the right (12 Bits).
+The remaining 17 Bits are spare and shall follow the
+above 27 Bits and be encoded all as 1’s.
+“000” ELT (excludes ELT(DT));
+“001” EPIRB;
+“010” PLB;
+“011” ELT(DT);
+“111” System beacon; and
+“100”, “101”, “110” spare.
+
+Beacon Type*
+
+3
+
+138-140
+
+Spare bits
+
+14
+
+141-154
+
+TOTAL BITS
+IN EACH
+BURST
+
+154
+
+These bits are all set to binary 1.
+For a cancellation message, these bits are all set to 0.
+To be transmitted in each burst.
+
+Table 3.2: Modified Baudot Code
+Letter
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+K
+L
+M
+*
+
+Code†
+MSB
+LSB
+111000
+110011
+101110
+110010
+110000
+110110
+101011
+100101
+101100
+111010
+111110
+101001
+100111
+
+Letter
+N
+O
+P
+Q
+R
+S
+T
+U
+V
+W
+X
+Y
+Z
+
+Code
+MSB
+LSB
+100110
+100011
+101101
+111101
+101010
+110100
+100001
+111100
+101111
+111001
+110111
+110101
+110001
+
+Letter
+( )‡
+(-)§
+/
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+
+Code
+MSB
+LSB
+100100
+011000
+010111
+001101
+011101
+011001
+010000
+001010
+000001
+010101
+011100
+001100
+000011
+
+These bits always indicate the type of beacon (ELT, EPIRB, PLB, ELT(DT)), as certified, or a System beacon,
+regardless of the vessel ID coded into the beacon.
+†
+MSB: most significant bit,
+LSB: least significant bit
+‡
+Space
+§
+Hyphen
+
+3-7
+
+3.3
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Beacon Message Content – Rotating Fields
+
+The objective requirements of document C/S G.008 are provided in rotating fields as detailed below.
+During every transmission burst the beacon shall transmit 1 of the 16 types of rotating field content.
+The type of field content selected for transmission shall be in accordance with the rotating field
+scheduling requirements – see section 3.4. The 16 types of rotating field content are listed below.
+0. C/S G.008 Objective Requirements (except national use and spares)
+1. ELT(DT) In-flight Emergency (to allow more accurate time parameters)
+2. RLS Type 1 Automatic and Type 2 Manual Acknowledgment (for RLS messages)
+3. National Use (to allow national administrations to define for their use)
+4. RLS Type 3 Two-way Communication (to support TWC messages)
+5. Spare (for future use)
+6. Spare (for future use)
+7. Spare (for future use)
+8. Spare (for future use)
+9. Spare (for future use)
+10. Spare (for future use)
+11. Spare (for future use)
+12. Spare (for future use)
+13. Spare (for future use)
+14. Spare (for future use)
+15. Cancellation Message
+Detailed content of rotating fields #0 through #3, and #15 are shown in the tables below.
+Unless stated otherwise all sub-fields of every rotating field are separately binary encoded, with the Least
+Significant Bit to the right (i.e., the highest numbered bit in that particular message field).
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-8
+
+Table 3.3: C/S G.008 Objective Requirements Rotating Field (#0)
+C/S G.008
+Section
+
+Sub-field
+Description
+Rotating
+Identifier
+
+Number
+of bits
+
+Bit
+numbers in
+message
+155-158 in
+message (14 in rotating
+field)
+159-164 in
+message (510 in
+rotating
+field)
+
+field
+
+4
+
+4.3.1a
+
+Elapsed
+Time
+since activation
+
+6
+
+4.3.1b
+
+Time from last
+encoded location
+
+11
+
+165-175 in
+message
+(11-21 in
+rotating
+field)
+
+4.3.1c
+
+Altitude
+Encoded
+location
+
+10
+
+176-185 in
+message
+(22-31 in
+rotating
+field)
+
+4.3.1d
+
+Dilution
+Precision
+
+of
+
+of
+
+8
+
+186-193 in
+message
+(32-39 in
+rotating
+field)
+
+Content
+
+0000 – G.008 Objective Requirements.
+
+0 to 63 hours in one-hour steps (actual time since
+activation shall be truncated, not rounded e.g., between
+1 hour and 2 hours after activation shall be encoded as
+1 hour). If the beacon is turned off and on again (even
+quickly) this field shall be reset to zero. If the time is
+greater than 63 hours, the value shall be set to 63.
+0 to 2046 minutes (34 hours and 6 minutes) in one-minute
+steps (actual time since last location shall be truncated, not
+rounded e.g., between 34 minutes and 35 minutes after
+activation shall be encoded as 34 minutes). Every time
+that a new / updated encoded location is obtained this field
+shall be reset to zero. Time is calculated from when the
+location was obtained not when it was transmitted. If the
+time is greater than 2046 minutes, the value shall be set to
+2046. If the beacon has not yet obtained a location from
+the GNSS receiver or is not equipped with encoded
+location capability, then this field should be set to 2047 as
+a default value.
+Altitudes of ≤-400 metres to 15952 metres in steps of 16
+metres (where altitudes ≤-400m are encoded as all zeros,
+-384 metres is encoded as 0000000001 and sea level
+would be encoded as 0000011001). Heights shall be
+rounded to the nearest 16 metre step, not truncated. If the
+height is greater than 15952 metres, the height shall be
+considered as 15952 metres and encoded as 1111111110.
+If altitude is not available (e.g., there is no location data or
+only a 2D fix is available) then this field shall be encoded
+as all 1’s.
+The value of HDOP of the encoded location shall be
+reported (first 4 bits) followed by the value of VDOP on
+the following basis:
+0000 = DOP <= 1;
+0001 = DOP > 1 and <= 2;
+0010 = DOP > 2 and <= 3;
+0011 = DOP > 3 and <= 4;
+0100 = DOP > 4 and <= 5;
+0101 = DOP > 5 and <= 6;
+0110 = DOP > 6 and <= 7;
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-9
+
+C/S G.008
+Section
+
+Sub-field
+Description
+
+Number
+of bits
+
+Bit
+numbers in
+message
+
+4.3.1f
+
+Automated/Man
+ual Activation
+notification
+
+2
+
+4.3.1g
+
+Remaining
+battery capacity
+
+3
+
+Not in C/S
+G.008
+
+GNSS status
+
+2
+
+199-200 in
+message
+(45-46 in
+rotating
+field)
+
+Spare
+
+2
+
+201-202 in
+message
+(47-48 in
+rotating
+field)
+
+Bits in Rotating
+Field
+
+48
+
+TOTAL
+
+194-195 in
+message
+(40-41 in
+rotating
+field)
+196-198 in
+message
+(42-44 in
+rotating
+field)
+
+Content
+
+0111 = DOP > 7 and <= 8;
+1000 = DOP > 8 and <= 10;
+1001 = DOP > 10 and <= 12;
+1010 = DOP > 12 and <= 15;
+1011 = DOP > 15 and <= 20;
+1100 = DOP > 20 and <= 30;
+1101 = DOP > 30 and <= 50;
+1110 = DOP > 50;
+1111 = DOP Not Available.
+Report the activation method of the beacon as follows:
+00
+Manual Activation by user;
+01
+Automatic Activation by the beacon;
+10
+Automatic Activation by external means; and
+11
+Spare.
+The remaining battery capacity in the beacon compared to
+its initial capacity shall be reported as follows:
+000 <= 5% remaining;
+001 > 5% and <= 10% remaining;
+010 > 10% and <= 25% remaining;
+011 > 25% and <= 50% remaining;
+100 > 50% and <= 75% remaining;
+101 > 75% and <= 100% remaining;
+110 Reserved for future use; and
+111 Battery Capacity Not Available or Not Provided.
+This field reports the status of the GNSS receiver used to
+provide the encoded location as follows:
+00
+No Fix, or not available;
+01
+2D location only;
+10
+3D location; and
+11
+Reserved for future use.
+00.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-10
+
+Table 3.4: ELT(DT) In-Flight Emergency Rotating Field (#1)
+C/S
+G.008
+section
+
+Sub-field
+Description
+
+# Bits
+
+Bit numbers in
+message
+
+Content
+
+field
+
+4
+
+0001 In-Flight Emergency.
+
+Time of last
+encoded location
+
+17
+
+155-158 in
+message (1-4 in
+rotating field)
+159-175 in
+message (5-21
+in rotating field)
+
+Altitude of
+Encoded
+Location
+
+10
+
+176-185 in
+message (22-31
+in rotating field)
+
+Triggering event
+
+4
+
+186-189 in
+message (32-35
+in rotating field)
+
+GNSS Status
+
+2
+
+190-191 in
+message (36-37
+in rotating field)
+
+Remaining
+battery capacity
+
+2
+
+192-193 in
+message (38-39
+in rotating field)
+
+Spare
+
+9
+
+194-202 in
+message (40-48
+in rotating field)
+
+TOTAL
+
+48
+
+Rotating
+Identifier
+4.3.1b
+
+*
+
+Trigger in compliance with EUROCAE document ED-237.
+
+Time rounded to nearest second (17 bits):
+Time ‘sssss’ where ‘00001’ indicates a time of
+00:00:01 UTC and ‘86399’ indicates a time of
+23:59:59 UTC). If UTC time is not available or
+the time is more than 24 hours old, then this field
+shall be encoded as all ones.
+Altitudes of ≤-400 metres to 15952 metres in
+steps of 16 metres (where altitudes ≤-400m are
+encoded as all zeros, -384 metres is encoded as
+0000000001 and sea level would be encoded as
+0000011001). Heights shall be rounded to the
+nearest 16 metre step, not truncated. If the height
+is greater than 15952 metres, the height shall be
+considered as 15952 metres and encoded as
+1111111110.
+If altitude is not available, e.g., there is no
+location data or only a 2D fix is available, then
+this field shall be encoded as all ones.
+0001 – Manual activation by the crew;
+0100 – G-switch/Deformation Activation;
+1000 – Automatic Activation from Avionics or
+Triggering System*.
+If multiple triggers occur these bits shall always
+indicate the latest event.
+All other bit combinations – spare.
+This field reports the status of the GNSS receiver
+used to provide the encoded location as follows:
+00 Not Fix;
+01 2D location only;
+10 3D location; and
+11 Spare.
+The remaining battery capacity in the beacon
+compared to its initial capacity shall be reported
+as follows:
+00 ≤ 33% remaining;
+01 > 33% and ≤ 66% remaining;
+10 > 66% remaining; and
+11 Battery capacity not available or Not Provided
+All 0’s.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-11
+
+Table 3.5: RLS Type 1 Automatic and Type 2 Manual Acknowledgment Rotating Field (#2)
+C/S
+G.008
+section
+
+Sub-field
+Description
+Rotating
+identifier
+
+field
+
+Unassigned
+
+Beacon
+Capability
+
+# Bits
+
+Bit numbers in
+message
+
+Content
+
+4
+
+155-158 in
+message (1-4 in
+rotating field)
+159-160 in
+message (5-6 in
+rotating field)
+161-166 in
+message (7-12
+in rotating field)
+
+bit 1-4:
+“0010”.
+
+2
+
+RLS
+
+6
+
+bit 5-6:
+All 0’s.
+bit 7 - Capability to process automatically
+generated Acknowledgement RLM Type-1:
+"1": Acknowledgement Type-1 (automatic
+acknowledgement) accepted by this beacon; and
+"0": Acknowledgement Type-1 not requested
+and not accepted by this beacon.
+bit 8 - Capability to process manually generated
+RLM (e.g., Acknowledgment Type-2):
+"1": Manually generated RLM (such as
+Acknowledgement Type-2) accepted by this
+beacon; and
+"0": Manually generated RLM (such as
+Acknowledgement Type-2) not requested and
+not accepted by this beacon.
+Note: The condition bit 7 = “0” and bit 8 = “0” is
+an invalid condition; at least one of these two bits
+must always be a “1”.
+
+RLS
+Provider
+Identification
+
+3
+
+167-169 in
+message (13-15
+in rotating field)
+
+Beacon Feedback
+(acknowledgement
+of RLM reception)
+
+22
+
+170-191 in
+message (16-37
+in rotating field)
+
+bit 9-12 – Reserved for future use and to be set
+to all “0’s”.
+bit 13-15:
+"001": GALILEO Return Link Service Provider;
+"010": GLONASS* Return Link Service
+Provider; and
+“011”: BDS* Return Link Service Provider.
+Other combinations: Spares (for other possible
+RLS providers)
+If RLS Provider Identification = 001 (bit 13-15)
+bit 16 – RLM Type I Feedback:
+"0": Type 1 not (yet) received; and
+"1": Type 1 received.
+bit 17 – RLM Type 2 Feedback:
+“0”: Type 2 not (yet) received; and
+“1”: Type 2 received.
+
+*
+
+Beacons shall not be coded with these coding options (except for the RLS test coded beacons) until the GLONASS
+or BDS RLS services are declared by the Cospas-Sarsat Council as operational within the Cospas-Sarsat Programme.
+Type approval certificates allowing these versions of the RLS coding will not be issued until the RLS provider has
+been approved for operational use in the System.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-12
+
+C/S
+G.008
+section
+
+Sub-field
+Description
+
+# Bits
+
+Bit numbers in
+message
+
+Content
+
+bit 18-37 – RLM:
+if (bit 16 = 1 and bit 17=0):
+Copy of bits 61-80 of the short RLM in the Open
+Service Signal in Space (section 5.2 of OS SIS
+ICD* and section 3.2.1 of Galileo SAR SDD†).
+if (bit 16 = 0 and bit 17=1):
+Reserved for future use, currently an invalid
+condition.
+if (bit 16 = 0 and bit 17 = 0):
+Then bits 18-37 all = “0”.
+if (bit 16 = 1 and bit 17 = 1):
+Reserved for future use, currently an invalid
+condition.
+If RLS Provider Identification is not 001:
+Reserved and bits 16-37 shall all be set to “0”.
+Unassigned
+
+11
+
+TOTAL
+
+48
+
+192-202 in
+message (38-48
+in rotating field)
+
+All 0’s
+
+Table 3.6: National Use Rotating Field (#3)
+C/S
+G.008
+section
+
+Sub-field
+Description
+Rotating
+identifier
+
+4.3.1.i
+
+*
+†
+
+field
+
+# Bits
+
+Bit numbers in
+message
+
+Content
+
+4
+
+155-158 in
+message (1-4 in
+rotating field)
+159-202 in
+message (5-48 in
+rotating field)
+
+0011.
+
+National use
+
+44
+
+TOTAL
+
+48
+
+As defined by national administrations
+Default content all 0’s.
+
+European GNSS (Galileo) Open Service Signal In Space Interface Control Document (OS SIS ICD v1.3), December 2016.
+
+European GNSS (Galileo) SAR/GALILEO Service Definition Document (GALILEO SAR SDD Issue 2.0), January
+2020.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-13
+
+Table 3.7: RLS Type 3 TWC (Message) Rotating Field (#4)
+C/S
+G.008
+section
+
+Sub-field
+Description
+
+# Bits
+
+Bit numbers in
+message
+
+Content
+
+field
+
+4
+
+bit 1-4:
+“0100”.
+
+TWC
+Provider
+Identification
+
+3
+
+155-158 in
+message (1-4 in
+rotating field)
+159-161 in the
+message (5-7 in
+rotating field)
+
+Version ID
+
+5
+
+Rotating
+identifier
+
+RLM Type 3 TWC
+Acknowledgement
+
+1
+
+Spare
+
+2
+
+TWC Messages
+
+33
+
+162-166 in the
+message (8-12
+in rotating field)
+
+167 in the
+message (13 in
+rotating field)
+
+168-169 in the
+message (14-15
+in rotating field)
+170-202 in the
+message (16-48
+in rotating field)
+
+bits 5-7:
+"001": GALILEO* Return Link Service
+Provider;
+"010": GLONASS† Return Link Service
+Provider; and
+“011”: BDS* Return Link Service Provider.
+Other combinations: Spares (for other possible
+RLS providers)
+bits 8-12:
+TWC Message Database versioning‡
+Default value 00000
+The database version inserted here shall
+correspond to the Database version number that
+is being used by the beacon at that time. If the
+Database is subsequently updated then this field
+shall also be updated to reflect the version
+number of the updated Database now being used
+by the beacon.
+bit 13:
+“0”: RLM Type3 TWC Acknowledgement not
+(yet) received; and
+“1”: RLM Type-3 TWC Acknowledgement
+received.
+Note: Once the first RLM Type-3 TWC
+acknowledgement is received by the beacon, this
+bit should remain set to “1” for the remaining
+period of activation.
+bits 14-15:
+Spare bits.
+Default content all 0’s
+bits 16-22:
+7 bits dedicated to question or instruction A
+Default value 0000000.
+bits 23-26:
+
+*
+
+Galileo L1 navigation message is described in European GNSS (Galileo) Open Service Signal In Space Interface
+Control Document (OS SIS ICD version TBC).
+†
+Beacons shall not be coded with these coding options (except for the RLS test coded beacons) until the GLONASS
+or BDS RLS services are declared by the Cospas-Sarsat Council as operational within the Cospas-Sarsat Programme.
+Type approval certificates allowing these versions of the RLS coding will not be issued until the RLS provider has
+been approved for operational use in the System.
+‡
+
+TWC message database versions are available at [document C/S TBD].
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-14
+
+C/S
+G.008
+section
+
+Sub-field
+Description
+
+# Bits
+
+Bit numbers in
+message
+
+Content
+
+4 bits allocated to answer.
+Default value (0000) is for the
+acknowledgement to question or instruction A.
+bits 27-33:
+7 bits dedicated to question or instruction B
+Default value 0000000.
+bits 34-37:
+4 bits allocated to answer.
+Default value (0000) is for the
+acknowledgement to question or instruction B.
+bits 38-44:
+7 bits dedicated to question or instruction C
+Default value 0000000.
+bits 45-48:
+4 bits allocated to answer.
+Default value (0000) is for the
+acknowledgement to question or instruction C.
+[The dataset is defined in document C/S TBD]
+TOTAL
+
+48
+
+Table 3.8: Spare Rotating Fields (for future use) (#5 - #14)
+C/S
+G.008
+section
+
+4.3.1.h
+
+Sub-field
+Description
+
+# Bits
+
+Bit numbers in
+message
+
+Content
+
+Rotating field
+identifier
+
+4
+
+0101 to 1110 inclusive.
+
+Spares
+
+44
+
+155-158 in
+message (1-4 in
+rotating field)
+159-202 in
+message (5-48
+in rotating field)
+
+TOTAL
+
+48
+
+Default content all 0’s.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-15
+
+Table 3.9: Cancellation Message Rotating Field (#15)
+C/S
+G.008
+section
+
+3.4
+
+Sub-field
+Description
+
+# Bits
+
+Bit numbers
+in message
+
+Content
+
+Rotating field
+Identifier
+
+4
+
+1111.
+
+Fixed
+
+42
+
+Method of
+deactivation
+
+2
+
+155-158 in
+message (1-4
+in rotating
+field)
+159-200 in
+message (5-46
+in rotating
+field)
+201-202 in
+message (4748 in rotating
+field)
+
+TOTAL
+
+48
+
+Set to all 1’s.
+
+00 Spare;
+10 Manual De-Activation by user;
+01 Automatic De-Activation by external means;
+and
+11 Spare.
+
+Beacon Transmission Scheduling of Rotating Fields
+
+Unless dictated otherwise by national or international regulations beacons shall transmit the rotating
+fields indicated below when making the following transmissions:
+Table 3.10: Rotating Field Transmission Conditions
+Type of Beacon
+All Beacons except
+ELT(DT)s, Beacons with
+RLS Functionality (Type
+1, 2 and/or 3) and National
+Use Beacons
+ELT(DT)s
+(see Note 2)
+Beacons with RLS Type 1
+Automatic
+Acknowledgement
+Functionality
+(see Note 3)
+National Use Beacons
+(see Note 4)
+
+Self-Test
+Transmission
+G.008 Objective
+Requirements Field
+#0
+
+Normal
+Transmission
+G.008 Objective
+Requirements Field
+#0
+
+Cancellation
+Message
+Cancellation
+Message Field #15
+
+In-Flight Emergency
+Field #1
+RLS Field #2
+
+In-Flight Emergency
+Field #1
+RLS Field #2
+alternating with
+G.008 Field #0
+
+Cancellation
+Message Field #15
+Cancellation
+Message Field #15
+
+National Use Field
+#3
+
+Field #3 and Field #0
+on a schedule set by
+
+Cancellation
+Message Field #15
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+3-16
+
+Type of Beacon
+
+Self-Test
+Transmission
+
+Normal
+Transmission
+the relevant national
+authority
+
+Cancellation
+Message
+
+Beacons with RLS Type-3
+TWC (message) Functionality
+(see Note 5)
+[Beacons with combined RLS
+Functionality (see Note 6)]
+
+TWC Field #4
+
+TWC Field #4
+alternating with G.008
+Field #0
+[TWC Fields #2 and/or
+#4 alternating with
+G.008 Field #0
+TWC Field #4 to have
+priority in TWC mode]
+
+Cancellation Message
+Field #15
+
+[RLS Field #2 and/or
+TWC Field #4]
+
+[Cancellation Message
+Field #15]
+
+Notes
+1. All beacons always transmit the Main 154 Bit Message Field in every burst before transmitting a
+Rotating Field as defined above.
+2. ELT(DT)s cannot include RLS (e.g., Type 1, Type 2, Type 3, etc.) functionality and therefore
+always transmit Rotating Field #1
+3. Beacons with RLS Type 1 automatic acknowledgement functionality always transmit Field #2 in
+the first and subsequent odd numbered bursts and Field #0 in the second and subsequent even
+numbered bursts
+4. National Use ELT(DT) Beacons shall transmit Field #3 and Field #1 on a schedule set by the
+relevant national authority. National Use Beacons with RLS Functionality shall transmit the
+selected fields, Field #4, Field #3, Field #2 and Field #0 on a schedule set by the relevant national
+authority. During a self-test all types of National Use beacons always transmit Field #3.
+5. Beacons with RLS Type 3 TWC (message) functionality will transmit Field #4 in the first and
+subsequent odd numbered bursts and Field #0 in the second and subsequent even numbered bursts.
+6. Beacons with combined RLS functionality which may be specified in the future.
+
+3.5
+
+Beacon Message Content – Error Correcting Field
+
+A sample of the BCH Error-correcting Code Calculation is provided in Appendix B.
+
+3-17
+
+3.6
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Beacon Coding and Hex ID
+
+The manufacturer shall program a unique combination of TAC Number and Serial Number into every
+beacon before it leaves their factory. The TAC Number and Serial Number shall not be capable of
+being deleted from that beacon. Only approved devices shall be allowed to temporarily modify the
+TAC and Serial Number in the transmitted message (e.g., a programming adapter (see section 3.7)). If
+a unit is destroyed or recycled at the end of its life, the unique combination of TAC Number and Serial
+Number used in that beacon shall not be used in another beacon.
+Beacon coding methods are defined in section 3.1 of this specification. Specific operational requirements
+that impact beacon coding, such as the encoding of position data, are defined in section 4 of this
+specification.
+The 23 hexadecimal characters that uniquely identify each 406 MHz beacon are called the beacon
+23 Hex ID. This is never transmitted by the beacon as such, rather it is generated locally by the SAR
+ground segment hardware and generated during beacon manufacture in order to apply identity labels
+to the beacon by extracting the bits shown below from the beacon data.
+The 23 Hex ID is composed as follows:
+Table 3.11: Hex ID Contents
+23 Hex ID Bit
+1
+2 to 11
+12
+13
+14
+15 to 30
+31 to 44
+45
+46 to 48
+49 to 92
+Total
+
+No Bits
+1
+10
+1
+1
+1
+16
+14
+1
+3
+44
+92
+
+Reference to Bits in Message
+n/a
+31-40
+n/a
+n/a
+n/a
+1-16
+17-30
+43
+91-93
+94-137
+
+Data Content
+Fixed Binary ‘1’
+C/S Country Code
+Fixed Binary ‘1’
+Fixed Binary ‘0’
+Fixed Binary ‘1’
+C/S TAC No
+Beacon Serial Number
+Test Protocol Flag
+Aircraft / Vessel ID Type
+Aircraft / Vessel ID
+23 Hex
+
+Notes
+1) Fixing bits 1, 12, 13 and 14 of the 23 Hex ID to ‘1101’ ensures that the 23 Hex ID cannot duplicate a
+First Generation Beacon 15 Hex ID.
+2) The first 60 bits of the 23 Hex ID comprising the C/S Country Code, C/S TAC Number, Beacon Serial
+Number, Test Protocol Flag, Fixed Bits 1, 12, 13 and 14 and the first part of the Aircraft / Vessel ID
+together form a unique subset of the 23 Hex ID which form an SGB 15 Hex ID which is required for
+certain services, such as the Return Link Service. That is a unique SGB 15 Hex ID which may be
+obtained by simply truncating the 23 Hex ID and ignoring the last 8 Hex characters.
+
+3-18
+
+3.7
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Programming Adapters
+
+If a manufacturer chooses to offer an optional Programming Adapter with a particular Beacon Model
+(as defined in C/S T.021 section 1.3) then it shall comply with the requirements in this section.
+A Programming Adapter shall only be capable of functioning with one particular Beacon Model;
+separate Beacon Models shall require the use of a different Programming Adapter. The mechanism
+used to prevent the use of a Programming Adapter with a model for which it was not designed shall be
+defined by the beacon manufacturer and may include physically keying of the adaptors, use of model
+recognition functionality, or other suitable design features.
+Each Programming Adapter shall be given its own unique Serial Number by the beacon manufacturer.
+The manufacturer shall program a unique combination of TAC Number and Serial Number into every
+Programming Adapter before it leaves their factory. The TAC Number and Serial Number shall not be
+capable of being deleted from that Programming Adapter or being overwritten by any means. If a unit
+is destroyed or recycled at the end of its life, the unique combination of TAC Number and Serial
+Number used in that Programming Adapter shall not be used in another Programming Adapter.
+All data stored in a Programming Adapter shall be in non-volatile memory.
+A Programming Adapter shall be capable of having a Country Code and Vessel ID programmed into
+it, which may be capable of being changed and overwritten.
+Every Programming Adapter shall be labelled in accordance with Section 4.5.11.
+When a beacon connected to a Programming Adapter is activated, it shall continue to transmit in its
+message the ID supplied from the Programming Adapter for the duration of the beacon activation, even
+if the adapter subsequently becomes disconnected/disassociated from the beacon. When next activated
+(unless the Programming Adapter or another Programming Adapter has been reconnected / connected
+to the beacon in the meantime), it shall transmit the beacon’s own unique TAC Number and Serial
+Number and the Country Code and Vessel ID. If a Programming Adapter is connected to an activated
+beacon, then the beacon shall ignore the Programming Adapter and continue to transmit the beacons
+own identity, until the beacon is deactivated and subsequently reactivated with the Programming
+Adapter connected, at which time it will then transmit the identity in the Programming Adapter.
+- END OF SECTION 3 –
+
+4-1
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+4.
+
+ENVIRONMENTAL AND OPERATIONAL REQUIREMENTS
+
+4.1
+
+General
+
+SGBs shall function with the MEOSAR system such that 406 MHz transmissions from a beacon can
+be correctly detected, located, and decoded by a MEOLUT when the beacon is operated in nominal
+beacon configuration(s) and under nominal System conditions. An ELT(DT) shall also provide valid
+2D and altitude data.
+As explained in section 1.2, the environmental and operational requirements defined in this section are
+not intended to be exhaustive. They are minimum requirements, which may be complemented by
+national or international standards.
+4.2
+
+Thermal Environment
+4.2.1
+
+Operating Temperature Range
+
+Three standard classes of operating temperature range are defined, inside which all of the
+requirements within this specification shall be met:
+Class 0: -55°C to +70°C
+Class 1: -40°C to +55°C
+Class 2: -20°C to +55°C
+4.2.2
+
+Temperature Gradient
+
+All of the requirements within this specification, shall be met when the beacon is subjected to the
+temperature gradient shown in Figure 4.1.
+4.2.3
+
+Thermal Shock
+
+All of the requirements within this specification shall be met, for measurements beginning 5 seconds
+after simultaneously activating the beacon and applying a rapid thermal shock of 50 °C within the
+specified operating temperature range of the beacon within 1 minute. Subsequently, all requirements
+shall continue to be met for a minimum period of two hours.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+4-2
+
+2hα
+
+h
++A *
+°C
+/
+SL
+
+/h
+°C
+
+OP
+E=
+
+*
+
+-A
+
+2h
+
+E=
+OP
+
+Twarm-up = 0 min
+
+SL
+
+TEMPERATURE (°C)
+
+Tmax
+
+1h
+
+2h
+
+Tmin
+
+tstart
+
+TIME
+
+ton
+tmeas
+NOTES:
+
+tstop
+
+Tmax = + 70°C (Class 0 beacon)
+Tmax = + 55°C (Class 1 & 2 beacons)
+Tmin = - 55°C (Class 0 beacon)
+Tmin = - 40°C (Class 1 beacon)
+Tmin = - 20°C (Class 2 beacon)
+tstart = test start time
+tstop = test stop time
+ton = beacon turn-on time after 2 hour “cold soak”
+tmeas = start time of frequency stability measurement (ton + 0 min)
+A*
+A*
+α
+
+= 7°C/hour for Class 0 (45°C/hour for ELT(DT))
+= 5°C/hour for Class 1 and Class 2 (33°C/hour for ELT(DT))
+= For ELT(DT)s this time is reduced on the down-ramp test to
+one (1) hour.
+
+Figure 4-1: Temperature Gradient
+
+4.3
+
+Mechanical Environment
+
+Beacons should be submitted to vibration and shock tests consistent with their intended use. These
+requirements should be defined by national authorities, preferably using internationally-recognized
+standards such as RTCA/DO-204 for ELTs.
+
+4-3
+
+4.4
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Other Environmental Requirements
+
+Other environmental requirements such as humidity tests, altitude tests, over/under pressure tests,
+waterproofness tests, sand and dust tests, fluids susceptibility tests, etc., may be defined by national
+authorities, preferably using internationally-recognized standards.
+4.5
+
+Operational Requirements
+4.5.1
+
+Duration of Continuous Operation
+
+The minimum duration of continuous operation shall be at least 24 hours* at any temperature
+throughout the specified operating temperature range.
+For ELT(DT)s, at the end of the 370-minute period, the ELT(DT) shall continue transmitting on the
+same schedule as before the 370-minute limit was reached until the ELT(DT) is either deactivated,
+or runs out of battery life. Minimum duration of continuous operation requirements for Crash
+Survivable ELT(DT)s can be found in section 4.5.15.5 and for Combined ELT(DT)s in section
+4.5.16.7.
+4.5.1.1 Battery Replacement Interval
+The beacon battery replacement interval shall be declared by the beacon manufacturer. At the
+end of the battery replacement interval the beacon shall continue to meet the required duration of
+continuous operation as defined in 4.5.1 after accounting for all losses in battery capacity over
+the declared battery replacement interval at ambient temperatures plus a safety factor of 65%
+applied to all losses, except the loss due to self-discharge.
+4.5.2
+
+Other Operational Requirements
+
+Other operational requirements such as installation and maintenance methods, remote monitoring,
+activation methods on planes or boats, etc. may be defined by national authorities.
+4.5.3
+
+Radio-Locating Signal (for Homing and on-Scene Locating)
+
+The distress beacon may transmit a 406 MHz Radio-Locating signal as defined in section 2.5.
+ELT(DT)s are not required to provide a Radio-Locating signal.
+The transmission of the 406 MHz satellite signal shall take precedence over any Radio-Locating
+Signals. Homing signal types should be momentarily interrupted, delayed, rescheduled, or eliminated
+according to the relevant standard for each type, in order to ensure that homing signals are not
+transmitted at the same time as the 406-MHz signal to satellites.
+
+*
+
+For installations meeting IMO GMDSS requirements, a minimum operating lifetime of 48 hours (EPIRB) and 168 hours
+(for Float Free VDR capsules) at any temperature throughout the specified operating temperature range is necessary. The
+minimum operating lifetime for an ELT (DT) to meet the ICAO GADSS requirement at any temperature throughout
+the specified operating temperature range shall be 370 Minutes. This duration is based on the ICAO standards for
+Extended Diversion Time Operations (EDTO) and the maximum diversion time capability of existing aircraft types,
+as of April 2018.
+
+4-4
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+The distress beacon may transmit other radio-locating signals in compliance with appropriate national
+or international standards. The inclusion of any Radio-Locating Signals within a beacon and the
+prioritization of these Radio-Locating Signals is the responsibility of the appropriate national or
+international bodies. The status of the radio-locating transmissions (e.g., operational or
+non-operational) shall be monitored before each beacon satellite transmission and shall be encoded
+in the beacon message as indicated in section 3.2.
+Any such radio-locating device must satisfy all the national performance standards applicable to
+radio-locating devices at the selected frequency.
+Radio-Locating Signals shall not begin transmissions for at least 30 seconds (in order for the as
+equipped status to be transmitted) but shall begin transmission within 5 minutes maximum after
+beacon activation, except (if applicable) AIS signals which shall not be delayed for longer than
+1 minute after beacon activation.
+4.5.4
+
+Beacon Self-Test Mode
+
+In the self-test mode beacons shall transmit a 406-MHz signal with digital message encoded in
+accordance with section 3. The content of the self-test message shall always provide the beacon
+ID as defined in section 3.6, except when a Programming Adapter is attached to the beacon, in
+which case it shall comply with section 3.7. The transmitted message shall be spread by a specific
+sequence defined in section 2.2.3.
+The self-test mode or GNSS self-test mode shall not be used for the purposes of repetitive
+automated interrogation of the beacon status. A beacon (e.g., ELT(DT)) may contain a different
+test mode that can be used for repetitive automated interrogation of its status, but operation of the
+beacon in this different test mode shall not result in the transmission of a 406-MHz signal or other
+radio locating signals (if applicable) nor interfere with the normal operation of the beacon.
+4.5.4.1 Nominal Beacon Self-Test Mode
+All beacons shall include a self-test mode of operation, which shall include a Verification of
+Registration function as detailed in section 4.5.8.
+The complete self-test transmission shall be limited to one 406 burst at full power and one burst
+of each radio-locating signal at full power with a maximum duration of 3 sec each regardless of
+the duration of activation of the self-test control. The radiolocating signals shall be transmitted
+first in order of ascending frequency followed lastly by the 406 MHz satellite signal.
+The self-test mode shall be activated by either a separate switch to that used to activate the beacon
+or cancel transmissions; or a separate switch position of the beacon activation switch.
+The duration of the self-test cycle shall not exceed 15 seconds.
+The self-test function shall perform an internal check and provide a distinct indication that:
+a) the self-test mode has been initiated within 2 seconds of activation;
+
+4-5
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+b) RF power is being emitted at 406 MHz and the radio locating frequencies, if applicable;
+and
+c) the internal check has passed successfully within 15 seconds of activation; or
+d) any of the items a), b) or c) has failed the self-test within 15 seconds of activation;
+e) for RLS Type 1 automatic acknowledgment capable beacons an indication if the beacon
+has RLS functionality enabled; and
+f) for RLS Type 3 TWC (message) capable beacons an indication if the beacon has RLS
+Type 3 TWC (message) functionality enabled.
+The content of the encoded position data field of the self-test message shall be the default values
+specified in section 3.
+The beacon shall be designed to ensure an automatic termination of the self-test mode
+immediately after completion of the self-test cycle and indication of the self-test results.
+4.5.4.2 GNSS Beacon Self-Test Mode
+In addition to the mandatory regular self-test, beacons may optionally include a GNSS self-test
+mode.
+ELT(DT) beacons shall include a GNSS self-test mode resulting in a single burst transmission.
+Beacons which provide for the transmission of an encoded position in a GNSS self-test message
+shall:
+a) activate the GNSS self-test mode via a distinct operation from the normal self-test mode,
+but the GNSS self-test mode may be activated via the same self-test switch(es) or
+operation provided that it shall require a separate, deliberate action by the user that
+would limit the likelihood of inadvertent GNSS self-test activation, and shall not result
+in more than a single self-test burst regardless of the duration of activation of the GNSS
+self-test control;
+b) provide for that in the case of internal GNSS receivers powered by the primary* beacon
+battery the number of GNSS self-tests shall be limited by the beacon design to prevent
+inadvertent battery depletion;
+c) provide a distinct indication that the GNSS self-test is underway and to register
+successful completion or failure of the GNSS self-test;
+d) provide, for beacons with internal navigation devices powered by the primary beacon
+battery, a separate distinct indication that the limited number of GNSS self-test
+opportunities have been attained;
+e) ensure that the duration of the GNSS self-test is limited to a maximum time duration set
+by the manufacturer, noting that:
+- in the case where the beacon fails to encode the location into the 406 MHz message
+within this time limit the GNSS self-test shall cease, the beacon shall indicate a
+
+*
+
+The primary battery is the battery which is powering the 406 MHz function.
+
+4-6
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+GNSS self-test failure and may transmit a single self-test burst with default location
+data (as described in Section 3),
+- in the case where the beacon encodes the location into the 406 MHz message within
+this time limit the GNSS self-test shall cease at that time (or before the time limit is
+reached), indicate a GNSS self-test pass and transmit a single self-test burst
+containing the valid location data; and
+f) for beacons that provide a GNSS self-test using both the internal navigation device and
+the external navigation interface:
+-
+
+when the GNSS Self-test is initiated, the beacon shall attempt to obtain location
+data from the internal navigation device, if this data is available,
+
+-
+
+if location data is not available from the internal navigation device, then the beacon
+shall obtain the location data from the external navigation interface,
+
+-
+
+if the location data from the external navigation interface is not available, the
+beacon shall wait to obtain location data from the internal navigation device for the
+maximum duration of the GNSS self-test, as declared by the beacon manufacturer.
+
+Encoded Position Data*
+
+4.5.5
+
+4.5.5.1 General
+Beacon position data, obtained from a navigation device internal, integral† or external to the
+beacon, shall be encoded in the beacon message, if available. Beacons that do not provide
+encoded position data shall indicate this within the message and shall transmit default location
+data as defined in section 3. Beacons capable of encoding position data shall comply with all the
+appropriate parts of section 4.5.5.
+•
+•
+•
+
+Section 4.5.5.2 applies to all beacons with an internal navigation device except
+ELT(DT)s
+Section 4.5.5.3 applies only to ELT(DT)s which must always include an internal
+navigation device
+Section 4.5.5.4 applies to all beacons (including ELT(DT)s) which include an external
+navigation device input.
+
+Thus, for example if an EPIRB has an internal navigation device and an external navigation
+device input then it shall comply with both sections 4.5.5.2 and 4.5.5.4.
+All times are measured since beacon activation unless specified otherwise.
+Encoded position message content shall be as defined in section 3.
+ELT (DT)s shall incorporate an internal navigation device and may incorporate an interface to
+an external navigation device. The initial position transmitted in the first burst may be obtained
+*
+
+ELTs carried to satisfy the requirements of ICAO Annex 6, Parts I, II and III shall operate in accordance with ICAO
+Annex 10.
+†
+An integral navigation device is a part of the beacon system but may be separate to the beacon transmitter and shall
+comply with the performance requirements of an internal navigation device.
+
+4-7
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+from either the internal navigation device or from the external navigation device input.
+Subsequently all future positions shall only be obtained from the internal navigation device.
+The transmission in the beacon message of this external source of position is only subsequently
+allowed if the internal GNSS receiver is not able to produce a valid encoded position less than 1
+second before the burst. If position data is available from both sources, within 1 second before
+the burst, then the location produced by the internal GNSS receiver has the priority over the
+external source of data*.
+Operation or failure of an internal or external navigation device providing position data to the
+beacon shall not degrade other aspects of beacon performance.
+4.5.5.2 Internal Navigation Device
+An internal navigation device shall be capable of global operation and should conform to an
+applicable international standard.
+An internal navigation device shall incorporate self-check features to ensure that erroneous
+position data is not encoded into the beacon message. The self-check features shall prevent
+position data from being encoded into the beacon message unless minimum performance criteria
+are met. These criteria could include the proper internal functioning of the device, the presence
+of a sufficient number of navigation signals, and sufficient quality of the signals.
+Internal navigation device cold start shall be forced at every beacon activation. Cold start refers
+to the absence of time dependent or position dependent data in memory, which might affect the
+acquisition of the GNSS position.
+With a clear view of the sky the distance between the static horizontal position provided by the
+navigation device, at the time of the position update, and the actual navigation device static
+position shall not exceed 30 m 95% of the time. The distance between the static vertical position
+(altitude) provided by the navigation device, at the time of the position update, and the actual
+navigation device static position shall not exceed 50 m 95% of the time.
+The objective should be to provide a position with low geometric dilution of precision, however
+if the only position available (whether this be 2D or 3D) has a high dilution of precision then this
+position should be provided rather than being discarded in favour of not providing a position at
+all.
+The encoded position data shall be provided in a format compatible with the International
+Terrestrial Reference System (ITRS) and its reference frames (ITRF) such as the WGS 84 or
+GTRF. The difference between the chosen format and the ITRF shall not exceed 10 cm.
+
+*
+
+The internal navigation device or even the entire ELT(DT) may be powered by an external source prior to its activation
+in order to comply with this requirement, but must be powered solely by the ELT(DT)’s internal power source
+immediately after activation of the ELT(DT). The ELT(DT) shall have its own integral or internal power source.
+However, when available, the ELT(DT) may use aircraft electrical power source during transmission after its
+activation. ELT(DT) system minimum duration of continuous operation shall however be demonstrated with the
+ELT(DT) own internal/integral power source.
+
+4-8
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+The navigation device shall provide an indication of the potential error of each provided position
+in terms of Horizontal Dilution of Precision (HDOP) and Vertical Dilution of Precision (VDOP)
+and shall encode the respective DOP values in the message in accordance with section 3.3.
+The navigation device shall provide the following additional information for each provided
+position whether it has no Fix or was operating in 2D or 3D Mode and shall encode this data in
+the message in accordance with section 3.3. If a valid 3D location (including height) is available
+then this shall be transmitted, however if a 3D location is not available but a valid 2D location is
+then this shall be transmitted instead. In this instance when the location changes from 3D to 2D
+(or No Fix) the altitude shall be reset to the default value until such time as a 3D fix with altitude
+is available.
+First provision of encoded location within a transmitted message shall occur no later than the first
+burst after 2 minutes from beacon activation with a 95% probability, with a clear view of the sky.
+The Internal navigation device shall operate continuously during the initial 30 minutes period
+following beacon activation. During this period the beacon shall acquire fresh position
+information immediately prior to every transmission burst unless this becomes impractical due
+to navigation signal constraints.
+During the first 30 minutes after beacon activation the location transmitted by the beacon shall
+always be the latest information provided by the navigation device. This applies even if the
+quality of the location has become worse. The navigation device shall provide an updated
+location at least every 1 second and the update immediately prior to the next scheduled
+transmission burst shall be encoded and transmitted by the beacon within 1 second of receipt.
+After the first 30 minutes, the navigation device shall make subsequent attempts to obtain an
+initial location, or an updated location, as applicable, at least every 15 minutes from the end of
+the last update attempt, for the remainder of the manufacturer declared minimum operating
+lifetime of the beacon*. Whenever an updated location is obtained, it shall be encoded into the
+next available beacon message to be transmitted.
+Whenever the beacon has fresh encoded location data at the start of a burst, this shall be indicated
+within the message by zeroing the “time from last encoded location” field as required by section
+3.3.
+If no position is available, then the beacon shall transmit either default position data (if it has no
+position) or the last received position until such time as a fresh position is available. In addition,
+the beacon shall compute the elapsed time since the last position update (or since activation) to
+an accuracy of 10 seconds and provide this in the transmitted message to a resolution of the
+nearest minute as required by section 3.3.
+Each location update attempt shall require the navigation device to be operational for a period of
+at least 90 seconds or until a valid location has been obtained whichever is shortest.
+
+*
+
+For EPIRBs used as the float-free recording medium for VDRs, after at least 48 hours, the update rate can be extended
+to a maximum of once every 60 minutes for the remainder of the operating lifetime if required.
+
+4-9
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+4.5.5.3 Internal Navigation Device ELT(DT)s only
+An internal navigation device shall be capable of global operation and should conform to an
+applicable international standard.
+An internal navigation device shall incorporate self-check features to ensure that erroneous
+position data is not encoded into the beacon message. The self-check features shall prevent
+position data from being encoded into the beacon message unless minimum performance criteria
+are met. These criteria could include the proper internal functioning of the device, the presence
+of a sufficient number of navigation signals, and sufficient quality of the signals.
+The ELT (DT) navigation system shall be cold-started on initial power-up (ELT(DT) in ARMED
+mode see section 4.5.6.1) but shall not be cold started if the ELT(DT) is subsequently activated
+or between ELT(DT) transmissions. Cold start refers to the absence of time dependent or position
+dependent data in memory, which might affect the acquisition of the GNSS position.
+With a clear view of the sky the distance between the static horizontal position provided by the
+navigation device, at the time of the position update, and the actual navigation device static
+position shall not exceed 30 m 95% of the time. The distance between the static vertical position
+(altitude) provided by the navigation device, at the time of the position update, and the actual
+navigation device static position shall not exceed 50 m 95% of the time. The objective should be
+to provide a position with low geometric dilution of precision, however if the only position
+available (whether this be 2D or 3D) has a high dilution of precision then this position should be
+provided rather than being discarded in favour of not providing a position at all.
+The encoded position data shall be provided in a format compatible with the International
+Terrestrial Reference System (ITRS) and its reference frames (ITRF) such as the WGS 84 or
+GTRF. The difference between the chosen format and the ITRF shall not exceed 10 cm.
+The navigation device shall provide the following additional information for each provided
+position whether it has no Fix or was operating in 2D or 3D Mode and shall encode this data in
+the message in accordance with section 3.3. If a valid 3D location (including height) is available
+then this shall be transmitted, however if a 3D location is not available but a valid 2D location is
+then this shall be transmitted instead. In this instance when the location changes from 3D to 2D
+(or No Fix) the altitude shall be reset to the default value until such time as a 3D fix with altitude
+is available.
+First provision of encoded location within a transmitted message shall occur within 5 seconds*
+after ELT(DT) activation with a 95% probability, with a clear view of the sky. If, after the
+ELT(DT) activation, current navigation data is not available, then the ELT(DT) shall transmit its
+first and subsequent 406-MHz messages with the last position available prior to the ELT(DT)
+activation (which shall be retained in beacon memory for this purpose). The position provided in
+the transmitted message shall also contain the UTC time that relates to when the position was
+obtained in accordance with Table 3.4 “Time of Last Encoded Location” (to an accuracy of 1
+second), until either navigation data becomes available or 24 hours has elapsed. To facilitate the
+provision of position data prior to activation, the ELT(DT) shall attempt to update the position
+retained in memory from either the internal navigation device or the external navigation input at
+The ELT(DT)’s internal navigation device or even the entire ELT(DT) may be powered by an external source prior
+to its activation in order to comply with this requirement.
+*
+
+4-10
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+intervals of no longer than 2 seconds. If no position was available prior to the ELT(DT)
+activation, or if 24 hours have elapsed without an updated position becoming available, the
+ELT(DT) shall transmit the default position until such time, as navigation data becomes available
+from an internal GNSS receiver or, if applicable, from an external navigation device.
+The Internal navigation device shall operate continuously during the initial 30 minutes period
+following beacon activation, subsequently each location update attempt prior to every 406 MHz
+transmission shall require the navigation device to be operational for a period of at least 15
+seconds or until a valid location has been obtained whichever is shortest. If the internal navigation
+device fails to provide a location during the two location update attempts immediately previous
+to the current location update attempt, then the current update attempt shall be extended to a
+minimum duration of 25 seconds scheduled immediately prior to the next planned location
+update. After the first hour following beacon activation, the internal navigation device shall also
+be operational for a period of at least 180 seconds once every hour thereafter, to ensure that the
+device can download any necessary navigation message updates.
+ELT(DT)s shall attempt to acquire fresh position information prior to every 406 MHz
+transmission (unless this becomes impractical due to navigation signal constraints) for the entire
+operating lifetime of the ELT (DT) and shall encode the latest position obtained within less than
+1 second prior to each burst into that transmission. If an updated position is not available within
+1 second immediately prior to every 406 MHz transmission, then the ELT(DT) shall transmit the
+latest position that it has, unless this position is more than 24 hours old, in which case it shall
+revert to transmitting the default position until such time as an updated position is available.
+ELT (DT)s shall provide the UTC time of the last encoded location to an accuracy and resolution
+of 1 second and provide this in the transmitted message as required by section 3.3, Table 3.4. If
+UTC is not available for an encoded location, or if the time of the last encoded location is over
+24 hours old then the ELT(DT) shall transmit default data.
+4.5.5.4 External Navigation Device Input
+It is recommended that beacons, which are designed to accept data from an external navigation
+device, be compatible with an applicable international standard, such as the IEC Standard on
+Digital Interfaces (IEC Publication 61162) and that any difference between the ITRS and the
+datum employed by the receiver should be less than 10 cm. The input should be able to provide
+all relevant position data as required by sections 3.2 and 3.3, this includes horizontal position,
+vertical position (altitude), time of this position to an accuracy of 1 second, HDOP, VDOP and,
+No Fix or 2D or 3D operating. Examples of suitable Maritime IEC 61162-1 sentences to achieve
+this objective include GNS and GSA and Aviation ARINC 429 labels to achieve this objective
+include Label 101, 102, 310, 311 etc. The beacon user manual shall include details of the
+acceptable interfaces.
+In addition to providing horizontal position and altitude the external navigation input shall
+provide an indication of the potential error of each provided position in terms of Horizontal
+Dilution of Precision (HDOP) and Vertical Dilution of Precision (VDOP) and shall encode the
+respective DOP values in the message in accordance with section 3.3, except for ELT(DT)s
+transmitting Rotating Field #1 as this field does not include provision for HDOP or VDOP.
+
+4-11
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+The external navigation input shall indicate for each provided position whether it has no Fix or
+was operating in 2D or 3D Mode and the beacon shall encode this data in the message in
+accordance with section 3.3. If a valid 3D location (including height) is available then this shall
+be transmitted, however if a 3D location is not available but a valid 2D location is then this shall
+be transmitted instead.
+In static conditions the distance between the horizontal position provided by the external
+navigation input, at the time of the position update, and the position transmitted by the beacon
+shall not exceed 20 m. The distance between the vertical position (altitude) provided by the
+external navigation input, at the time of the position update, and the position transmitted by the
+beacon shall not exceed 40 m.
+First provision of encoded location within a transmitted message shall occur within 5 seconds
+with navigation data available at the external navigation device input.
+During the first 30 minutes after beacon activation the location transmitted by the beacon shall
+always be the latest information provided by the external navigation input. This applies even if
+the quality of the location has become worse. The external navigation input shall provide an
+updated location at least every 1 second and the update immediately prior to the next scheduled
+transmission burst shall be encoded and transmitted by the beacon within 1 second of receipt.
+After the first 30 minutes, the beacon shall access the external navigation input prior to every
+transmission and shall encode the position, if available, into the next transmitted burst. Whenever
+the beacon has fresh encoded location data at the start of a burst, this shall be indicated within
+the message by zeroing the “time from last encoded location” field (except for ELT(DT)s) as
+required by section 3.3, Table 3.3. ELT(DT)s shall include the UTC time of the last encoded
+location as required by section 3.3, Table 3.4.
+If no position is available, then the beacon shall transmit either default position data (if it has no
+position) or the last received position until such time as a fresh position is available. In addition,
+the beacon shall compute (except for ELT(DT)s) the elapsed time since the last position update
+(or since activation) to an accuracy of 10 seconds and provide this in the transmitted message to
+a resolution of the nearest minute as required by section 3.3, Table 3.3.
+If a beacon designed to operate with an external position source is installed in a configuration
+which does not supply any or all of the expected GNSS data (e.g., position, status, etc.), then the
+beacon should transmit default data for all of the missing data items. Note: This could occur in
+the installation of an ELT in an aircraft which cannot provide any or all of the expected GNSS
+data due to limitations of the installation.
+
+4.5.6
+
+Beacon Activation
+
+Beacons shall have a means of manual activation and deactivation and may optionally also include
+means of automatic activation (for ELT (DT)s see section 4.5.6.1 below).
+The beacon shall be designed to prevent inadvertent activation.
+Within 1 second after activation, the beacon shall provide a visual indication that it has been activated.
+
+4-12
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+For beacons which can be remotely activated, there shall be an indicator on both the remote activation
+device and the beacon.
+The beacon (except ELT(DT)s) shall track time since activation to an accuracy of 10 minutes and
+provide this in appropriate transmitted messages to a resolution of the nearest one hour as required
+by section 3.3.
+After activation the beacon shall commence transmissions in accordance with section 2.2.1, thereafter
+the beacon shall not transmit more frequently than the minimum burst transmission interval (as
+defined in section 2.2.1) regardless of the duration of activation of any controls or the activation of
+any combination of controls. Once activated and transmitting, the activation of any control other than
+the ‘Off’, ‘Reset’ or ‘Cancellation’ controls shall not stop the beacon from transmitting.
+4.5.6.1 ELT(DT) Modes of Operation
+ELT(DT)s shall allow for automatic and manual means of activation. All ELT(DT)s shall
+include a means of receiving information from the aircraft to determine whether the ELT(DT) is
+on the ground or in the air and shall take this status into account when activated. ELT(DT)s shall
+also have means of deactivation by the same means of activation which shall be followed by a
+cancellation message sequence.
+Standalone ELT(DT)s (i.e., those that do not comply with either sections 4.5.15 or 4.5.16) should
+function as follows. National Administrations or Aviation Authorities may define additional
+functionality.
+Table 4.1: Expected Stand-alone ELT(DT) Behaviour
+Activation Means
+Activation Criteria
+Manual
+Avionics
+On-Ground
+406 Distress Tracking Avionics Activation
+(DT) sequence and
+Disabled
+121.5 optional if
+available
+In-Air
+406 DT sequence only 406 DT sequence only
+preferred
+121.5 optional if
+available
+If the beacon is activated in one aircraft state (e.g., in-flight) and the aircraft transitions to another
+state (e.g., on-ground) while the beacon is still transmitting, the beacon transmission
+characteristics should behave as indicated for the new aircraft state as per the table above.
+Consequently:
+•
+
+*
+
+If the ELT(DT) has been automatically activated by the triggering system*, it shall
+only be de-activated by the same means.
+
+For example, triggered by an external source in compliance with EUROCAE ED-237.
+
+4-13
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+•
+
+If the ELT(DT) has been automatically activated by the beacon sensors*, it shall only
+be deactivated by manually resetting the beacon.
+
+•
+
+If the ELT(DT) has been manually activated (i.e., from the cockpit), it shall only be
+manually de-activated.
+
+•
+
+If the ELT(DT) has been activated by any combination of activation means, it can
+only be de-activated once each activation means has been deactivated.
+
+•
+
+Bits 186 to 189 of the ELT(DT) message shall indicate the most recent means of
+activation. If one means of activation is removed but others remain then Bits 186 to 189
+shall revert to indicating the previous most recent means of activation.
+
+Thus, an ELT(DT) shall as a minimum have the following modes of operation:
+OFF – The complete ELT(DT) (and any related components) is/are unpowered
+ARMED – The ELT(DT) or some parts of it may if required be powered up, such that
+when it is activated by an automatic triggering system† or manually, it can start
+transmitting within 5 seconds and meet the requirements in this specification for
+ELT(DT)s including the provision of encoded location in the first burst. However, until
+the ELT(DT) is activated there are no outputs from the ELT(DT) at all (e.g., no 406 MHz
+or Homing Signal transmissions)
+ON – The ELT(DT) has been either activated by an automatic triggering system and/or
+has been manually activated and is transmitting 406 MHz signals in full compliance with
+the ELT(DT) requirements in this specification.
+RESET – The ELT(DT) is deactivated and ceases transmitting distress alerts and instead
+transmits a sequence of cancellation messages as defined by Section 4.5.7. Upon
+completion of the cancellation message sequence, the ELT(DT) reverts to the ARMED
+condition. The ELT(DT) can only be deactivated as defined above.
+4.5.7
+
+Beacon Activation Cancellation Function
+
+The beacon shall include a beacon activation cancellation function. This shall be a separate function
+from the on/off capability of the beacon for all beacons except ELT(AD), ELT(AF), and ELT(DT).
+The cancellation function shall be protected from inadvertent activation and shall be triggered by two
+simple and independent actions that provide confidence in intentional cancellation action by the user.
+The beacon shall provide an indication of the transmission of cancellation messages.
+When the beacon is deactivated with the cancellation function, the beacon shall transmit the first
+cancellation messages within 5 seconds, and transmit a total of 10 identical cancellation messages at
+intervals of 10 seconds ±0.5 seconds, after which time the beacon shall cease transmitting. In the case
+the beacon is activated (e.g., triggered) during the cancellation sequence, the beacon shall terminate
+the cancellation transmission sequence and reinitiate the alert sequence per section 2.2.1 (unless
+otherwise specified in this section).
+
+*
+†
+
+For example, triggered by G-switch / deformation.
+For example, triggered in compliance with EUROCAE ED-237 or by G-switch / deformation.
+
+4-14
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+When the beacon activation cancellation function is initiated it shall comply with section 3.4,
+Table 3.1 and Table 3.9.
+4.5.7.1 Additional Requirements for ELT(AD), ELT(AF) and ELT(DT) Beacons
+For ELT(AD), ELT(AF), and ELT(DT) beacons, the cancellation transmission sequence shall
+start when either:
+• the beacon is active (ON mode), and the user turns the beacon off (OFF mode) from the
+front panel on the beacon, or
+• the beacon is active (ON mode), and an automatic or manual RESET is initiated,
+provided no other activation sources are present.
+For ELT (DT)s the cancellation function shall include a means of automatic cancellation from
+the same source(s) as the aircraft automatic activation.
+4.5.7.2 Additional Requirements for ELT(AP) Beacons
+For ELT(AP) beacons, when connected to the remote control and indicator panel (i.e., when
+mounted in the aircraft), the cancellation message sequence shall be initiated whenever a beacon
+is deliberately turned off or reset provided no other activation sources are present (thus overriding
+the cancellation function on the ELT unit itself).
+For ELT(AP) beacons, when not connected to the remote control and indicator panel (i.e., when
+external to the aircraft), the cancellation message sequence shall only be initiated when the
+cancellation function on the ELT unit is enabled.
+4.5.7.3 Additional Requirements for all other Beacons
+For all other beacons, the cancellation function shall only be activated through a dedicated
+control.
+Manual operation of the cancellation function shall only result in the transmission of a set of
+cancellation messages when either the beacon is active and transmitting distress alerts or when
+the cancellation function is activated within 180 seconds of a previously activated beacon having
+been turned off, deactivated or reset.
+4.5.8
+
+Verification of Registration
+
+See footnote.*
+
+*
+
+C/S G.008 Section 3.13 describes an operational beacon requirement to design the beacon such that the registration
+status of the beacon is displayed to the beacon user. The registration status shall remain valid for a period of two years
+and the beacon shall be designed such that the self-test function indicates by default that the beacon is not
+registered. National Administrations have a variety of registration renewal requirements and methods for registration
+verification. The lack of a common approach makes it difficult to identify a specific specification to achieve the
+requirement at this time. It's possible that in the future that a common approach would be identified, but until such
+time, compliance with this requirement is not met by SGBs in C/S T.018.
+
+4-15
+
+4.5.9
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+RLS Functions
+
+If a beacon is equipped with a Return Link Service (RLS) functionality and is configured to transmit
+the RLS Rotating Field, it shall meet the following additional requirements.
+4.5.9.1 RLS GNSS Receiver
+The RLS beacon shall contain an internal GNSS Receiver capable of receiving and decoding
+Return Link Messages (RLMs) from a Cospas-Sarsat recognised Return Link Service Provider
+(RLSP) and of providing these messages to the beacon in an IEC 61162-1 RLM compliant
+sentence or an equivalent proprietary RLM sentence defined by the GNSS receiver manufacturer.
+If the GNSS receiver is capable of processing signals from only one GNSS constellation, this
+shall be the associated RLS provider’s constellation, and satellites should be tracked above 5
+degrees of elevation.
+If the GNSS receiver is capable of processing signals from several GNSS constellations
+(multi-constellation GNSS receiver), such a receiver shall prioritize the reception from satellites
+of the GNSS constellation associated with the RLS provider above 5 degrees of elevation over
+other GNSS constellations.
+The following Return Link Messages have been defined by Cospas-Sarsat to date:
+•
+•
+
+RLM Type 1 Automatic Acknowledgement – An automated response that simply
+acknowledges receipt of the RLS request by the System.
+RLM Type 3 Two-way Communication (message) – a return link message (RLM) that
+supports the exchange and acknowledgement of information between the beacon user
+and SAR Authorities using pre-defined questions, information or instructions.
+
+The definition of the Type 1 RLM message content included as part of the Galileo L1 navigation
+message is defined in the Galileo Open Service Public Signal in Space ICD Issue 1.3.
+The definition of the Type 3 RLM message content included as part of the Galileo L1 navigation
+message is defined in the Galileo Open Service Public Signal in Space ICD Issue TBD.
+4.5.9.2 RLS Type 1 GNSS Receiver Operation
+4.5.9.2.1
+
+Operation Cycle
+
+In addition to the beacons normal GNSS receiver operating cycle as defined in section
+4.5.5.2 or as defined by the beacon manufacturer if the receiver is designed to be active
+more frequently than those requirements, the RLS Type 1 automatic acknowledgement
+beacon shall:
+a) when encoded with RLS functionality (i.e., transmitting an RLS Rotating
+Field) maintain the GNSS receiver in an active mode of operation such that it
+can continuously check for receipt of an RLM message and Coordinated
+Universal Time (UTC), for a minimum period of 30 minutes after beacon
+activation, or until a valid RLM message is acquired, or until the beacon is
+deactivated, whichever occurs first;
+
+4-16
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+b) as soon as possible determine UTC from the GNSS receiver and maintain a
+clock for at least 6 hours from the time the beacon was first activated, to an
+accuracy of better than three seconds (once UTC has been acquired) or until
+the beacon is deactivated (if UTC is not acquired see (e) below);
+c) if an RLM message has not been received within the first 30-minute period,
+then at the end of this time, utilize UTC time to next activate the GNSS receiver*
+at the next occurrence of UTC Moffset† minutes to check for receipt of an RLM,
+for a minimum period of 15 minutes, or until an RLM message is acquired
+(e.g., if the first 30-minute period ended at 02:29 and Moffset is 15 minutes, then
+next activate the GNSS receiver at 03:15, or if Moffset is 44 minutes, then next
+activate the GNSS receiver at 02:44);
+d) then during each subsequent hour reactivate the GNSS receiver to check for
+receipt of an RLM for a minimum period of 15 minutes at Moffset minutes, with
+0 ≤ Moffset ≤ 59, past the hour until either an RLM message is received or 6
+hours has elapsed since the beacon was activated;
+e) if UTC is not available after the first 30 minutes the beacon shall attempt to
+establish UTC using the timings detailed in sections 4.5.5.2. If UTC is then
+established the beacon shall continue as per c) and d) above from the next
+occurrence of UTC Moffset minutes; and
+f) once an RLM message is received, or after 6 hours has elapsed since beacon
+activation, whichever is sooner, the beacon shall revert to the GNSS timings
+in sections 4.5.5.2.
+For instance, if the beacon is activated at 03.17h UTC, then the GNSS receiver would
+remain active until at least 03.47h UTC or until an RLM message is acquired if sooner,
+or the beacon is deactivated if it is deactivated before that time. If an RLM message is
+acquired within this period, then the beacon reverts to the GNSS timings in section
+4.5.5.2. If an RLM message is not acquired then it would reactivate at the next occurrence
+of Moffset past the hour and remain active until at least Moffset+15, or until an RLM message
+is acquired, or the beacon is deactivated and it would then reactivate again during the next
+hour at Moffset until Moffset+15, etc. The scheme continues as above until an RLM message
+is acquired, or 6 hours has elapsed since beacon activation, that is in this example until
+09.17h UTC, at which time if an RLM wasn’t acquired earlier the GNSS Receiver reverts
+to the GNSS timings in section 4.5.5.2. If the beacon is deactivated, then the entire
+operation cycle commences again from the beginning when the beacon is next activated.
+NOTE – The Galileo system will cease sending RLM messages back to the beacon, either
+once it receives an RLM Acknowledgement confirming that the RLM has been received
+by the beacon, or 6 hours have elapsed since the first RLS Request message from the
+beacon was received by the RLSP, whichever is the sooner.
+
+There is no specific requirement to deactivate the GNSS receiver between position updates so the “next activation”
+may simply consist of ensuring that the GNSS receiver remains on at the start of this period. The GNSS receiver may
+have been previously activated due to a required GNSS position update and not as a result of the Moffset timing.
+†
+Note that in between Moffset activations the GNSS receiver must also comply with the requirements in section 4.5.5.2.
+*
+
+4-17
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+The RLS beacon may contain an internal GNSS receiver capable of receiving and
+decoding other types of acknowledgment RLM following the same operation cycle as the
+one described.
+4.5.9.2.2
+
+Derivation of Moffset
+
+The value of Moffset for each beacon is computed from the beacon 15 Hex ID subset of the
+23 Hex ID (see section 3.6). More specifically:
+Moffset = BIN2DEC (CRC16(Beacon 15 Hex ID in Binary)) mod 60
+Where BIN2DEC and CRC16 are functions performing the conversion of binary number
+to a decimal number and the CRC-16 of a stream of bits with polynomial x16+x15+x2+1
+respectively. The CRC-16 is used to obtain a uniform distribution of Moffset. A sample of
+a Moffset calculation and CRC code is shown in Appendix F.
+4.5.9.3 RLS Indicator
+The beacon shall be provided with an RLS indicator designed to advise the user when a Type 1
+RLS message has been received by the RLSP and the beacon has received a Type 1 Return Link
+Message (RLM). The RLS Indicator shall:
+
+a) be readily visible to the user when the beacon is operated in all its normal operational
+configurations as declared by the manufacturer;
+b) be clearly visible to the user in direct sunlight;
+c) provide a distinct unique indication;
+d) remain inactive at all times when the beacon message is encoded with any message
+content other than the RLS Rotating Field;
+e) within 5 seconds of the beacon transmitting an initial RLS request, commence
+indication of an RLS request until either a valid RLM Type 1 message is received,
+or the beacon is deactivated, or the beacon battery is expired;
+f) within 5 seconds of the beacon receiving a valid RLM Type 1 message
+acknowledgement, commence a distinct indication until either the beacon is deactivated
+or the beacon battery is expired;
+g) only provide the indication of receipt of an RLS request acknowledgment when the
+received RLM Type 1 message contains the unique 15 Hex ID subset of the 23 Hex ID
+programmed into that beacon and the beacon has validated that this matches its own
+15 Hex ID subset of its 23 Hex ID; and
+h) provide an indication during a self-test if the RLS functionality is enabled in accordance
+with section 4.5.4.1 e).
+4.5.9.4 Confirmation of a Return-Link Message Receipt
+Upon receipt of an Acknowledgement Type-1 RLM or a Test RLM associated with the beacon
+15 HEX ID, the beacon shall, within 4 minutes and 14 seconds, acknowledge the RLM receipt
+by changing the coding of its message as defined in the RLS rotating field, as described in section
+3.3. Once changed, the RLM beacon feedback field shall no longer be changed until a different
+RLM message is received or beacon is switched off or the beacon battery is depleted.
+Once the beacon has received an Acknowledgement Type-1 RLM or a Test RLM and has
+acknowledged the RLM receipt, the GNSS Receiver shall continue to function as required by
+
+4-18
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+section 4.5.9.2.1 unless the beacon is coded as a "Type-1 only capable" RLS beacon as defined
+in Table 3.5. In this specific case only, the GNSS receiver may revert to operating as defined
+within sections 4.5.5.2 and 4.5.5.4, taking into account the time elapsed between the moment of
+activation and the moment when the Type-1 RLM message is received, until either the beacon is
+deactivated or the beacon performance ceases to meet specification due to battery depletion.
+Example
+A beacon is activated at 9:00. It transmits emergency signals for 2 hours and 30 minutes. During
+the period from 11:00 to 11:15, it receives a Type-1 RLM Acknowledgement. The GNSS
+receiver could then revert to operating in accordance to the requirements for internal GNSS
+receiver without the RLS capability which specifies that, the navigation device shall attempt
+location update at least once every 15 minutes, for a period of at least 90 seconds, or until an
+updated location is obtained, if sooner.
+4.5.9.5 RLS Beacon Documentation
+The operation of the RLS Type 1 automatic acknowledgement function shall be clearly explained
+in the User Manual including the performance characteristics of the overall RLS system.
+Suggested minimum text is provided in Annex H.1.
+4.5.10
+
+Battery Status Indication
+
+The battery status indication provides the user with an indication prior to beacon activation that the
+battery may be partially depleted and may not operate for the full specified operating lifetime.
+Beacons powered by a rechargeable battery shall automatically provide an indication when the battery
+requires recharging.
+Beacons powered by a non-rechargeable battery shall provide an indication of battery status during
+self-tests. This shall be a separate indication to the self-test pass/fail indication and the battery status
+indicator shall provide a distinct indication of Potentially Insufficient Battery Energy (PIE). That is,
+that the remaining battery energy may not be sufficient to support the manufacturer declared
+minimum duration of continuous beacon operation.
+4.5.11
+
+Beacon Labelling
+
+All beacons shall have the following information durably marked on the exterior of the beacon:
+
+*
+
+1)
+
+Beacon 23 Hex ID (the 23 Hex ID shall be displayed as:
+NNNNNN NNNNNN NNNNNN NNNNN (i.e., a space after every 6 characters))
+
+2)
+
+The beacon operating temperature range
+
+3)
+
+The minimum duration of continuous operation
+
+4)
+
+For RLS-capable beacons, wording on the Beacon Identity label (TAC / Hex ID Label)
+indicating whether the RLS function is enabled or disabled
+
+5)
+
+For RLS-capable beacons*, a label indicating which are the RLS and RLM indicator(s).
+
+Labeling of the RLS and RLM indicator(s), is independent of the value of bit 42, and whether there is a rotating field #2.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+4-19
+
+If applicable, all Programming Adapters shall be durably marked with the Beacon Model that it
+relates to and its own unique TAC and Serial Number. In addition there shall be sufficient space to
+provide the Country Code and Vessel ID information that will be programmed into the adapter.
+4.5.12
+
+Beacon Instruction Manual
+
+An End User instruction manual shall be made available with all beacons, it shall include the
+information as outlined in the data item description (Annex H.1.10 of document C/S T.021).
+4.5.13
+
+Beacon Data Requirements
+
+The manufacturer shall make available for the purposes of supporting the type approval review the
+information as outlined in the data item description (Annex G-3 and Annex H.1 of document C/S
+T.021).
+4.5.14
+
+External Power Source for ELT(DT)s
+
+The ELT(DT) shall have its own integral or internal power source. However, when available, all
+ELT(DT)s (including those in compliance with sections 4.5.15 and 4.5.16) may use the external
+aircraft electrical power source. An ELT(DT) shall comply with all applicable requirements
+regardless of power source. In addition, the ELT(DT) performance shall not be impacted by switching
+between power sources.
+4.5.15
+
+ELT(DT)s Specifically Designed to Withstand a Crash Impact
+
+4.5.15.1 Introduction
+Potentially there may be ELT(DT)s that have additional functionality, as defined by National
+Administrations and/or Aviation Authorities, which are designed to:
+1)
+2)
+3)
+4)
+
+function both prior to a crash and after a crash, and withstand crash impact conditions;
+be activated in-flight or by crash;
+have homing and locating signals; and/or
+have extended operating life.
+
+Crash Survivable ELT(DT)s should function as follows.
+Table 4.2: Expected Crash Survivable ELT(DT) Behaviour
+
+Activation Criteria
+Unknown aircraft state
+
+Manual
+406 Distress
+Tracking (DT)
+sequence only
+preferred,
+homing permitted
+
+Activation Means
+Automatic Activation Avionics Trigger
+by the Beacon
+406 Post Crash (PC)
+406 DT sequence only
+sequence and homing
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+4-20
+
+On-Ground
+
+In-Flight
+
+406 Distress
+Tracking (DT)
+sequence and
+homing
+406 DT sequence
+only preferred
+homing permitted
+
+406 PC sequence and
+homing
+
+Avionics Activation
+Disabled
+
+406 PC sequence and
+homing
+
+406 DT sequence only
+
+If the beacon is activated in one aircraft state (e.g., in-flight) and the aircraft transitions to
+another state (e.g., on-ground) while the beacon is still transmitting, the beacon transmission
+characteristics should behave as indicated for the new aircraft state as per the table above.
+If there is a conflict between the requirements of this section and any other section of this
+document, then this section takes precedence.
+4.5.15.2 Beacon Hex ID
+The Hex ID of the ELT(DT) shall not change from when activated in-flight compared to when
+operating after a crash.
+4.5.15.3 Burst Transmission Interval (with Crash Detection)
+If the ELT(DT) includes a crash detection function, within 5 seconds of a crash the ELT(DT)
+shall initiate or restart the transmission schedule for an ELT(DT) as if the ELT(DT) had just
+been activated as defined in section 2.2.1 and maintain this transmission schedule for the first
+95 bursts (i.e., approximately 30 minutes) after the crash detection. After burst number 95 (after
+crash detection), transmissions shall then occur at nominally 120 second intervals. The time
+between the start of two successive transmissions (TR) shall be randomized with uniform (flat)
+distribution around the stated nominal value, so that the time intervals between the beginnings
+of two successive bursts (TR) are randomly distributed over ± 5 seconds. After burst number
+95 (after crash detection), the standard deviation over the next 20 successive bursts of TR shall
+be greater than 2.5 seconds. The minimum value of TR observed over the 20 successive bursts
+shall be between 115.0 and 115.2 seconds, the maximum value of TR observed over the 20
+successive bursts shall be between 124.8 and 125.0 seconds.
+Operation after 370 minutes without crash detection
+If, after 370 minutes of in-flight operation, the ELT(DT) has not transitioned to a post-crash
+mode or has not been deactivated, then it shall continue transmitting on the same schedule
+(with the GNSS encoded location updated before each transmitted burst) as before the 370minute limit was reached until the ELT(DT) is either deactivated, gets a subsequent “crash”
+indication to transition to the “post-crash” mode, runs out of battery life, or reaches the
+minimum duration of continuous operation, whichever occurs first.
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+4-21
+
+4.5.15.4 GNSS Update Rate (after Crash Detection)
+During a 30-minute period after a crash detection, the GNSS encoded location shall be updated
+before each transmitted burst, as per sections 4.5.5.1, 4.5.5.3 and 4.5.5.4 (if applicable).
+Beyond 30 minutes, the GNSS encoded location shall be updated in accordance with section
+4.5.5.1, 4.5.5.2 and 4.5.5.4 (if applicable).
+4.5.15.5 Duration of Continuous Operation
+The minimum duration of continuous operation under worst case conditions for this type of
+ELT(DT) shall be at least 24 hours at any temperature throughout the specified operating
+temperature range. This is to be understood to mean the total operating time which is a
+combination of the time prior to a crash (minimum of 10 minutes and maximum of 370
+minutes) and post-crash. For the avoidance of doubt, if the ELT(DT) continues to operate after
+370 minutes without crash detection then the 24-hour minimum duration of continuous
+operation does not apply, and might be reduced as a result of the extended operation in this
+pre-crash mode.
+4.5.15.6 Homing and Locating Signals
+The inclusion or otherwise of one or more homing signals in the ELT(DT) and the activation
+and duration of any homing signal transmissions are the responsibility of national
+administrations.
+
+4.5.16
+
+ELT(DT)s Combined with Automatic ELTs
+
+4.5.16.1 Introduction
+Potentially there may be ELT(DT)s that have combined functionality, that is they function as an
+ELT(DT) during a flight, but on detection of an incident perform as an Automatic ELT (either
+an ELT(AD), ELT(AF) or ELT(AP)), such a combined ELT would be required to meet the
+regulatory requirements set by National Administrations and/or Aviation Authorities, for both an
+ELT(DT) and the type of Automatic ELT that it is combined with.
+However, from a Cospas-Sarsat perspective there are certain key functions of such a combined
+ELT that need to be clearly defined related to its performance and operation and the transition
+from an ELT(DT) to either an ELT(AD), ELT(AF) or ELT(AP) as follows.
+ELT(DT)s combined with Automatic ELTs should function as follows.
+Table 4.3: Expected ELT(DT) Combined with Automatic ELT Behaviour
+
+Activation Criteria
+
+Manual
+
+Activation Means
+Automatic Activation Avionics Trigger
+by the Beacon
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+4-22
+
+Unknown aircraft state
+
+On-Ground
+In-Flight
+
+406 Distress
+Tracking (DT)
+sequence only
+preferred,
+homing permitted
+406 SGB sequence
+and homing
+406 DT sequence
+only preferred,
+homing permitted
+
+406 SGB sequence
+and homing
+
+406 DT sequence only
+
+406 SGB sequence
+and homing
+406 SGB sequence
+and homing
+
+Avionics Activation
+Disabled
+406 DT sequence only
+
+If the beacon is activated in one aircraft state (e.g., in-flight) and the aircraft transitions to another
+state (e.g., on-ground) while the beacon is still transmitting, the beacon transmission
+characteristics should behave as indicated for the new aircraft state as per the table above.
+If there is a conflict between the requirements of this section and any other section of this
+document, then this section takes precedence.
+4.5.16.2 Beacon Coding and Beacon Hex ID
+The combined ELT(DT) and Automatic ELT shall transmit the ELT(DT) In-Flight Emergency
+Rotating Field #1 at all times and shall not change to transmitting the Objective Requirements
+Rotating Field #0 when the combined device transitions to or is activated as an Automatic ELT.
+The 23 Hex ID shall remain the same regardless of whether the device is operating as an
+ELT(DT) or as an automatic ELT.
+Bit 42 in the combined device message shall remain as “0” indicating that the device is not
+equipped with the RLS capability and shall not change to “1” when the combined device
+transitions to or is activated as an Automatic ELT.
+Bits 138 to 140 in the combined device message shall remain as “011” indicating that the device
+is an ELT(DT) and shall not change to “000” when the combined device transitions to or is
+activated as an Automatic ELT.
+4.5.16.3 Burst Transmission Interval
+When activated as an ELT(DT) the beacon shall meet the burst repetition requirements for an
+ELT(DT) as defined in section 2.2.1. When activated as an Automatic ELT or if transitioning
+from an ELT(DT) to an Automatic ELT then the combined device shall commence the burst
+repetition requirements for a non-ELT(DT) 406 MHz beacon as defined in section 2.2.1 (i.e.,
+restart the Initial IAMSAR stage transmission schedule).
+Operation after 370 minutes without crash detection
+If, after 370 minutes of in-flight operation, the ELT(DT) has not transitioned to a post-crash mode
+or has not been deactivated, then it shall continue transmitting on the same schedule (with the
+GNSS encoded location updated before each transmitted burst) as before the 370-minute limit
+
+4-23
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+was reached until the ELT(DT) is either deactivated, gets a subsequent “crash” indication to
+transition to the “post-crash” (Automatic ELT) mode, runs out of battery life, or reaches the
+minimum duration of continuous operation, whichever occurs first.
+4.5.16.4 System Requirements
+The combined ELT(DT) and Automatic ELT shall meet the more stringent requirements, that
+apply to either part of the device (except where stated otherwise below), specifically:
+a) the combined ELT(DT) and Automatic ELT does not have to meet the requirement for
+90% of measured EIRP values to meet the limits shown at elevation angles below 55
+degrees (but does have to meet the other requirements in section 2.4.2);
+b) the combined device shall comply with both the Temperature Gradient requirements for
+an ELT(DT) and the Temperature Gradient requirements for a regular 406 MHz beacon,
+based upon the declared temperature classes for each part of the device (section 4.2.2);
+c) the combined ELT(DT) shall not be required to track time since activation (since it will
+not be transmitting Rotating Field #0) (section 4.5.6); and
+d) the combined ELT(DT) shall comply with the modes of operation for an ELT(DT)
+(section 4.5.6.1).
+4.5.16.5 Cancellation Message
+The cancellation message shall function as defined in section 4.5.7 while operating as an
+Automatic ELT as well as while operating as an ELT(DT).
+4.5.16.6 Encoded Position Data and Navigation Device Performance
+While operating as an ELT(DT) the navigation device shall comply with the requirements of
+sections 4.5.5.1, 4.5.5.3 and 4.5.5.4 (if applicable). When operating as an Automatic ELT, that is
+automatically activated, the navigation device shall comply with the requirements of sections
+4.5.5.1, 4.5.5.2 and 4.5.5.4 (if applicable). When operating as an Automatic ELT, that is manually
+activated, the navigation device shall comply with the requirements of sections 4.5.5.1, 4.5.5.3
+and 4.5.5.4 (if applicable), for a period of at least 6 hours and 10 minutes, after which time it shall
+comply with the requirements of sections 4.5.5.1, 4.5.5.2 and 4.5.5.4 (if applicable).
+4.5.16.7 Duration of Continuous Operation
+The minimum duration of continuous operation under worst case conditions for this type of
+combined ELT shall be a combination of the minimum duration of continuous operation for an
+ELT(DT) (370 minutes) and the minimum duration of continuous operation for a regular 406
+MHz beacon (24 hours), thus resulting in a total of at least 30 hours and 10 minutes.
+For the avoidance of doubt, if the combined ELT continues to operate after 370 minutes without
+crash detection, then the 30 hours and 10 minutes minimum duration of continuous operation
+does not apply and might be reduced as a result of the extended operation in the ELT(DT) mode.
+4.5.16.8 Class of Operation
+The combined device may, if required, function at different classes of temperature as an
+ELT(DT) or Automatic ELT (e.g., the ELT(DT) part of the device may be specified to operate
+
+4-24
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+as a Class 1 device, while the Automatic ELT part of the device may be specified to operate as a
+Class 2 device).
+4.5.16.9 Homing and Locating Signals
+The inclusion or otherwise of one or more homing signals in the combined device and the
+activation and duration of any homing signal transmissions are the responsibility of national
+administrations. The status of the homing signals in the transmitted beacon message shall comply
+with Table 3.1.
+
+4.5.17
+
+RLS Type 3 TWC (message) Functionality
+
+If a beacon is equipped with an RLS Type 3 Two-Way Communication (TWC) (message) functionality
+and is configured to transmit the RLS Type 3 TWC Rotating Field, it shall meet the following
+additional requirements.
+4.5.17.1 RLS Type 3 TWC (message) Mode of Operation
+If the RLS Type 3 Two-Way Communication (TWC) (message) functionality is enabled on a
+beacon, after activation and start of transmissions in accordance with section 2.2.1, the TWC
+capable beacon shall display the initial automatic questions.
+Starting from beacon activation, RF#4 and RF#0 shall be transmitted.
+The initial questions shall be made available to the beacon user sequentially and the next one
+shall be made available only when the previous one is answered by the user. However, the beacon
+may provide an option to skip a particular question. If a follow-on question or instruction is
+received during the initial questions answering phase, it shall be prioritized over the remaining
+initial questions.
+The priority among follow-on questions or instructions shall be the order of reception by the
+beacon.
+If the RLS Type 3 Two-Way Communication (TWC) (message) functionality in the beacon is
+not enabled, then the user shall be advised of this.
+The bit assignment in the RF#4 defined in Table 3.11 is represented hereafter:
+
+Figure 4-2: RF#4 bit assignment representation with the FLAM
+
+4-25
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+This assignment enables having 3 slots of 11 bits each for Questions/Answers or
+Instructions/Reception Acknowledgements per burst.
+4.5.17.2 RLS Type 3 Two-Way Communication (TWC) (message) Operation
+All the answers to initial or follow-on questions shall be transmitted as soon as available in the
+next RF#4 (i.e., the beacon shall not wait until all three Q&A slots in the message have been
+filled). In the event that the number of answers to be sent exceed the number of slots available in
+the RF#4 (i.e., 3 slots), the answers shall be stacked and sent in different successive RF#4 bursts
+without waiting for acknowledgements from the TWC-SP. The answers sent in the RF#4s rotate,
+meaning that for example, if 6 answers have to be sent, the first 3 in stack are transmitted, then
+the next 3 answers, then the first 3 answers again etc.
+4.5.17.2.1
+
+Operation with Initial Q&As
+
+Upon activation the beacon transmits RF#4 with default Q&As in slots 1, 2 and 3 until either an
+Initial Question is answered or a Follow-on Question or Instruction is received (see 4.5.17.2.2
+below).
+a) Once the user answers the first Question this is inserted in Slot 1 together with its
+Answer and is transmitted in the next RF#4 burst. This process is repeated for
+subsequent Initial Q&As using other Slots in the message as available. If there are more
+Questions than Slots available then Q&As are stacked and alternated in subsequent
+RF#4s as outlined above.
+b) Once an Initial Q&A has been received by the TWC-SP, it will be acknowledged by
+sending an Acknowledgement for the specific question (or questions) back to the beacon
+in an RLM containing the beacons 15 Hex ID (truncated from the 23 Hex ID).
+c) [Upon receipt of the Acknowledgement to a specific question the beacon will continue
+to transmit the Question in the next RF#4 burst but will change the Answer to Default
+(this will advise the TWC-SP that it can now stop transmitting the Acknowledgement
+for that specific question).]
+d) [The beacon shall transmit the Question with the Default Answer in [5] bursts (as a
+means to try and ensure that the TWC-SP receives this message), after this period of
+time the beacon reverts to transmitting default data in both the Q&A part of the Slot
+until such time as this Slot is required to send another Q&A.]
+e) The same strategy applies to any other Initial Q&As, which may be contained in the
+same 406 MHz burst as the first Q&A, or may be in later bursts depending on the speed
+at which the user answers the Initial Questions.
+f) Once all the Initial Questions have been addressed, unless one or more Follow-on
+Questions or Instructions have been received, the beacon will revert to transmitting
+default Q&As.
+
+4-26
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+As noted above, the Initial Q&A session may be interrupted by the reception of a Follow-on
+Question or Instruction from an RCC or SPOC. In this case this Follow-on question shall take
+precedence over any unanswered Initial Questions.
+Note that Slots in the message are generic as each Slot contains all necessary data, thus it does
+not matter if a specific Q&A is for example transmitted in Slot 2 in one RF#4 and is then
+subsequently transmitted in Slot 1 in a later RF#4.
+4.5.17.2.2
+
+Operation with Follow-on Q&As or Instructions
+
+The beacon will either not have answered any of the Initial Questions, or still be answering Initial
+Questions, or will have finished with all of these and will thus have reverted to transmitting
+default Q&As, regardless of when it receives one or more Follow-on Question(s) or Instruction(s)
+it handles them as follows.
+a) As soon as the beacon receives a Follow-on Question or Instruction in an RLM
+containing the beacons 15 Hex ID (truncated from the 23 Hex ID) it shall, transmit the
+Follow-on Question / Instruction Number with a Default answer in a free Slot in the
+next RF#4 (this informs the TWC-SP that the Question / Instruction has been received).
+b) If there is not a free Slot in which to transmit the follow-on Question / Instruction, then
+this shall replace the newest other Q&A in whichever Slot it occupies in RF#4. This
+other Q&A shall then be transmitted in the next RF#4. RF#4 transmissions then alternate
+between the sets of Q&As until one or more Slots can be freed up as the result of
+completing the handshake with the TWC-SP. At which time the beacon reverts to
+providing all outstanding Q&As in a single RF#4.
+c) If further Questions or Instructions are received, they shall be handled in the same
+manner as in (a) above in the order of reception by the beacon.
+d) If the user has not yet answered all of the Initial Questions then any Follow-on Questions
+or Instructions take priority over these in terms of being presented to the user for
+answering. Once the Follow-on Questions or Instructions have been answered the
+beacon shall revert to displaying any remaining unanswered Initial Questions to the user,
+or if there are no more Questions or Instructions then the user shall be advised of this.
+e) Once the user answers a Follow-on Question or Instruction, then the message containing
+the Question / Instruction Number shall be updated with the relevant Answer instead of
+the default which shall be transmitted in the next RF#4.
+f) The beacon shall continue to transmit the Follow-on Question or Instruction with its
+Answer until it receives an RLM Acknowledging receipt containing the beacons 15 Hex
+ID (truncated from the 23 Hex ID). Once the beacon receives the acknowledgment it
+shall cease transmitting the Follow-on Question or Instruction with its Answer.
+Once all the Initial Questions and Follow-on Questions or Instructions have been addressed, the
+beacon will revert to transmitting default Q&As.
+
+4-27
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+Note that Slots in the message are generic as each Slot contains all necessary data, thus it does
+not matter if a specific Q&A is for example transmitted in Slot 2 in one RF#4 and is then
+subsequently transmitted in Slot 1 in a later RF#4.
+4.5.17.3 GNSS Receiver
+The RLS Type-3 TWC GNSS receiver shall comply with the requirements in section 4.5.9.1.
+4.5.17.3.1
+
+RLS Type-3 TWC GNSS Receiver Operation
+
+In addition to the beacons normal GNSS receiver operating cycle as defined in section
+4.5.5.2 or as defined by the beacon manufacturer if the receiver is designed to be active
+more frequently than those requirements, the TWC beacon shall:
+a) when encoded with TWC functionality (i.e., transmitting an TWC Rotating Field)
+maintain the GNSS receiver in an active mode of operation such that it can continuously
+check for receipt of an RLM message and Coordinated Universal Time (UTC), for a
+minimum period of 1 hour after beacon activation, or until the beacon is deactivated,
+whichever occurs first;
+b) as soon as possible determine UTC from the GNSS receiver and maintain a clock for at
+least 6 hours from the time the beacon was first activated, to the accuracy of better than
+three seconds (once UTC has been acquired) or until the beacon is deactivated (if UTC
+is not acquired see (e) below);
+c) [after the first hour and each subsequent hour reactivate the GNSS receiver to check for
+receipt of an RLM for a minimum period of 15 minutes at Moffset minutes, with 0 ≤ Moffset
+≤ 59, past the hour until 6 hours has elapsed since the beacon was activated; ]
+d) [if UTC is not available after the first 30 minutes the beacon shall attempt to establish
+UTC using the timings detailed in sections 4.5.5.2. If UTC is then established the beacon
+shall continue as per c) and d) above from the next occurrence of UTC Moffset minutes;
+and]
+e) [after 6 hours has elapsed since beacon activation the beacon shall revert to the GNSS
+timings in sections 4.5.5.2.]
+[For instance, if the beacon is activated at 03.17h UTC, then the GNSS receiver would
+remain active until at least 04.17h UTC or the beacon is deactivated if it is deactivated
+before that time. The beacon shall reactivate at the next occurrence of Moffset past the hour
+and remain active until at least Moffset+15, or the beacon is deactivated and it would then
+reactivate again during the next hour at Moffset until Moffset+15, etc. The scheme continues
+as above until 6 hours has elapsed since beacon activation, that is in this example until
+09.17h UTC, at which time the GNSS Receiver reverts to the GNSS timings in section
+4.5.5.2. If the beacon is deactivated, then the entire operation cycle commences again
+from the beginning when the beacon is next activated.]
+The RLS beacon may contain an internal GNSS receiver capable of receiving and
+decoding other types of acknowledgment RLM following the same operation cycle as the
+one described.
+
+4-28
+
+4.5.17.3.2
+
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+
+[RLS Type-3 TWC (message) Beacon Use of Moffset]
+
+[The derivation of Moffset is defined in section 4.5.9.2.2.]
+4.5.17.4 RLS Type 3 Two-Way Communication (TWC) (message) Indicator
+The beacon shall be provided with a TWC indicator designed to advise the user when the first TWC
+message has been received by the TWC-SP and the beacon has received the first Type-3 Return Link
+Message (RLM). The TWC Indicator shall:
+a) be readily visible to the user when the beacon is operated in all its normal operational
+configurations as declared by the manufacturer;
+b) be clearly visible to the user in direct sunlight;
+c) provide a distinct unique indication;
+d) remain inactive at all times when the beacon message is encoded with any message
+content other than the TWC Rotating Field;
+e) within 5 seconds of the beacon transmitting an initial Type-3 request, commence
+indication of the request until either the valid RLM Type-3 message is received, or the
+beacon is deactivated, or the beacon battery is expired;
+f) within 5 seconds of the beacon receiving the first valid Type-3 RLM message
+acknowledgement, commence a distinct indication until either the beacon is deactivated
+or the beacon battery is expired;
+g) only provide the indication of receipt of a Type-3 request acknowledgment when the
+received RLM Type-3 message contains the unique 15 Hex ID subset of the 23- Hex ID
+programmed into that beacon and the beacon has validated that this matches its own 15Hex ID subset of its 23- Hex ID;
+h) provide an indication during a self-test if the TWC functionality is enabled in
+accordance with section 4.5.4.1; and
+i) be distinct from the RLS indicator described in Section 4.5.9.3.
+
+4.5.17.5 RLS Type 3 TWC (message) Beacon Documentation
+The operation of the TWC function shall be clearly explained in the User Manual including the
+performance characteristics of the overall TWC system. Suggested minimum text is provided in
+Annex H.2.
+- END OF SECTION 4 -

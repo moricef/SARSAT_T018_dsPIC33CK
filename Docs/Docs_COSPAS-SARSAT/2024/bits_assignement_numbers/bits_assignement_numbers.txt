@@ -1,0 +1,864 @@
+E-1
+ C/S T.018 – Issue 1 Rev. 12
+October 2024
+APPENDIX E - BIT ASSIGNMENT NUMBERS
+Bits 1 to 43 of 202 Information bits
+1 to 43 of 154 bit Main Field
+0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4 4 4 4slu n ot o cTAC Number
+ Serial Number
+ Country Code
+ a t i t oc tS(16 bits)
+ (14 bits)
+ (10 bits)
+ g n u o rn Pi F(Part of 23 HEX ID)
+ (Part of 23 HEX ID)
+ (Part of 23 HEX ID)
+ m S t so L eR TH5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 0
+ 1
+ 51 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 1 1 4 23 HEX ID bit numbers
+Bits 44 to 90 of 202 Information bits
+44 to 90 of 154 bit Main Field
+4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+4 4 4 4 4 4 5 5 5 5 5 5 5 5 5 5 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 9Encoded Location
+(47 bits)
+Bits 91 to 137 of 202 Information bits
+91 to 137 of 154 bit Main Field
+0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 39 9 9 9 9 9 9 9 91 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1Vessel ID
+(47 bits) (Part of 23 HEX ID)
+6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+4 4 4 4 5 5 5 5 5 5 5 5 5 5 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 9 9 9 23 HEX ID bit numbers
+Bits 138 to 154 of 202 Information bits
+138 to 154 of 154 bit Main Field
+8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+3 3 4 4 4 4 4 4 4 4 4 4 5 5 5 5 51 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1e
+pyTnocaeB)
+stib3(Spare Bits
+(14 bits)
+Bits 155 to 202 of 202 Information bits
+Rotating Field Information (48 bits)
+Bits 203 to 250 of message bits (Error Correction Code)
+48 bits
+3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 4 52 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2BCH (250,202)
+E-2
+C/S T.018 – Issue 1 Rev. 12
+October 2024
+Bits 155 to 202 of 202 Information bits
+Rotating Field #0 (C/S G.008 Requirements) (48 bits)
+5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+5 5 5 5 5 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9 9 9 0 0 01 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2Rotating
+ n g s uElapsed Time
+ i o ) s n i y r ) s a t ) s e
+ ) sField ID
+ Time from last encoded location Altitude of encoded location
+ Dilution of Precision
+ i v a t i b t n i a t e t t i b t S S b i t a r p b i tsince Activation
+"0000"
+ (11 bits)
+ (10 bits)
+ (8 bits)
+ c t 2 ( m a B ( 3 S ( 2 S ( 2(6 bits)
+ A e R N(4 bits)
+ G0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0 1 2 3 4 5 6 7
+ 81
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 Rotating Field bit number
+Bits 155 to 202 of 202 Information bits
+Rotating Field #1 (ELT(DT)) (48 bits)
+5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+5 5 5 5 5 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9 9 9 0 0 01 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2Rotating
+ s u g ) s t iTriggering
+ t a ) s n i bField ID
+ Time of last encoded location
+ Altitude of encoded location
+ t S t i n i 2 ( Spare
+Event
+ b a y"0001"
+ (11 bits)
+ (10 bits)
+ S S 2 ( m e r e t (9 bits)
+(4 bits)
+ N R t a(4 bits)
+ G B0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6 7 8 9 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 Rotating Field bit number
+Bits 155 to 202 of 202 Information bits
+Rotating Field #2 (RLS) (48 bits)
+5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+5 5 5 5 5 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9 9 9 0 0 01 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2Rotating
+ d e D In ) s Beacon RLS
+ r ) s Beacon Feedback
+Field ID
+ g i t i S
+ e t i Unassigned
+s s b Capability
+ L R d i b (acknowledgement of RLM reception)
+"0010"
+ a 2 ( v o 3 ( (11 bits)
+n (6 bits)
+ r (22 bits)
+(4 bits)
+ U P0
+ 1
+ 2
+ 3
+ 4 5 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+1
+ 2
+ 3
+ 4
+ 5 6
+ 7
+ 8
+ 9
+ 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 Rotating Field bit number
+Bits 155 to 202 of 202 Information bits
+Rotating Field #3 (National Use) (48 bits)
+5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+5 5 5 5 5 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9 9 9 0 0 01 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2Rotating
+Field ID
+ National Use
+"0011"
+ (44 bits)
+(4 bits)
+0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 Rotating Field bit number
+Bits 155 to 202 of 202 Information bits
+Rotating Field #15 (Cancellation Message) (48 bits)
+5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+5 5 5 5 5 6 6 6 6 6 6 6 6 6 6 7 7 7 7 7 7 7 7 7 7 8 8 8 8 8 8 8 8 8 8 9 9 9 9 9 9 9 9 9 9 0 0 01 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2Rotating
+ f
+ n
+o oField ID
+ Fixed (all 1's)
+ d o i t avh i"1111"
+ (42 bits)
+ t e t caM e(4 bits)
+ D0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 0
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7 81
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4 4 Rotating Field bit number
+NOTE: When displaying a message as 63 hex characters, one bit is inserted at the beginning of the
+message to indicate the PRN sequence (0 = Normal, 1 = self-test), followed by one zero, to form the 63
+hexadecimal representation (2 bits + 250 bit message) for processing by the Cospas-Sarsat ground
+segment.
+- END OF APPENDIX E -

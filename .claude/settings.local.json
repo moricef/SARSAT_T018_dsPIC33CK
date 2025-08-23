@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/opt/microchip/xc-dsc/v3.21/bin/xc-dsc-gcc:*)",
+      "Bash(make:*)",
+      "Read(//opt/microchip/xc-dsc/v3.21/**)",
+      "Bash(grep:*)",
+      "Read(//home/fab2/MPLABXProjects/SARSAT_T001_dsPIC33CK.X/**)",
+      "Read(//home/fab2/MPLABXProjects/SARSAT_T001_dsPIC33CK.X/**)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": [],
+    "additionalDirectories": [
+      "/home/fab2/MPLABXProjects/SARSAT_T001_dsPIC33CK.X"
+    ]
+  }
+}

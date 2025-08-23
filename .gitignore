@@ -1,0 +1,58 @@
+# MPLAB X IDE Build files
+build/
+debug/
+dist/
+.generated_files/
+
+# MPLAB X IDE private files
+nbproject/private/
+nbproject/Makefile-*
+!nbproject/Makefile-impl.mk
+!nbproject/Makefile-variables.mk
+
+# MPLAB X IDE configuration files (keep only essential)
+nbproject/configurations.xml
+
+# Temporary files
+*.tmp
+*.bak
+*~
+.#*
+\#*#
+
+# Log files
+*.log
+*.inx
+
+# Object files and libraries
+*.o
+*.a
+*.elf
+*.hex
+*.map
+
+# Debug symbols
+*.dwarf
+*.coff
+
+# MPLAB X IDE cache
+.mplab_ide/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE specific
+.vscode/
+.idea/
+
+# Motor Bench (if present)
+motorbench/
+
+# Queue logs and debug
+queuelogs/
+logs/
+
+# MCC generated files (preserve configuration)
+mcc-manifest*.yml

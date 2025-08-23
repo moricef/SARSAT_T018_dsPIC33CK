@@ -1,0 +1,51 @@
+// =============================
+// Nouvelle Structure des Bits (CSV + Appendix B)
+// =============================
+
+// Bits 1-43: Identification
+#define FRAME_TAC_START 1
+#define FRAME_TAC_LENGTH 16
+#define FRAME_SERIAL_START 17
+#define FRAME_SERIAL_LENGTH 14
+#define FRAME_COUNTRY_START 31
+#define FRAME_COUNTRY_LENGTH 10
+#define FRAME_HOMING_BIT 41
+#define FRAME_RLS_BIT 42
+#define FRAME_TEST_BIT 43
+
+// Bits 44-90: Position encodée
+#define FRAME_LOCATION_START 44
+#define FRAME_LOCATION_LENGTH 47
+
+// Bits 91-137: Vessel ID
+#define FRAME_VESSEL_ID_START 91
+#define FRAME_VESSEL_ID_LENGTH 47
+
+// Bits 138-154: Beacon Type + Spare
+#define FRAME_BEACON_TYPE_START 138
+#define FRAME_BEACON_TYPE_LENGTH 3
+#define FRAME_SPARE_START 141
+#define FRAME_SPARE_LENGTH 14
+
+// Bits 155-202: Rotating Field
+#define FRAME_ROTATING_ID_START 155
+#define FRAME_ROTATING_ID_LENGTH 4
+#define FRAME_TIME_START 159
+#define FRAME_TIME_LENGTH 11
+#define FRAME_ALTITUDE_START 170
+#define FRAME_ALTITUDE_LENGTH 10
+#define FRAME_TRIGGERING_START 180
+#define FRAME_TRIGGERING_LENGTH 4
+#define FRAME_GNSS_STATUS_START 184
+#define FRAME_GNSS_STATUS_LENGTH 2
+#define FRAME_BATTERY_START 186
+#define FRAME_BATTERY_LENGTH 2
+#define FRAME_ROTATING_SPARE_START 188
+#define FRAME_ROTATING_SPARE_LENGTH 15
+
+// BCH (250,202)
+#define FRAME_BCH_START 203
+#define FRAME_BCH_LENGTH 48
+
+// 23 HEX ID Structure (Appendix B.2)
+#define HEX_ID_FIXED_BITS 0xB  // Binary: 1011 (bits fixes: 1,1,0,1)
