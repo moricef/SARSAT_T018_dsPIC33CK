@@ -181,30 +181,32 @@ make clean && make
 
 ## Support
 
-Projet développé pour ADRASEC - Formation et exercices de secours  
+**Projet développé par ADRASEC09**
 Architecture ouverte et entièrement documentée  
 Conformité SARSAT T.018 Rev.12 Oct 2024  
 
-Ce projet implémente les spécifications COSPAS-SARSAT T.018 pour applications pédagogiques et validation technique.
 
 
 ## Licence
 
+Ce projet est sous licence Creative Commons Attribution - Pas d'Utilisation Commerciale - Partage dans les Mêmes Conditions 4.0 International (CC BY-NC-SA 4.0).
 
-**Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International**
+[![Licence Creative Commons](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-Ce projet est sous licence [CC BY-NC-SA 4.0](LICENSE) - Usage éducatif et formation ADRASEC/SATER uniquement.
+### Vous êtes autorisé à :
 
-### Permissions
+- **Partager** : copier, distribuer et communiquer le matériel par tous moyens et sous tous formats
+- **Adapter** : remixer, transformer et créer à partir du matériel
 
-- **Partage** : Copier et redistribuer
-- **Adaptation** : Modifier et développer  
-- **Formation** : Usage ADRASEC/SATER
+### Selon les conditions suivantes :
 
-### Restrictions  
-- **Commercial** : Pas d'usage commercial
-- **Attribution** : Créditer l'auteur original
-- **ShareAlike** : Même licence pour modifications
+- **Attribution** : Vous devez créditer l'œuvre, intégrer un lien vers la licence et indiquer si des modifications ont été effectuées
+- **Pas d'Utilisation Commerciale** : Vous n'êtes pas autorisé à faire un usage commercial de cette œuvre
+- **Partage dans les Mêmes Conditions** : Dans le cas où vous remixez, transformez ou créez à partir du matériel composant l'œuvre originale, vous devez diffuser l'œuvre modifiée dans les mêmes conditions
+
+**Avertissement** : Cette licence ne s'applique pas aux données de décodage des balises de détresse réelles, qui restent soumises aux réglementations nationales et internationales sur les communications d'urgence.
+
+Pour plus de détails, consultez le texte complet de la licence : https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr
 
 ---
 
