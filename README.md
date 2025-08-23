@@ -179,3 +179,28 @@ Architecture ouverte et entièrement documentée
 Conformité SARSAT T.018 Rev.12 Oct 2024  
 
 Ce projet implémente les spécifications COSPAS-SARSAT T.018 pour applications pédagogiques et validation technique.
+
+=======
+## Licence
+
+
+**Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International**
+
+Ce projet est sous licence [CC BY-NC-SA 4.0](LICENSE) - Usage éducatif et formation ADRASEC/SATER uniquement.
+
+### Permissions
+
+- **Partage** : Copier et redistribuer
+- **Adaptation** : Modifier et développer  
+- **Formation** : Usage ADRASEC/SATER
+
+### Restrictions  
+- **Commercial** : Pas d'usage commercial
+- **Attribution** : Créditer l'auteur original
+- **ShareAlike** : Même licence pour modifications
+
+---
+
+> **IMPORTANT** : Ce générateur utilise 403 MHz pour éviter les fausses alertes COSPAS-SARSAT. Usage formation uniquement.
+
+> **ADRASEC** : Association Départementale des RadioAmateurs au service de la Sécurité Civile
