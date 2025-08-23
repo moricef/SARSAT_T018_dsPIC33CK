@@ -4,7 +4,7 @@
 [![COSPAS-SARSAT](https://img.shields.io/badge/Standard-T.018%20Compliant-blue)](https://cospas-sarsat.int)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-orange)](LICENSE)
 
-> **Générateur de balises 403 MHz conforme COSPAS-SARSAT pour formation ADRASEC et exercices SATER**
+> **Générateur de trames conforme COSPAS-SARSAT sur fréquence 403 MHz pour formation ADRASEC et exercices SATER**
 
 
 Balise COSPAS-SARSAT 2ème génération pour formation ADRASEC  
