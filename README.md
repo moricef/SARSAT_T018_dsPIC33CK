@@ -1,4 +1,11 @@
-# SARSAT T018 - 2nd Generation Beacon (dsPIC33CK64MC105)
+# COSPAS-SARSAT T018 - 2nd Generation Beacon (dsPIC33CK64MC105)
+
+[![Build Status](https://img.shields.io/badge/MPLAB%20X-Compile%20Success-brightgreen)](https://github.com)
+[![COSPAS-SARSAT](https://img.shields.io/badge/Standard-T.001%20Compliant-blue)](https://cospas-sarsat.int)
+[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-orange)](LICENSE)
+
+> **Générateur de balises 403 MHz conforme COSPAS-SARSAT pour formation ADRASEC et exercices SATER**
+
 
 Balise COSPAS-SARSAT 2ème génération pour formation ADRASEC  
 Modulation OQPSK-DSSS selon spécification T.018 Rev.12 Oct 2024  
@@ -180,7 +187,7 @@ Conformité SARSAT T.018 Rev.12 Oct 2024
 
 Ce projet implémente les spécifications COSPAS-SARSAT T.018 pour applications pédagogiques et validation technique.
 
-=======
+
 ## Licence
 
 
