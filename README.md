@@ -133,22 +133,9 @@ make clean && make
 - ✅ **Mémoire optimisée** : <33% program, <36% data
 - ✅ **Conformité T.018** : 100% spécification respectée
 
-## 📊 Validation MATLAB
+## Statut Implémentation
 
-### Documents Analysés
-- `DSSSReceiverForSARbasedTrackingSystem_4.pdf` - Architecture récepteur  
-- `DSSSReceiverForSARbasedTrackingSystem_8.pdf` - Implémentation pratique  
-
-### Confirmations Techniques  
-- ✅ **OQPSK enveloppe constante** : Minimise émissions hors bande
-- ✅ **Budget liaison RF** : SNR=24dB @ 300km, EIRP=33dBm
-- ✅ **Architecture récepteur** : AGC→Préambule→FreqCorr→TimingRecovery→Demod→BCH
-- ✅ **Paramètres T.018** : ChipRate=38.4k, SymbolRate=300, SpreadFactor=256
-- ✅ **Séquences timing** : 5s/10s/28.5s±1.5s conformes
-
-## 🔍 Statut Implémentation
-
-### ✅ Implémenté et Testé
+### Implémenté et Testé
 - **CCP1 Timer précis** : 38.400 kHz ±0.005% (hardware)
 - **Spreading factor 256** : Conforme T.018 (corrigé de 128)  
 - **PRN sequences officielles** : LFSR x^23 + x^18 + 1
@@ -160,7 +147,7 @@ make clean && make
 - **GPS NMEA parser** : Basique mais opérationnel
 - **Modes Test/Exercise** : Switch hardware + logique
 
-### 🚧 À Finaliser  
+### À Finaliser  
 - **Parser NMEA complet** : Coordonnées précises (actuellement simulé)
 - **Test RF complet** : Validation analyseur spectre 403MHz
 - **Documentation utilisateur** : Guide ADRASEC détaillé
@@ -190,6 +177,5 @@ make clean && make
 Projet développé pour ADRASEC - Formation et exercices de secours  
 Architecture ouverte et entièrement documentée  
 Conformité SARSAT T.018 Rev.12 Oct 2024  
-Validation MATLAB des spécifications DSSS  
 
 Ce projet implémente les spécifications COSPAS-SARSAT T.018 pour applications pédagogiques et validation technique.
