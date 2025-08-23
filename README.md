@@ -1,14 +1,10 @@
 # SARSAT T018 - 2nd Generation Beacon (dsPIC33CK64MC105)
 
-**Balise de détresse COSPAS-SARSAT 2ème génération** pour test/exercice ADRASEC  
-**Modulation** : OQPSK-DSSS selon spécification T.018 Rev.12 Oct 2024  
-**Applications** : Formation, validation décodeurs, exercices secours  
+Balise COSPAS-SARSAT 2ème génération pour formation ADRASEC  
+Modulation OQPSK-DSSS selon spécification T.018 Rev.12 Oct 2024  
+Fréquence 403MHz (formation) - Protocol T.018 compliant
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
-[![Compliance](https://img.shields.io/badge/T.018-100%25%20compliant-blue)]()
-[![Memory Usage](https://img.shields.io/badge/program-21468%20bytes%20(32%25)-orange)]()
-
-## 🎯 Objectif
+## Objectif
 
 Développement d'une balise de formation 403MHz conforme aux spécifications officielles COSPAS-SARSAT T.018 pour :
 - **Formation** des opérateurs ADRASEC  
@@ -171,31 +167,29 @@ make clean && make
 
 ## ⚠️ Conformité et Légalité
 
-### ⚡ **IMPORTANTE DISTINCTION FRÉQUENCES**
-- **403 MHz** : Fréquence de **FORMATION/TEST** (ce projet)
-- **406 MHz** : Fréquence d'**URGENCE RÉSERVÉE** (interdite formation)
-- **Objectif** : Éviter interférences avec vraies balises d'urgence
-- **Conformité** : Protocole T.018 complet mais à 403MHz
+### Fréquences d'opération
+- **403 MHz** : Fréquence de formation et test (ce projet)
+- **406 MHz** : Fréquence d'urgence réservée (interdite pour formation)
+- **Objectif** : Éviter interférences avec balises d'urgence réelles
+- **Conformité** : Protocole T.018 complet adapté à 403MHz
 
 ### Spécifications Respectées
 - **COSPAS-SARSAT T.018** Rev.12 Oct 2024 (protocole officiel)
 - **ITU-R M.633-4** : Caractéristiques techniques balises
 - **ETSI EN 300 066** : Standards balises d'urgence (adaptation 403MHz)
 
-### Usage Légal
-- ✅ **Formation ADRASEC** : Autorisé dans cadre pédagogique
-- ✅ **Validation décodeurs** : Test conformité récepteurs  
-- ✅ **Exercices secours** : Simulation crashes contrôlés
-- ⚠️ **Usage commercial** : Certification obligatoire
-- ⚠️ **Transmission réelle** : Licence radioamateur requise
+### Usage autorisé
+- Formation ADRASEC dans cadre pédagogique
+- Validation de décodeurs et récepteurs SARSAT  
+- Exercices de recherche et sauvetage simulés
+- Usage commercial nécessite certification appropriée
+- Transmission RF nécessite licence radioamateur
 
-## 📞 Support et Contact
+## Support
 
-**Projet développé pour ADRASEC** - Formation et exercices de secours  
-**Architecture ouverte** et entièrement documentée  
-**Conformité SARSAT officielle** T.018 Rev.12 Oct 2024  
-**Validation MATLAB complète** des spécifications DSSS  
+Projet développé pour ADRASEC - Formation et exercices de secours  
+Architecture ouverte et entièrement documentée  
+Conformité SARSAT T.018 Rev.12 Oct 2024  
+Validation MATLAB des spécifications DSSS  
 
----
-
-*Ce projet implémente fidèlement les spécifications COSPAS-SARSAT T.018 pour applications pédagogiques et validation technique*
+Ce projet implémente les spécifications COSPAS-SARSAT T.018 pour applications pédagogiques et validation technique.
