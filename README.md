@@ -1,7 +1,7 @@
 # COSPAS-SARSAT T018 - 2nd Generation Beacon (dsPIC33CK64MC105)
 
 [![Build Status](https://img.shields.io/badge/MPLAB%20X-Compile%20Success-brightgreen)](https://github.com)
-[![COSPAS-SARSAT](https://img.shields.io/badge/Standard-T.001%20Compliant-blue)](https://cospas-sarsat.int)
+[![COSPAS-SARSAT](https://img.shields.io/badge/Standard-T.018%20Compliant-blue)](https://cospas-sarsat.int)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-orange)](LICENSE)
 
 > **Générateur de balises 403 MHz conforme COSPAS-SARSAT pour formation ADRASEC et exercices SATER**
