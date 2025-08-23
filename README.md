@@ -10,11 +10,11 @@
 
 ## 🎯 Objectif
 
-Développement d'une balise de détresse 406MHz conforme aux spécifications officielles COSPAS-SARSAT T.018 pour :
+Développement d'une balise de formation 403MHz conforme aux spécifications officielles COSPAS-SARSAT T.018 pour :
 - **Formation** des opérateurs ADRASEC  
-- **Validation** de décodeurs 406MHz  
+- **Validation** de décodeurs SARSAT  
 - **Exercices** de recherche et sauvetage  
-- **Tests** de conformité SARSAT  
+- **Tests** de conformité T.018 (hors fréquence d'urgence 406MHz)  
 
 ## 🏗️ Architecture Hardware
 
@@ -26,7 +26,7 @@ Développement d'une balise de détresse 406MHz conforme aux spécifications off
 
 ### Chaîne RF Complète (~95€)
 - **MCP4922** : Dual 12-bit DAC pour I/Q OQPSK  
-- **ADF4351** : Synthétiseur LO 406MHz  
+- **ADF4351** : Synthétiseur LO 403MHz  
 - **ADL5375** : Modulateur I/Q quadrature  
 - **RA07M4047M** : Amplificateur de puissance  
 - **BPF 403MHz** : Filtrage hors bande  
@@ -166,15 +166,21 @@ make clean && make
 
 ### 🚧 À Finaliser  
 - **Parser NMEA complet** : Coordonnées précises (actuellement simulé)
-- **Test RF complet** : Validation analyseur spectre 406MHz
+- **Test RF complet** : Validation analyseur spectre 403MHz
 - **Documentation utilisateur** : Guide ADRASEC détaillé
 
 ## ⚠️ Conformité et Légalité
 
+### ⚡ **IMPORTANTE DISTINCTION FRÉQUENCES**
+- **403 MHz** : Fréquence de **FORMATION/TEST** (ce projet)
+- **406 MHz** : Fréquence d'**URGENCE RÉSERVÉE** (interdite formation)
+- **Objectif** : Éviter interférences avec vraies balises d'urgence
+- **Conformité** : Protocole T.018 complet mais à 403MHz
+
 ### Spécifications Respectées
-- **COSPAS-SARSAT T.018** Rev.12 Oct 2024 (officiel)
+- **COSPAS-SARSAT T.018** Rev.12 Oct 2024 (protocole officiel)
 - **ITU-R M.633-4** : Caractéristiques techniques balises
-- **ETSI EN 300 066** : Balises d'urgence 406 MHz
+- **ETSI EN 300 066** : Standards balises d'urgence (adaptation 403MHz)
 
 ### Usage Légal
 - ✅ **Formation ADRASEC** : Autorisé dans cadre pédagogique

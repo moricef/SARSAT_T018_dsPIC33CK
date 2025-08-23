@@ -40,7 +40,7 @@
 ## 🎛️ MODES DE FONCTIONNEMENT
 
 ### **MODE TEST (Switch = 0)**
-- **Objectif** : Validation décodeur (~Documents/HAM/balise_406MHz/Dec406_v10.2/)
+- **Objectif** : Validation décodeur (~Documents/HAM/balise_403MHz/Dec406_v10.2/)
 - **Position GPS** : Fixe (45.1885°N, 5.7245°E - Grenoble)
 - **Timing** : 1 transmission / 10 secondes (lent pour debug)
 - **Données** : Trame prédictible/connue
@@ -136,7 +136,7 @@ dsPIC33CK64MC105 Assignation:
 ### **Applications ciblées**
 - **Formation** opérateurs ADRASEC
 - **Exercices** secours
-- **Validation** décodeurs 406MHz
+- **Validation** décodeurs SARSAT (403MHz formation)
 - **Tests** conformité SARSAT
 
 ### **Caractéristiques projet**
