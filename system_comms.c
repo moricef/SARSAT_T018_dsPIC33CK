@@ -21,8 +21,8 @@ prn_state_t prn_state_2g = {0, 0, 0x12345, 0x54321, 0};
 // GPS data storage
 static gps_data_t current_gps_data = {0};
 gps_data_t test_position_2g = {
-    .latitude = 0.0,          // TEST: Equator
-    .longitude = 0.0,         // TEST: Prime meridian
+    .latitude = 43.2,         // Marseille offshore latitude
+    .longitude = 5.4,         // Mediterranean longitude
     .altitude = 0.0,          // Sea level (m)
     .satellites = 8,          // Good fix
     .fix_quality = 1,         // GPS fix

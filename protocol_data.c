@@ -41,8 +41,8 @@ elt_state_2g_t elt_state_2g = {
 uint32_t system_time_2g = 0;
 uint32_t last_update_2g = 0;
 uint32_t activation_time_2g = 0;  // Time of beacon activation
-float current_latitude_2g = 0.0;     // TEST: Equator
-float current_longitude_2g = 0.0;    // TEST: Prime meridian
+float current_latitude_2g = 43.2;    // Marseille offshore
+float current_longitude_2g = 5.4;    // Mediterranean
 float current_altitude_2g = 0.0;
 
 // =============================================================================
@@ -97,13 +97,14 @@ void build_2g_information_field(uint8_t* info_bits) {
     info_bits[bit_pos++] = (lat < 0) ? 1 : 0;
 
     // Bits 45-51: Degrees (7 bits, 0-90)
-    uint8_t lat_degrees = (uint8_t)(lat < 0 ? -lat : lat);
+    float lat_abs = (lat < 0) ? -lat : lat;
+    uint8_t lat_degrees = (uint8_t)lat_abs;
     write_bits(info_bits, bit_pos, 7, lat_degrees);
     bit_pos += 7;
 
     // Bits 52-66: Decimal parts (15 bits)
-    float lat_decimal = (lat < 0 ? -lat : lat) - lat_degrees;
-    uint16_t lat_decimal_encoded = (uint16_t)(lat_decimal * (1 << 15) + 0.5);  // Round
+    float lat_decimal = lat_abs - (float)lat_degrees;
+    uint16_t lat_decimal_encoded = (uint16_t)(lat_decimal * 32768.0 + 0.5);  // Round
     write_bits(info_bits, bit_pos, 15, lat_decimal_encoded);
     bit_pos += 15;
 
@@ -112,13 +113,14 @@ void build_2g_information_field(uint8_t* info_bits) {
     info_bits[bit_pos++] = (lon < 0) ? 1 : 0;
 
     // Bits 68-75: Degrees (8 bits, 0-180)
-    uint8_t lon_degrees = (uint8_t)(lon < 0 ? -lon : lon);
+    float lon_abs = (lon < 0) ? -lon : lon;
+    uint8_t lon_degrees = (uint8_t)lon_abs;
     write_bits(info_bits, bit_pos, 8, lon_degrees);
     bit_pos += 8;
 
     // Bits 76-90: Decimal parts (15 bits)
-    float lon_decimal = (lon < 0 ? -lon : lon) - lon_degrees;
-    uint16_t lon_decimal_encoded = (uint16_t)(lon_decimal * (1 << 15) + 0.5);  // Round
+    float lon_decimal = lon_abs - (float)lon_degrees;
+    uint16_t lon_decimal_encoded = (uint16_t)(lon_decimal * 32768.0 + 0.5);  // Round
     write_bits(info_bits, bit_pos, 15, lon_decimal_encoded);
     bit_pos += 15;
 
