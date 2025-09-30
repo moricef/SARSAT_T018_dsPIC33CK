@@ -41,17 +41,25 @@ uint8_t nmea_get_checksum(const char* sentence);
 #define OQPSK_BIT_RATE      300         // 300 bps
 #define OQPSK_SYMBOLS_PER_BIT 128       // Spreading factor
 
-// OQPSK state
+// OQPSK state with double buffering for pipeline chip generation
 typedef struct {
     volatile uint8_t transmitting;
     volatile uint16_t current_bit;
-    volatile uint16_t current_chip;  // Current chip position within bit (0-255)
+    volatile uint16_t current_chip;     // Current chip position within bit (0-255)
     uint8_t frame_bits[252];
     uint32_t start_time;
-    int8_t chip_buffer_i[256];       // Pre-generated I chips for current bit
-    int8_t chip_buffer_q[256];       // Pre-generated Q chips for current bit
-    volatile uint8_t chips_ready;    // Flag: chips pre-generated for current bit
-    int8_t prev_q_chip;              // Previous Q chip for OQPSK delay
+
+    // Double buffer: ISR consumes buffer A while main generates buffer B
+    int8_t chip_buffer_a_i[256];        // Buffer A - I chips
+    int8_t chip_buffer_a_q[256];        // Buffer A - Q chips
+    int8_t chip_buffer_b_i[256];        // Buffer B - I chips
+    int8_t chip_buffer_b_q[256];        // Buffer B - Q chips
+
+    volatile uint8_t active_buffer;     // 0=A is transmitting, 1=B is transmitting
+    volatile uint16_t next_bit_to_gen;  // Which bit to generate next
+    volatile uint8_t next_chips_ready;  // Flag: next bit's chips ready
+
+    int8_t prev_q_chip;                 // Previous Q chip for OQPSK delay
 } oqpsk_state_t;
 
 // OQPSK functions

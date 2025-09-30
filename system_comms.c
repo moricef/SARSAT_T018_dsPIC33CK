@@ -261,13 +261,19 @@ void stop_chip_timer(void) {
 // Hardware chip timer callback - called by CCP1 ISR at 38.4 kHz
 void chip_timer_callback(void) {
     // Safety: Check if CCP1 should be active
-    if(!chip_timer_active || !oqpsk_state_2g.transmitting || !oqpsk_state_2g.chips_ready) {
+    if(!chip_timer_active || !oqpsk_state_2g.transmitting) {
         return;
     }
 
-    // Output current chip from pre-generated buffer
-    int8_t i_chip = oqpsk_state_2g.chip_buffer_i[oqpsk_state_2g.current_chip];
-    int8_t q_chip = oqpsk_state_2g.chip_buffer_q[oqpsk_state_2g.current_chip];
+    // Select chips from active buffer
+    int8_t i_chip, q_chip;
+    if(oqpsk_state_2g.active_buffer == 0) {
+        i_chip = oqpsk_state_2g.chip_buffer_a_i[oqpsk_state_2g.current_chip];
+        q_chip = oqpsk_state_2g.chip_buffer_a_q[oqpsk_state_2g.current_chip];
+    } else {
+        i_chip = oqpsk_state_2g.chip_buffer_b_i[oqpsk_state_2g.current_chip];
+        q_chip = oqpsk_state_2g.chip_buffer_b_q[oqpsk_state_2g.current_chip];
+    }
 
     // T.018 OQPSK: Apply half-chip Q delay
     int8_t delayed_q = oqpsk_state_2g.prev_q_chip;
@@ -286,7 +292,12 @@ void chip_timer_callback(void) {
     if(oqpsk_state_2g.current_chip >= PRN_CHIPS_PER_BIT) {
         oqpsk_state_2g.current_chip = 0;
         oqpsk_state_2g.current_bit++;
-        oqpsk_state_2g.chips_ready = 0;  // Need new chips for next bit
+
+        // Switch to next buffer if ready
+        if(oqpsk_state_2g.next_chips_ready) {
+            oqpsk_state_2g.active_buffer = !oqpsk_state_2g.active_buffer;
+            oqpsk_state_2g.next_chips_ready = 0;
+        }
 
         // Check if frame complete
         if(oqpsk_state_2g.current_bit >= FRAME_TOTAL_BITS) {
@@ -302,7 +313,9 @@ void chip_timer_callback(void) {
 void oqpsk_init(void) {
     memset(&oqpsk_state_2g, 0, sizeof(oqpsk_state_t));
     oqpsk_state_2g.prev_q_chip = 0;
-    oqpsk_state_2g.chips_ready = 0;
+    oqpsk_state_2g.active_buffer = 0;
+    oqpsk_state_2g.next_bit_to_gen = 0;
+    oqpsk_state_2g.next_chips_ready = 0;
 
     // Initialize MCP4922 DAC for I/Q outputs
     mcp4922_init();
@@ -341,17 +354,35 @@ void oqpsk_transmit_frame(uint8_t* info_bits) {
     oqpsk_state_2g.current_bit = 0;
     oqpsk_state_2g.current_chip = 0;
     oqpsk_state_2g.start_time = millis_counter;
-    oqpsk_state_2g.chips_ready = 0;
     oqpsk_state_2g.prev_q_chip = 0;
+    oqpsk_state_2g.active_buffer = 0;  // Start with buffer A
+    oqpsk_state_2g.next_bit_to_gen = 0;
+    oqpsk_state_2g.next_chips_ready = 0;
+
+    // Pre-generate bit 0 chips into buffer A (active buffer)
+    uint8_t data_bit = oqpsk_state_2g.frame_bits[0];
+
+    generate_prn_sequence_i(oqpsk_state_2g.chip_buffer_a_i, PRN_MODE_NORMAL);
+    generate_prn_sequence_q(oqpsk_state_2g.chip_buffer_a_q, PRN_MODE_NORMAL);
+
+    // DSSS spreading for bit 0
+    for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
+        if(!data_bit) {
+            oqpsk_state_2g.chip_buffer_a_i[i] = -oqpsk_state_2g.chip_buffer_a_i[i];
+            oqpsk_state_2g.chip_buffer_a_q[i] = -oqpsk_state_2g.chip_buffer_a_q[i];
+        }
+    }
+
+    // Set pipeline: bit 0 ready in buffer A, next generate bit 1
+    oqpsk_state_2g.next_bit_to_gen = 1;
 
     // Enable RF amplifier
     rf_amplifier_enable(1);
 
-    // Pre-generate first bit's chips
-    transmission_task_2g();
-
-    // Start T.018 hardware chip timer (ISR will output chips)
+    // Start T.018 hardware chip timer (ISR will output chips from buffer A)
     start_chip_timer();
+
+    // Main loop will pre-generate bit 1 into buffer B while ISR transmits bit 0
 }
 
 void oqpsk_test_iq_output(void) {
@@ -422,41 +453,53 @@ uint8_t is_transmission_active_2g(void) {
 void transmission_task_2g(void) {
     if(!oqpsk_state_2g.transmitting) return;
 
-    // Atomically check if we need to generate chips
+    // Atomically check if we need to generate next bit's chips
     uint8_t need_chips = 0;
     uint16_t bit_to_generate = 0;
+    uint8_t target_buffer = 0;
 
     __builtin_disable_interrupts();
-    if(!oqpsk_state_2g.chips_ready && oqpsk_state_2g.current_bit < FRAME_TOTAL_BITS) {
+    if(!oqpsk_state_2g.next_chips_ready &&
+       oqpsk_state_2g.next_bit_to_gen < FRAME_TOTAL_BITS) {
         need_chips = 1;
-        bit_to_generate = oqpsk_state_2g.current_bit;
+        bit_to_generate = oqpsk_state_2g.next_bit_to_gen;
+        target_buffer = !oqpsk_state_2g.active_buffer;  // Generate in inactive buffer
     }
     __builtin_enable_interrupts();
 
     if(!need_chips) return;
 
-    // Generate chips outside critical section (can take time)
+    // Generate chips outside critical section (takes time)
     uint8_t data_bit = oqpsk_state_2g.frame_bits[bit_to_generate];
 
+    // Temporary buffers for generation
+    static int8_t temp_i[256];
+    static int8_t temp_q[256];
+
     // Generate T.018 PRN chips for this bit (256 chips per bit)
-    generate_prn_sequence_i(oqpsk_state_2g.chip_buffer_i, PRN_MODE_NORMAL);
-    generate_prn_sequence_q(oqpsk_state_2g.chip_buffer_q, PRN_MODE_NORMAL);
+    generate_prn_sequence_i(temp_i, PRN_MODE_NORMAL);
+    generate_prn_sequence_q(temp_q, PRN_MODE_NORMAL);
 
     // T.018 DSSS spreading: XOR data bit with PRN chips
     for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
         // DSSS spreading: bit XOR PRN (invert if data_bit=0)
         if(!data_bit) {
-            oqpsk_state_2g.chip_buffer_i[i] = -oqpsk_state_2g.chip_buffer_i[i];
-            oqpsk_state_2g.chip_buffer_q[i] = -oqpsk_state_2g.chip_buffer_q[i];
+            temp_i[i] = -temp_i[i];
+            temp_q[i] = -temp_q[i];
         }
     }
 
-    // Atomically mark chips ready for hardware ISR
+    // Copy to target buffer and mark ready atomically
     __builtin_disable_interrupts();
-    // Verify we're still on the same bit (ISR might have advanced)
-    if(oqpsk_state_2g.current_bit == bit_to_generate) {
-        oqpsk_state_2g.chips_ready = 1;
+    if(target_buffer == 0) {
+        memcpy(oqpsk_state_2g.chip_buffer_a_i, temp_i, 256);
+        memcpy(oqpsk_state_2g.chip_buffer_a_q, temp_q, 256);
+    } else {
+        memcpy(oqpsk_state_2g.chip_buffer_b_i, temp_i, 256);
+        memcpy(oqpsk_state_2g.chip_buffer_b_q, temp_q, 256);
     }
+    oqpsk_state_2g.next_bit_to_gen++;
+    oqpsk_state_2g.next_chips_ready = 1;
     __builtin_enable_interrupts();
 }
 
