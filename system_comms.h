@@ -43,15 +43,15 @@ uint8_t nmea_get_checksum(const char* sentence);
 
 // OQPSK state
 typedef struct {
-    uint8_t transmitting;
-    uint16_t current_bit;
-    uint16_t current_chip;          // Current chip position within bit (0-255)
+    volatile uint8_t transmitting;
+    volatile uint16_t current_bit;
+    volatile uint16_t current_chip;  // Current chip position within bit (0-255)
     uint8_t frame_bits[252];
     uint32_t start_time;
-    int8_t chip_buffer_i[256];      // Pre-generated I chips for current bit
-    int8_t chip_buffer_q[256];      // Pre-generated Q chips for current bit
-    uint8_t chips_ready;            // Flag: chips pre-generated for current bit
-    int8_t prev_q_chip;             // Previous Q chip for OQPSK delay
+    int8_t chip_buffer_i[256];       // Pre-generated I chips for current bit
+    int8_t chip_buffer_q[256];       // Pre-generated Q chips for current bit
+    volatile uint8_t chips_ready;    // Flag: chips pre-generated for current bit
+    int8_t prev_q_chip;              // Previous Q chip for OQPSK delay
 } oqpsk_state_t;
 
 // OQPSK functions

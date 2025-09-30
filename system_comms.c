@@ -422,26 +422,42 @@ uint8_t is_transmission_active_2g(void) {
 void transmission_task_2g(void) {
     if(!oqpsk_state_2g.transmitting) return;
 
-    // Pre-generate chips for current bit if needed
+    // Atomically check if we need to generate chips
+    uint8_t need_chips = 0;
+    uint16_t bit_to_generate = 0;
+
+    __builtin_disable_interrupts();
     if(!oqpsk_state_2g.chips_ready && oqpsk_state_2g.current_bit < FRAME_TOTAL_BITS) {
-        uint8_t data_bit = oqpsk_state_2g.frame_bits[oqpsk_state_2g.current_bit];
+        need_chips = 1;
+        bit_to_generate = oqpsk_state_2g.current_bit;
+    }
+    __builtin_enable_interrupts();
 
-        // Generate T.018 PRN chips for this bit (256 chips per bit)
-        generate_prn_sequence_i(oqpsk_state_2g.chip_buffer_i, PRN_MODE_NORMAL);
-        generate_prn_sequence_q(oqpsk_state_2g.chip_buffer_q, PRN_MODE_NORMAL);
+    if(!need_chips) return;
 
-        // T.018 DSSS spreading: XOR data bit with PRN chips
-        for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
-            // DSSS spreading: bit XOR PRN (invert if data_bit=0)
-            if(!data_bit) {
-                oqpsk_state_2g.chip_buffer_i[i] = -oqpsk_state_2g.chip_buffer_i[i];
-                oqpsk_state_2g.chip_buffer_q[i] = -oqpsk_state_2g.chip_buffer_q[i];
-            }
+    // Generate chips outside critical section (can take time)
+    uint8_t data_bit = oqpsk_state_2g.frame_bits[bit_to_generate];
+
+    // Generate T.018 PRN chips for this bit (256 chips per bit)
+    generate_prn_sequence_i(oqpsk_state_2g.chip_buffer_i, PRN_MODE_NORMAL);
+    generate_prn_sequence_q(oqpsk_state_2g.chip_buffer_q, PRN_MODE_NORMAL);
+
+    // T.018 DSSS spreading: XOR data bit with PRN chips
+    for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
+        // DSSS spreading: bit XOR PRN (invert if data_bit=0)
+        if(!data_bit) {
+            oqpsk_state_2g.chip_buffer_i[i] = -oqpsk_state_2g.chip_buffer_i[i];
+            oqpsk_state_2g.chip_buffer_q[i] = -oqpsk_state_2g.chip_buffer_q[i];
         }
+    }
 
-        // Mark chips ready for hardware ISR to output
+    // Atomically mark chips ready for hardware ISR
+    __builtin_disable_interrupts();
+    // Verify we're still on the same bit (ISR might have advanced)
+    if(oqpsk_state_2g.current_bit == bit_to_generate) {
         oqpsk_state_2g.chips_ready = 1;
     }
+    __builtin_enable_interrupts();
 }
 
 // =============================================================================
@@ -495,10 +511,19 @@ void transmit_beacon_2g(void) {
     // Start OQPSK transmission
     oqpsk_transmit_frame(frame_2g_info);
 
-    // Wait for completion
+    // Wait for completion with timeout
+    // Expected: 300 bits × 256 chips ÷ 38400 Hz = 2.0s + margin
+    uint32_t timeout = millis_counter + 3000;  // 3 second timeout
     while(oqpsk_is_transmitting()) {
         transmission_task_2g();
         system_delay_ms(1);
+
+        // Safety timeout
+        if(millis_counter > timeout) {
+            DEBUG_LOG_FLUSH("WARNING: Transmission timeout - forcing stop\r\n");
+            oqpsk_stop_transmission();
+            break;
+        }
     }
 
     // Turn OFF transmission LED (RD10)
