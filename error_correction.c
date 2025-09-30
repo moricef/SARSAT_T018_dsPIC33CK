@@ -24,10 +24,23 @@ static const uint8_t generator_poly[] = {
     189, 1
 };
 
-// Test data from T018 Appendix B.1
+// Test data from T.018 Appendix B.1 (202 bits)
+// Hex: 00E608F4C986196188A047C000000000000FFFC0100C1A00960
+// Expected BCH: 492A4FC57A49 (from official T.018 Appendix B Figure B-1)
 const uint8_t bch_test_data_appendix_b1[202] = {
-    0x00, 0xE6, 0x08, 0xF4, 0xC9, 0x86, 0x00, 0x00, // Example test vector
-    // ... (complete with actual T018 test data)
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0,
+    0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0,
+    1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0,
+    0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0,
+    0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,
+    0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 0, 0
 };
 
 const uint64_t bch_expected_parity_appendix_b1 = 0x492A4FC57A49ULL;
