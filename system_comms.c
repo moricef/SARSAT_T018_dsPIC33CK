@@ -254,8 +254,44 @@ void start_chip_timer(void) {
 void stop_chip_timer(void) {
     CCP1CON1Lbits.CCPON = 0;    // Stop CCP1
     chip_timer_active = 0;
-    
+
     DEBUG_LOG_FLUSH("T.018 CCP1 chip timer stopped\r\n");
+}
+
+// Hardware chip timer callback - called by CCP1 ISR at 38.4 kHz
+void chip_timer_callback(void) {
+    if(!oqpsk_state_2g.transmitting || !oqpsk_state_2g.chips_ready) {
+        return;
+    }
+
+    // Output current chip from pre-generated buffer
+    int8_t i_chip = oqpsk_state_2g.chip_buffer_i[oqpsk_state_2g.current_chip];
+    int8_t q_chip = oqpsk_state_2g.chip_buffer_q[oqpsk_state_2g.current_chip];
+
+    // T.018 OQPSK: Apply half-chip Q delay
+    int8_t delayed_q = oqpsk_state_2g.prev_q_chip;
+    oqpsk_state_2g.prev_q_chip = q_chip;
+
+    // Convert to 12-bit DAC values (MCP4922)
+    uint16_t i_dac = (uint16_t)(2048 + i_chip * 1000);
+    uint16_t q_dac = (uint16_t)(2048 + delayed_q * 1000);
+
+    mcp4922_write_both(i_dac, q_dac);
+
+    // Move to next chip
+    oqpsk_state_2g.current_chip++;
+
+    // Check if current bit complete (256 chips)
+    if(oqpsk_state_2g.current_chip >= PRN_CHIPS_PER_BIT) {
+        oqpsk_state_2g.current_chip = 0;
+        oqpsk_state_2g.current_bit++;
+        oqpsk_state_2g.chips_ready = 0;  // Need new chips for next bit
+
+        // Check if frame complete
+        if(oqpsk_state_2g.current_bit >= FRAME_TOTAL_BITS) {
+            oqpsk_stop_transmission();
+        }
+    }
 }
 
 // =============================================================================
@@ -264,10 +300,12 @@ void stop_chip_timer(void) {
 
 void oqpsk_init(void) {
     memset(&oqpsk_state_2g, 0, sizeof(oqpsk_state_t));
-    
+    oqpsk_state_2g.prev_q_chip = 0;
+    oqpsk_state_2g.chips_ready = 0;
+
     // Initialize MCP4922 DAC for I/Q outputs
     mcp4922_init();
-    
+
     DEBUG_LOG_FLUSH("OQPSK modulator initialized\r\n");
 }
 
@@ -293,24 +331,26 @@ void build_2g_frame(uint8_t* info_data, uint8_t* output_frame) {
 
 void oqpsk_transmit_frame(uint8_t* info_bits) {
     DEBUG_LOG_FLUSH("Starting OQPSK transmission...\r\n");
-    
+
     // Build complete transmission frame
     build_2g_frame(info_bits, oqpsk_state_2g.frame_bits);
-    
+
     // Initialize transmission state
     oqpsk_state_2g.transmitting = 1;
     oqpsk_state_2g.current_bit = 0;
-    oqpsk_state_2g.current_symbol = 0;
+    oqpsk_state_2g.current_chip = 0;
     oqpsk_state_2g.start_time = millis_counter;
-    
+    oqpsk_state_2g.chips_ready = 0;
+    oqpsk_state_2g.prev_q_chip = 0;
+
     // Enable RF amplifier
     rf_amplifier_enable(1);
-    
-    // Start T.018 hardware chip timer
-    start_chip_timer();
-    
-    // Start transmission task (simplified version here)
+
+    // Pre-generate first bit's chips
     transmission_task_2g();
+
+    // Start T.018 hardware chip timer (ISR will output chips)
+    start_chip_timer();
 }
 
 void oqpsk_test_iq_output(void) {
@@ -380,44 +420,26 @@ uint8_t is_transmission_active_2g(void) {
 
 void transmission_task_2g(void) {
     if(!oqpsk_state_2g.transmitting) return;
-    
-    // Simplified transmission - output bits with DSSS spreading
-    static int8_t prn_i[PRN_CHIPS_PER_BIT];
-    static int8_t prn_q[PRN_CHIPS_PER_BIT];
-    
-    if(oqpsk_state_2g.current_bit < FRAME_TOTAL_BITS) {
+
+    // Pre-generate chips for current bit if needed
+    if(!oqpsk_state_2g.chips_ready && oqpsk_state_2g.current_bit < FRAME_TOTAL_BITS) {
         uint8_t data_bit = oqpsk_state_2g.frame_bits[oqpsk_state_2g.current_bit];
-        
+
         // Generate T.018 PRN chips for this bit (256 chips per bit)
-        generate_prn_sequence_i(prn_i, PRN_MODE_NORMAL);
-        generate_prn_sequence_q(prn_q, PRN_MODE_NORMAL);
-        
+        generate_prn_sequence_i(oqpsk_state_2g.chip_buffer_i, PRN_MODE_NORMAL);
+        generate_prn_sequence_q(oqpsk_state_2g.chip_buffer_q, PRN_MODE_NORMAL);
+
         // T.018 DSSS spreading: XOR data bit with PRN chips
         for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
-            // DSSS spreading: bit XOR PRN
-            int8_t i_chip = data_bit ? prn_i[i] : -prn_i[i];
-            int8_t q_chip = data_bit ? prn_q[i] : -prn_q[i];
-            
-            // T.018 OQPSK: Apply half-symbol Q delay
-            static int8_t prev_q_chip = 0;
-            int8_t delayed_q = prev_q_chip;
-            prev_q_chip = q_chip;
-            
-            // Convert to 12-bit DAC values (MCP4922)
-            uint16_t i_dac = (uint16_t)(2048 + i_chip * 1000);
-            uint16_t q_dac = (uint16_t)(2048 + delayed_q * 1000);
-            
-            mcp4922_write_both(i_dac, q_dac);
-            
-            // T.018 timing: 38.4 kchips/sec = 26.041666µs per chip
-            // TODO: Replace with Timer2 ISR for precise hardware timing
-            __delay_us(26);
+            // DSSS spreading: bit XOR PRN (invert if data_bit=0)
+            if(!data_bit) {
+                oqpsk_state_2g.chip_buffer_i[i] = -oqpsk_state_2g.chip_buffer_i[i];
+                oqpsk_state_2g.chip_buffer_q[i] = -oqpsk_state_2g.chip_buffer_q[i];
+            }
         }
-        
-        oqpsk_state_2g.current_bit++;
-    } else {
-        // Transmission complete
-        oqpsk_stop_transmission();
+
+        // Mark chips ready for hardware ISR to output
+        oqpsk_state_2g.chips_ready = 1;
     }
 }
 
@@ -466,20 +488,21 @@ void transmit_beacon_2g(void) {
     // Build compliant frame
     build_compliant_frame_2g();
 
+    // Turn ON transmission LED (RD10)
+    LED_TX_PIN = 1;
+
     // Start OQPSK transmission
     oqpsk_transmit_frame(frame_2g_info);
-    
+
     // Wait for completion
     while(oqpsk_is_transmitting()) {
         transmission_task_2g();
-        
-        // Update status LED
-        if((oqpsk_get_bit_position() % 50) == 0) {
-            toggle_status_led();
-        }
         system_delay_ms(1);
     }
-    
+
+    // Turn OFF transmission LED (RD10)
+    LED_TX_PIN = 0;
+
     DEBUG_LOG_FLUSH("2G transmission complete\r\n");
 }
 

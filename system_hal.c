@@ -22,6 +22,9 @@ void spi_init(void);
 
 void __attribute__((__interrupt__, __auto_psv__)) _CCP1Interrupt(void);
 
+// External chip timer callback from system_comms.c
+extern void chip_timer_callback(void);
+
 // Timer2 initialization for T.018 chip clock (38.4 kHz)
 void timer2_init_chip_clock(void) {
     // dsPIC33CK64MC105 : Utilisation CCP1 pour timing précis 38.4 kHz
@@ -156,12 +159,9 @@ void timer_init(void) {
 void __attribute__((__interrupt__, __auto_psv__)) _T1Interrupt(void) {
     millis_counter++;
     timer_overflow_count++;
-    
-    // Toggle LED every 500ms for heartbeat
-    if((millis_counter % 500) == 0) {
-        LED_TOGGLE();
-    }
-    
+
+    // LED RD10 controlled only during transmission (system_comms.c)
+
     IFS0bits.T1IF = 0;  // Clear interrupt flag
 }
 
@@ -169,10 +169,10 @@ void __attribute__((__interrupt__, __auto_psv__)) _T1Interrupt(void) {
 void __attribute__((__interrupt__, __auto_psv__)) _CCP1Interrupt(void) {
     // ISR appelée exactement à 38.400 kHz pour sortie chip T.018
     // Gestion des symboles OQPSK avec timing hardware précis
-    
-    // Signal disponible pour modules OQPSK/transmission
-    // Implémentation complète dans system_comms.c chip_timer callback
-    
+
+    // Call chip output callback
+    chip_timer_callback();
+
     // Clear CCP1 interrupt flag
     IFS0bits.CCP1IF = 0;
 }

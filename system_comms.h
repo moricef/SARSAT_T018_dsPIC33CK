@@ -45,9 +45,13 @@ uint8_t nmea_get_checksum(const char* sentence);
 typedef struct {
     uint8_t transmitting;
     uint16_t current_bit;
-    uint16_t current_symbol;
+    uint16_t current_chip;          // Current chip position within bit (0-255)
     uint8_t frame_bits[252];
     uint32_t start_time;
+    int8_t chip_buffer_i[256];      // Pre-generated I chips for current bit
+    int8_t chip_buffer_q[256];      // Pre-generated Q chips for current bit
+    uint8_t chips_ready;            // Flag: chips pre-generated for current bit
+    int8_t prev_q_chip;             // Previous Q chip for OQPSK delay
 } oqpsk_state_t;
 
 // OQPSK functions
@@ -100,6 +104,7 @@ void reset_prn_generator(void);
 // T.018 Hardware timing functions
 void start_chip_timer(void);
 void stop_chip_timer(void);
+void chip_timer_callback(void);     // Called by CCP1 ISR at 38.4 kHz
 extern volatile uint8_t chip_timer_active;
 
 // =============================================================================
