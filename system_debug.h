@@ -28,7 +28,8 @@
 // Debug initialization
 void debug_init(void);
 
-// Debug print functions  
+// Debug print functions
+void debug_print_char(char c);
 void debug_print_dec(uint32_t value);
 void debug_print_hex(uint8_t value);
 void debug_print_float(float value, uint8_t decimals);

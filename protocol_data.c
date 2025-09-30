@@ -106,15 +106,30 @@ void build_2g_complete_frame(uint8_t* info_bits, uint8_t* complete_frame) {
 void build_compliant_frame_2g(void) {
     // Build information field
     build_2g_information_field(frame_2g_info);
-    
+
     // Build complete frame with BCH
     build_2g_complete_frame(frame_2g_info, beacon_frame_2g);
-    
+
     // Generate 23 HEX ID for logging
     char hex_id[24];
     generate_23hex_id_2g(frame_2g_info, hex_id);
     DEBUG_LOG_FLUSH("Frame built - 23 HEX ID: ");
     DEBUG_LOG_FLUSH(hex_id);
+    DEBUG_LOG_FLUSH("\r\n");
+
+    // Display complete 252-bit frame in hexadecimal (63 hex chars)
+    DEBUG_LOG_FLUSH("Complete frame (252 bits): ");
+    for(int i = 0; i < 63; i++) {
+        // Extract 4 bits starting at bit position i*4
+        uint8_t nibble = 0;
+        for(int j = 0; j < 4; j++) {
+            if(beacon_frame_2g[i*4 + j]) {
+                nibble |= (1 << (3 - j));
+            }
+        }
+        char hex_char = "0123456789ABCDEF"[nibble];
+        debug_print_char(hex_char);
+    }
     DEBUG_LOG_FLUSH("\r\n");
 }
 
