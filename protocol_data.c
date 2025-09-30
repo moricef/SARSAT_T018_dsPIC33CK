@@ -226,23 +226,45 @@ void encode_location_appendix_c(uint8_t* info_bits, float latitude, float longit
 // =============================================================================
 
 void generate_23hex_id_2g(const uint8_t *frame_202bits, char *hex_id) {
-    // Extract the 43-bit hex ID directly from information field bits 1-43
-    // This matches the encoding done in set_23_hex_id_2g()
-    uint64_t hex_id_value = 0;
+    // Generate 23 HEX ID according to T.018 Section 3.6 and Appendix B.2
+    // Format: 1 + Country(10) + 101 + TAC(16) + Serial(14) + Test(1) + VesselType(3) + VesselID(44)
+    // Total: 92 bits = 23 hex chars
 
-    // Extract 43 bits from positions 0-42 in the frame
-    for(int i = 0; i < 43; i++) {
-        if(frame_202bits[i]) {
-            hex_id_value |= (1ULL << (42 - i));
+    uint16_t tac = (beacon_config_2g.test_mode) ? 9999 : 10001;
+    uint16_t serial = beacon_config_2g.beacon_id & 0x3FFF;
+    uint16_t country = beacon_config_2g.country_code & 0x3FF;
+    uint8_t test_flag = beacon_config_2g.test_mode ? 1 : 0;
+    uint8_t vessel_type = 1;  // Maritime MMSI
+    uint64_t vessel_id = beacon_config_2g.vessel_id & 0xFFFFFFFFFFFULL;  // 44 bits
+
+    // Build 92-bit value according to T.018 format
+    // Bit layout: [1][country:10][1][0][1][tac:16][serial:14][test:1][type:3][vessel:44]
+    uint64_t hex_id_high = 0;  // Upper 28 bits
+    uint64_t hex_id_low = 0;   // Lower 64 bits
+
+    // Upper part: 1 + country(10) + 101 + tac(16) = 28 bits
+    hex_id_high |= (1ULL << 27);                    // Fixed bit 1
+    hex_id_high |= ((uint64_t)country << 17);       // Country code
+    hex_id_high |= (1ULL << 16);                    // Fixed bit 1
+    hex_id_high |= (0ULL << 15);                    // Fixed bit 0
+    hex_id_high |= (1ULL << 14);                    // Fixed bit 1
+    hex_id_high |= ((uint64_t)tac >> 2);            // TAC upper 14 bits
+
+    // Lower part: tac(2) + serial(14) + test(1) + type(3) + vessel(44) = 64 bits
+    hex_id_low |= ((uint64_t)(tac & 0x3) << 62);    // TAC lower 2 bits
+    hex_id_low |= ((uint64_t)serial << 48);         // Serial number
+    hex_id_low |= ((uint64_t)test_flag << 47);      // Test flag
+    hex_id_low |= ((uint64_t)vessel_type << 44);    // Vessel type
+    hex_id_low |= vessel_id;                         // Vessel ID
+
+    // Convert to hex string (92 bits = 23 hex chars)
+    for(int i = 0; i < 23; i++) {
+        uint8_t nibble;
+        if(i < 7) {  // First 7 chars from hex_id_high (28 bits)
+            nibble = (hex_id_high >> ((6 - i) * 4)) & 0xF;
+        } else {     // Remaining 16 chars from hex_id_low (64 bits)
+            nibble = (hex_id_low >> ((22 - i) * 4)) & 0xF;
         }
-    }
-
-    // Convert to hexadecimal string (43 bits = 10.75 nibbles = 11 nibbles = 22 chars + null)
-    // But T.018 specifies 23 hex characters, so we pad with leading zero
-    hex_id[0] = '0';  // Leading zero for 23-character format
-
-    for(int i = 1; i < 23; i++) {
-        uint8_t nibble = (hex_id_value >> ((22 - i) * 4)) & 0xF;
         hex_id[i] = "0123456789ABCDEF"[nibble];
     }
     hex_id[23] = '\0';

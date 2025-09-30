@@ -461,18 +461,11 @@ void beacon_task_2g(void) {
 }
 
 void transmit_beacon_2g(void) {
-    DEBUG_LOG_FLUSH("\\r\\n=== TRANSMITTING 2G BEACON ===\\r\\n");
-    
+    DEBUG_LOG_FLUSH("\r\n=== TRANSMITTING 2G BEACON ===\r\n");
+
     // Build compliant frame
     build_compliant_frame_2g();
-    
-    // Debug output
-    char hex_id[24];
-    generate_23hex_id_2g(frame_2g_info, hex_id);
-    DEBUG_LOG_FLUSH("23 HEX ID: ");
-    DEBUG_LOG_FLUSH(hex_id);
-    DEBUG_LOG_FLUSH("\\r\\n");
-    
+
     // Start OQPSK transmission
     oqpsk_transmit_frame(frame_2g_info);
     
@@ -487,7 +480,7 @@ void transmit_beacon_2g(void) {
         system_delay_ms(1);
     }
     
-    DEBUG_LOG_FLUSH("2G transmission complete\\r\\n");
+    DEBUG_LOG_FLUSH("2G transmission complete\r\n");
 }
 
 uint8_t should_transmit_beacon_2g(void) {
