@@ -102,22 +102,24 @@ void calculate_bch_2g(uint8_t* info_bits, uint8_t* parity_bits) {
 }
 
 uint64_t compute_bch_250_202(const uint8_t *data_202bits) {
-    // Simplified BCH computation for 48-bit parity
-    const uint64_t g = 0x1C7EB85DF3C97ULL;  // Generator polynomial (49 bits)
-    
-    uint64_t reg = 0;
-    
-    // Process 250 bits (202 data + 48 padding)
-    for (int i = 0; i < 250; i++) {
-        uint8_t bit = (i < 202) ? data_202bits[i] : 0;
-        uint8_t msb = (reg >> 48) & 1;
-        
-        reg = ((reg << 1) | bit) & 0x1FFFFFFFFFFFFULL;
-        
-        if (msb) reg ^= g;
+    // BCH computation according to T.018 Appendix B
+    const uint64_t g = 0x1C7EB85DF3C97ULL;
+
+    // Create 255-bit message: 5 zeros + 202 data + 48 zeros
+    uint8_t message_255[255];
+    memset(message_255, 0, 5);
+    memcpy(message_255 + 5, data_202bits, 202);
+    memset(message_255 + 207, 0, 48);
+
+    // Perform polynomial long division
+    uint64_t remainder = 0;
+    for (int i = 0; i < 255; i++) {
+        remainder = (remainder << 1) | message_255[i];
+        if (remainder & (1ULL << 48)) {
+            remainder ^= g;
+        }
     }
-    
-    return reg & 0xFFFFFFFFFFFFULL;  // Return 48 bits
+    return remainder & 0xFFFFFFFFFFFFULL;
 }
 
 void encode_bch_2g_with_correction(uint8_t* info_bits, uint8_t* codeword) {

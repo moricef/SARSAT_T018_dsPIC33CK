@@ -59,6 +59,11 @@ uint16_t altitude_to_code_2g(double altitude);
 uint8_t encode_altitude_2g(float altitude_m);
 uint32_t encode_time_value_2g(uint8_t day, uint8_t hour, uint8_t minute, uint8_t type);
 
+// T.018 G.008 rotating field functions
+uint8_t get_elapsed_activation_hours_2g(void);
+uint16_t get_time_since_last_location_minutes_2g(void);
+void init_realistic_test_times(void);
+
 // Vessel ID functions
 uint64_t encode_vessel_id_2g(uint64_t mmsi_or_reg);
 void set_vessel_id_field_2g(uint8_t* info_bits, uint64_t vessel_id);
@@ -151,6 +156,7 @@ extern elt_state_2g_t elt_state_2g;
 // System state variables
 extern uint32_t system_time_2g;
 extern uint32_t last_update_2g;
+extern uint32_t activation_time_2g;
 extern float current_latitude_2g;
 extern float current_longitude_2g;
 extern float current_altitude_2g;

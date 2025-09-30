@@ -32,7 +32,7 @@ void debug_print_string(const char* str) {
 void debug_print_char(char c) {
     #if DEBUG_ENABLED
     // Wait for transmit buffer to be empty
-    while(U1STAbits.UTXBF);
+    while(U1STAHbits.UTXBF);
     U1TXREG = c;
     #endif
 }

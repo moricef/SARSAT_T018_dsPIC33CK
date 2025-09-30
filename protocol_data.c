@@ -22,10 +22,10 @@ beacon_config_2g_t beacon_config_2g = {
     .generation = 2,
     .test_mode = 0,
     .rotating_type = RF_TYPE_G008_2G,
-    .beacon_id = 0x123456,
-    .country_code = 228,        // France
-    .protocol_code = 2,         // Standard location
-    .vessel_id = 0x123456789ABC
+    .beacon_id = 13398,
+    .country_code = 228,
+    .protocol_code = 2,
+    .vessel_id = 147937762
 };
 
 // ELT state
@@ -40,9 +40,10 @@ elt_state_2g_t elt_state_2g = {
 // System state
 uint32_t system_time_2g = 0;
 uint32_t last_update_2g = 0;
-float current_latitude_2g = 45.1885;   // Grenoble (test position)
-float current_longitude_2g = 5.7245;
-float current_altitude_2g = 214.0;
+uint32_t activation_time_2g = 0;  // Time of beacon activation
+float current_latitude_2g = 42.85001;
+float current_longitude_2g = 4.95001;
+float current_altitude_2g = 0.0;
 
 // =============================================================================
 // FRAME BUILDING FUNCTIONS
@@ -161,25 +162,37 @@ void set_vessel_id_2g(uint8_t* info_bits) {
 void set_rotating_field_2g(uint8_t* info_bits, rotating_field_type_2g_t rf_type) {
     rotating_field_data_2g_t rf_data = {0};
     prepare_rotating_field_data_2g(&rf_data);
-    
+
     // Set rotating field type identifier (4 bits)
     set_bit_field(info_bits, 154, 4, rf_type);
-    
+
     switch(rf_type) {
         case RF_TYPE_G008_2G:
+            // T.018 G.008 Objective Requirements rotating field
+            {
+                uint8_t elapsed_hours = get_elapsed_activation_hours_2g();
+                uint16_t last_pos_minutes = get_time_since_last_location_minutes_2g();
+
+                set_bit_field(info_bits, 158, 6, elapsed_hours);           // T.018 bits 159-164
+                set_bit_field(info_bits, 164, 11, last_pos_minutes);       // T.018 bits 165-175
+                set_bit_field(info_bits, 175, 10, rf_data.altitude_code);  // T.018 bits 176-185
+                set_bit_field(info_bits, 185, 17, 0);                      // T.018 bits 186-202
+            }
+            break;
+
         case RF_TYPE_ELTDT_2G:
-            // Time/Altitude data (44 bits)
+            // ELT-DT Time/Altitude data (44 bits)
             set_bit_field(info_bits, 158, 16, rf_data.time_value);
             set_bit_field(info_bits, 174, 10, rf_data.altitude_code);
             set_bit_field(info_bits, 184, 18, 0);  // Spare bits
             break;
-            
+
         case RF_TYPE_RLS_2G:
             // RLS provider and data
             set_bit_field(info_bits, 158, 8, rf_data.rls_provider);
             set_bit_field(info_bits, 166, 36, rf_data.rls_data);
             break;
-            
+
         case RF_TYPE_CANCEL_2G:
             // Cancellation method
             set_bit_field(info_bits, 158, 2, rf_data.deactivation_method);
@@ -213,51 +226,23 @@ void encode_location_appendix_c(uint8_t* info_bits, float latitude, float longit
 // =============================================================================
 
 void generate_23hex_id_2g(const uint8_t *frame_202bits, char *hex_id) {
-    uint8_t id_bits[92] = {0};
-    int pos = 0;
+    // Extract the 43-bit hex ID directly from information field bits 1-43
+    // This matches the encoding done in set_23_hex_id_2g()
+    uint64_t hex_id_value = 0;
 
-    // Extract components according to T.018 Appendix B.2
-    id_bits[pos++] = 1;  // Fixed bit 1
-    
-    // Country Code (bits 31-40)
-    for(int i = 30; i < 40; i++) {
-        id_bits[pos++] = frame_202bits[i];
-    }
-    
-    // Fixed bits
-    id_bits[pos++] = 1;  // Bit 12
-    id_bits[pos++] = 0;  // Bit 13
-    id_bits[pos++] = 1;  // Bit 14
-    
-    // TAC Number (bits 1-16)
-    for(int i = 0; i < 16; i++) {
-        id_bits[pos++] = frame_202bits[i];
-    }
-    
-    // Serial Number (bits 17-30)
-    for(int i = 16; i < 30; i++) {
-        id_bits[pos++] = frame_202bits[i];
-    }
-    
-    // Test Protocol (bit 43)
-    id_bits[pos++] = frame_202bits[42];
-    
-    // Beacon Type (bits 138-140)
-    for(int i = 137; i < 140; i++) {
-        id_bits[pos++] = frame_202bits[i];
-    }
-    
-    // Vessel ID (first 44 bits)
-    for(int i = 90; i < 134; i++) {
-        id_bits[pos++] = frame_202bits[i];
-    }
-
-    // Convert to hexadecimal
-    for(int i = 0; i < 23; i++) {
-        uint8_t nibble = 0;
-        for(int j = 0; j < 4; j++) {
-            nibble = (nibble << 1) | id_bits[i*4 + j];
+    // Extract 43 bits from positions 0-42 in the frame
+    for(int i = 0; i < 43; i++) {
+        if(frame_202bits[i]) {
+            hex_id_value |= (1ULL << (42 - i));
         }
+    }
+
+    // Convert to hexadecimal string (43 bits = 10.75 nibbles = 11 nibbles = 22 chars + null)
+    // But T.018 specifies 23 hex characters, so we pad with leading zero
+    hex_id[0] = '0';  // Leading zero for 23-character format
+
+    for(int i = 1; i < 23; i++) {
+        uint8_t nibble = (hex_id_value >> ((22 - i) * 4)) & 0xF;
         hex_id[i] = "0123456789ABCDEF"[nibble];
     }
     hex_id[23] = '\0';
@@ -272,10 +257,14 @@ uint16_t get_last_location_time_2g(void) {
 }
 
 uint16_t altitude_to_code_2g(double altitude) {
-    if(altitude < -1500) return 0;
-    if(altitude > 17000) return 1023;
-    
-    int16_t encoded = (int16_t)((altitude + 1500) * 1023.0 / 18500.0);
+    if(altitude <= -400.0) {
+        return 0;
+    }
+    if(altitude > 15952.0) {
+        return 1022;
+    }
+    // T.018 encoding: (altitude + 400) / 16 + 0.0625 (code 25 for 0m)
+    int16_t encoded = (int16_t)((altitude + 400.0) / 16.0 + 0.0625 + 0.5);
     return (uint16_t)(encoded & 0x3FF);
 }
 
@@ -379,9 +368,39 @@ void check_phase_transition_2g(void) {
 // ROTATING FIELD CONFIGURATION
 // =============================================================================
 
+uint8_t get_elapsed_activation_hours_2g(void) {
+    if(activation_time_2g == 0) {
+        activation_time_2g = system_time_2g;
+    }
+    uint32_t elapsed_seconds = system_time_2g - activation_time_2g;
+    uint8_t elapsed_hours = (uint8_t)(elapsed_seconds / 3600);
+    if(elapsed_hours > 63) elapsed_hours = 63;
+    return elapsed_hours;
+}
+
+uint16_t get_time_since_last_location_minutes_2g(void) {
+    uint32_t elapsed_seconds = system_time_2g - last_update_2g;
+    uint16_t elapsed_minutes = (uint16_t)(elapsed_seconds / 60);
+    if(elapsed_minutes > 2046) elapsed_minutes = 2046;
+    return elapsed_minutes;
+}
+
+void init_realistic_test_times(void) {
+    static uint8_t initialized = 0;
+    if(!initialized) {
+        activation_time_2g = system_time_2g - (3 * 3600);  // 3 hours ago
+        last_update_2g = system_time_2g - (5 * 60);        // GPS updated 5 minutes ago
+        initialized = 1;
+        DEBUG_LOG_FLUSH("Realistic ADRASEC test: activation=-3h, GPS=-5min\r\n");
+    }
+}
+
 void prepare_rotating_field_data_2g(rotating_field_data_2g_t* rf_data) {
     rf_data->field_type = beacon_config_2g.rotating_type;
-    
+
+    // Initialize realistic test times for ADRASEC training
+    init_realistic_test_times();
+
     switch(beacon_config_2g.rotating_type) {
         case RF_TYPE_G008_2G:
         case RF_TYPE_ELTDT_2G:
@@ -389,7 +408,7 @@ void prepare_rotating_field_data_2g(rotating_field_data_2g_t* rf_data) {
                 gps_data_t* gps = get_current_gps_data();
                 if(gps && gps->valid) {
                     rf_data->time_value = encode_time_value_2g(
-                        gps->day, gps->hour, gps->minute, 
+                        gps->day, gps->hour, gps->minute,
                         beacon_config_2g.rotating_type);
                     rf_data->altitude_code = encode_altitude_2g(gps->altitude);
                 } else {
@@ -398,12 +417,12 @@ void prepare_rotating_field_data_2g(rotating_field_data_2g_t* rf_data) {
                 }
             }
             break;
-            
+
         case RF_TYPE_RLS_2G:
             rf_data->rls_provider = get_rls_provider_id_2g();
             rf_data->rls_data = get_rls_data_2g();
             break;
-            
+
         case RF_TYPE_CANCEL_2G:
             rf_data->deactivation_method = get_deactivation_method_2g();
             break;
