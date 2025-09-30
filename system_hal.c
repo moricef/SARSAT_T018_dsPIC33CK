@@ -77,26 +77,22 @@ void system_init(void) {
 
 // System oscillator configuration
 void oscillator_init(void) {
-    // Select FRC as primary clock source
-    __builtin_write_OSCCONH(0x0000);
-    __builtin_write_OSCCONL(OSCCON | 0x01);
-    while(OSCCONbits.OSWEN);
-    
-    // Configure PLL for 100MHz operation
-    // FRC = 8MHz, Target FCY = 100MHz, FOSC = 200MHz
-    // FOSC = FIN × M / (N1 × N2 × N3) = 8 × 200 / (2 × 4 × 1) = 200MHz
-    CLKDIVbits.PLLPRE = 1;     // N1 = 2 (Input divider)
-    PLLFBD = 199;              // M = 200 (Multiplier, register = M-1)
-    PLLDIVbits.POST1DIV = 3;   // N2 = 4 (Post divider 1)
-    PLLDIVbits.POST2DIV = 0;   // N3 = 1 (Post divider 2)
+    // Configure PLL: FRC=8MHz -> FOSC=200MHz, FCY=100MHz
+    // FOSC = FRC × M / (N1 × N2 × N3) = 8MHz × 200 / (1 × 4 × 1) = 200MHz
+    CLKDIVbits.PLLPRE = 1;      // N1=1
+    PLLFBDbits.PLLFBDIV = 200;  // M=200
+    PLLDIVbits.POST1DIV = 4;    // N2=4
+    PLLDIVbits.POST2DIV = 1;    // N3=1
 
-    // Activate FRC with PLL
+    // Initiate Clock Switch to FRC with PLL (NOSC=0b001)
     __builtin_write_OSCCONH(0x01);
     __builtin_write_OSCCONL(OSCCON | 0x01);
-    
-    // Wait for PLL lock
-    while(OSCCONbits.OSWEN);
-    while(!OSCCONbits.LOCK);
+
+    // Wait for Clock switch to occur
+    while (OSCCONbits.OSWEN != 0);
+
+    // Wait for PLL to lock
+    while (OSCCONbits.LOCK != 1);
     
     // Handle PLL lock failure
     if(!OSCCONbits.LOCK) {
@@ -185,12 +181,22 @@ void __attribute__((__interrupt__, __auto_psv__)) _CCP1Interrupt(void) {
 void uart_init(void) {
     // Disable UART during configuration
     U1MODEbits.UARTEN = 0;
-    
-    // Use default UART1 pins (no remapping required)
-    
+    U1MODEbits.UTXEN = 0;
+
+    // Configure PPS for UART1 on RC10 (RP58/TX) and RC11 (RP59/RX)
+    __builtin_write_OSCCONL(OSCCON | 0x40);   // Unlock PPS
+    _U1RXR = 59;                               // RC11 (RP59) -> U1RX input
+    _RP58R = 0x0001;                           // RC10 (RP58) -> U1TX output
+    __builtin_write_OSCCONL(OSCCON & ~0x40);  // Lock PPS
+
+    // Configure pins as digital I/O
+    TRISCbits.TRISC10 = 0;    // RC10 output (TX)
+    TRISCbits.TRISC11 = 1;    // RC11 input (RX)
+    LATCbits.LATC10 = 1;      // TX idle high
+
     // Configure baud rate: FCY / (16 * (BRG + 1))
     U1BRG = (FCY / (16UL * BAUDRATE)) - 1;
-    
+
     // Enable UART (T001 style)
     U1MODEbits.UARTEN = 1;  // Enable UART module
     U1MODEbits.UTXEN = 1;   // Enable transmitter

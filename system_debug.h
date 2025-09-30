@@ -11,11 +11,19 @@
 #define DEBUG_BUFFER_SIZE 256
 
 // Debug macros (used throughout the code)
-#define DEBUG_LOG_FLUSH(msg)    // Empty for now
-#define DEBUG_LOG_INFO(msg)     // Empty for now  
-#define DEBUG_LOG_ERROR(msg)    // Empty for now
-#define DEBUG_LOG_WARN(msg)     // Empty for now
-#define DEBUG_LOG_ISR(msg)      // Empty for now
+#ifdef DEBUG_ENABLED
+    #define DEBUG_LOG_FLUSH(msg)    debug_print_string(msg)
+    #define DEBUG_LOG_INFO(msg)     debug_print_string(msg)
+    #define DEBUG_LOG_ERROR(msg)    debug_print_string(msg)
+    #define DEBUG_LOG_WARN(msg)     debug_print_string(msg)
+    #define DEBUG_LOG_ISR(msg)      debug_print_string(msg)
+#else
+    #define DEBUG_LOG_FLUSH(msg)
+    #define DEBUG_LOG_INFO(msg)
+    #define DEBUG_LOG_ERROR(msg)
+    #define DEBUG_LOG_WARN(msg)
+    #define DEBUG_LOG_ISR(msg)
+#endif
 
 // Debug initialization
 void debug_init(void);

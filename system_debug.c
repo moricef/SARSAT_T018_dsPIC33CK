@@ -21,20 +21,16 @@ void debug_init(void) {
 
 // Print string via UART
 void debug_print_string(const char* str) {
-    #if DEBUG_ENABLED
     while(*str) {
         debug_print_char(*str++);
     }
-    #endif
 }
 
 // Print single character
 void debug_print_char(char c) {
-    #if DEBUG_ENABLED
     // Wait for transmit buffer to be empty
     while(U1STAHbits.UTXBF);
     U1TXREG = c;
-    #endif
 }
 
 // Print 8-bit hex value

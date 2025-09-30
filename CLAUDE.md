@@ -41,7 +41,7 @@
 
 ### **MODE TEST (Switch = 0)**
 - **Objectif** : Validation décodeur (~Documents/HAM/balise_403MHz/Dec406_v10.2/)
-- **Position GPS** : Fixe (45.1885°N, 5.7245°E - Grenoble)
+- **Position GPS** : Fixe
 - **Timing** : 1 transmission / 10 secondes (lent pour debug)
 - **Données** : Trame prédictible/connue
 
