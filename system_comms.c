@@ -260,7 +260,8 @@ void stop_chip_timer(void) {
 
 // Hardware chip timer callback - called by CCP1 ISR at 38.4 kHz
 void chip_timer_callback(void) {
-    if(!oqpsk_state_2g.transmitting || !oqpsk_state_2g.chips_ready) {
+    // Safety: Check if CCP1 should be active
+    if(!chip_timer_active || !oqpsk_state_2g.transmitting || !oqpsk_state_2g.chips_ready) {
         return;
     }
 

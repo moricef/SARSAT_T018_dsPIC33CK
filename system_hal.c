@@ -55,11 +55,12 @@ void timer2_init_chip_clock(void) {
     IPC1bits.CCP1IP = 5;           // High priority (above system tick)
     IFS0bits.CCP1IF = 0;           // Clear interrupt flag
     IEC0bits.CCP1IE = 1;           // Enable CCP1 interrupt
-    
-    // Enable CCP1 module
-    CCP1CON1Lbits.CCPON = 1;
-    
-    DEBUG_LOG_FLUSH("T.018 CCP1 chip clock initialized (38.400 kHz)\r\n");
+
+    // DO NOT enable CCP1 here - will be enabled by start_chip_timer()
+    // Activation during system_init() causes ISR before oqpsk_state_2g init
+    // CCP1CON1Lbits.CCPON = 0;  // Remains disabled
+
+    DEBUG_LOG_FLUSH("T.018 CCP1 chip clock configured (ready for 38.400 kHz)\r\n");
 }
 
 // System initialization
