@@ -17,15 +17,15 @@
 uint8_t beacon_frame_2g[252] = {0};
 uint8_t frame_2g_info[202] = {0};
 
-// Beacon configuration
+// Beacon configuration - EPIRB maritime au large de Marseille
 beacon_config_2g_t beacon_config_2g = {
     .generation = 2,
-    .test_mode = 0,
+    .test_mode = 1,              // Test mode
     .rotating_type = RF_TYPE_G008_2G,
-    .beacon_id = 13398,
-    .country_code = 228,
-    .protocol_code = 2,
-    .vessel_id = 147937762
+    .beacon_id = 13398,          // Serial number
+    .country_code = 228,         // France MID 228
+    .protocol_code = 1,          // EPIRB
+    .vessel_id = 227006600       // MMSI example (France)
 };
 
 // ELT state
@@ -41,48 +41,112 @@ elt_state_2g_t elt_state_2g = {
 uint32_t system_time_2g = 0;
 uint32_t last_update_2g = 0;
 uint32_t activation_time_2g = 0;  // Time of beacon activation
-float current_latitude_2g = 42.85001;
-float current_longitude_2g = 4.95001;
+float current_latitude_2g = 0.0;     // TEST: Equator
+float current_longitude_2g = 0.0;    // TEST: Prime meridian
 float current_altitude_2g = 0.0;
 
 // =============================================================================
 // FRAME BUILDING FUNCTIONS
 // =============================================================================
 
+// Helper function to write multi-bit values into bit array
+static void write_bits(uint8_t* bit_array, int start_pos, int num_bits, uint64_t value) {
+    for(int i = num_bits - 1; i >= 0; i--) {
+        bit_array[start_pos++] = (value >> i) & 1;
+    }
+}
+
 void build_2g_information_field(uint8_t* info_bits) {
     memset(info_bits, 0, 202);
-    
+
     DEBUG_LOG_FLUSH("Building 2G information field...\r\n");
-    
-    // Bit allocation per T.018 Appendix E
-    // Bits 1-43: TAC + Serial Number + Country Code (23 HEX ID)
-    set_23_hex_id_2g(info_bits);
-    
-    // Bits 44-90: Encoded Location (47 bits)
+
+    // Standard T.018 format (202 bits)
+    int bit_pos = 0;
+
+    // Bits 1-16: TAC (16 bits)
+    uint16_t tac = (beacon_config_2g.test_mode) ? 9999 : 10001;
+    write_bits(info_bits, bit_pos, 16, tac);
+    bit_pos += 16;
+
+    // Bits 17-30: Serial number (14 bits)
+    uint16_t serial = beacon_config_2g.beacon_id & 0x3FFF;
+    write_bits(info_bits, bit_pos, 14, serial);
+    bit_pos += 14;
+
+    // Bits 31-40: Country code (10 bits)
+    uint16_t country = beacon_config_2g.country_code & 0x3FF;
+    write_bits(info_bits, bit_pos, 10, country);
+    bit_pos += 10;
+
+    // Bit 41: Homing device status (0 = not equipped/disabled)
+    info_bits[bit_pos++] = 0;
+
+    // Bit 42: RLS capability (1 = enabled)
+    info_bits[bit_pos++] = 1;
+
+    // Bit 43: Test protocol flag
+    info_bits[bit_pos++] = beacon_config_2g.test_mode ? 1 : 0;
+
+    // Bits 44-66: Latitude (23 bits) per T.018 Appendix C
     gps_data_t* gps = get_current_gps_data();
-    if(gps && gps->valid) {
-        encode_location_2g(info_bits, gps->latitude, gps->longitude);
-    } else {
-        // Use fixed test position
-        encode_location_2g(info_bits, current_latitude_2g, current_longitude_2g);
-    }
-    
-    // Bits 91-137: Vessel ID (47 bits)
-    set_vessel_id_2g(info_bits);
-    
-    // Bits 138-140: Beacon Type (3 bits)
-    set_bit_field(info_bits, 137, 3, beacon_config_2g.protocol_code);
-    
-    // Bits 141-154: Spare bits (14 bits)
-    if(beacon_config_2g.rotating_type == RF_TYPE_CANCEL_2G) {
-        set_bit_field(info_bits, 140, 14, 0x3FFF);  // All 1s for cancel
-    } else {
-        set_bit_field(info_bits, 140, 14, 0);       // All 0s otherwise
-    }
-    
+    float lat = (gps && gps->valid) ? gps->latitude : current_latitude_2g;
+    float lon = (gps && gps->valid) ? gps->longitude : current_longitude_2g;
+
+    // Bit 44: N/S flag (N=0, S=1)
+    info_bits[bit_pos++] = (lat < 0) ? 1 : 0;
+
+    // Bits 45-51: Degrees (7 bits, 0-90)
+    uint8_t lat_degrees = (uint8_t)(lat < 0 ? -lat : lat);
+    write_bits(info_bits, bit_pos, 7, lat_degrees);
+    bit_pos += 7;
+
+    // Bits 52-66: Decimal parts (15 bits)
+    float lat_decimal = (lat < 0 ? -lat : lat) - lat_degrees;
+    uint16_t lat_decimal_encoded = (uint16_t)(lat_decimal * (1 << 15) + 0.5);  // Round
+    write_bits(info_bits, bit_pos, 15, lat_decimal_encoded);
+    bit_pos += 15;
+
+    // Bits 67-90: Longitude (24 bits) per T.018 Appendix C
+    // Bit 67: E/W flag (E=0, W=1)
+    info_bits[bit_pos++] = (lon < 0) ? 1 : 0;
+
+    // Bits 68-75: Degrees (8 bits, 0-180)
+    uint8_t lon_degrees = (uint8_t)(lon < 0 ? -lon : lon);
+    write_bits(info_bits, bit_pos, 8, lon_degrees);
+    bit_pos += 8;
+
+    // Bits 76-90: Decimal parts (15 bits)
+    float lon_decimal = (lon < 0 ? -lon : lon) - lon_degrees;
+    uint16_t lon_decimal_encoded = (uint16_t)(lon_decimal * (1 << 15) + 0.5);  // Round
+    write_bits(info_bits, bit_pos, 15, lon_decimal_encoded);
+    bit_pos += 15;
+
+    // Bits 91-93: Vessel ID type (3 bits) - 1=Maritime MMSI (001)
+    write_bits(info_bits, bit_pos, 3, 1);
+    bit_pos += 3;
+
+    // Bits 94-123: MMSI (30 bits) for maritime
+    uint32_t mmsi = beacon_config_2g.vessel_id & 0x3FFFFFFF;  // 30 bits max
+    write_bits(info_bits, bit_pos, 30, mmsi);
+    bit_pos += 30;
+
+    // Bits 124-137: EPIRB-AIS System Identity (14 bits) - spare for basic implementation
+    write_bits(info_bits, bit_pos, 14, 0);
+    bit_pos += 14;
+
+    // Bits 138-140: Beacon type (3 bits) - 1=EPIRB
+    write_bits(info_bits, bit_pos, 3, beacon_config_2g.protocol_code);
+    bit_pos += 3;
+
+    // Bits 141-154: Spare bits (14 bits) - all 1s unless cancellation
+    uint16_t spare_bits = (beacon_config_2g.rotating_type == RF_TYPE_CANCEL_2G) ? 0x3FFF : 0x3FFF;
+    write_bits(info_bits, bit_pos, 14, spare_bits);
+    bit_pos += 14;
+
     // Bits 155-202: Rotating Field (48 bits)
     set_rotating_field_2g(info_bits, beacon_config_2g.rotating_type);
-    
+
     DEBUG_LOG_FLUSH("2G information field built\r\n");
 }
 
@@ -110,11 +174,19 @@ void build_compliant_frame_2g(void) {
     // Build complete frame with BCH
     build_2g_complete_frame(frame_2g_info, beacon_frame_2g);
 
-    // Generate 23 HEX ID for logging
-    char hex_id[24];
-    generate_23hex_id_2g(frame_2g_info, hex_id);
-    DEBUG_LOG_FLUSH("Frame built - 23 HEX ID: ");
-    DEBUG_LOG_FLUSH(hex_id);
+    // Extract Short 15 HEX ID from frame (bits 2-43 = 42 bits TAC+Serial+Country)
+    DEBUG_LOG_FLUSH("Frame built - 15 HEX ID: ");
+    for(int i = 0; i < 11; i++) {  // 42 bits = 10.5 hex chars, round to 11
+        // Extract 4 bits starting at bit position 2 + i*4
+        uint8_t nibble = 0;
+        for(int j = 0; j < 4; j++) {
+            if((2 + i*4 + j) < 252 && beacon_frame_2g[2 + i*4 + j]) {
+                nibble |= (1 << (3 - j));
+            }
+        }
+        char hex_char = "0123456789ABCDEF"[nibble];
+        debug_print_char(hex_char);
+    }
     DEBUG_LOG_FLUSH("\r\n");
 
     // Display complete 252-bit frame in hexadecimal (63 hex chars)
@@ -137,49 +209,12 @@ void build_compliant_frame_2g(void) {
 // FRAME COMPONENT FUNCTIONS
 // =============================================================================
 
-void set_23_hex_id_2g(uint8_t* info_bits) {
-    // Format: TAC (16 bits) + Serial (14 bits) + Country (10 bits) + Protocol (3 bits)
-    uint64_t hex_id = 0;
-    
-    // TAC must be > 10000 for real beacons
-    uint16_t tac = (beacon_config_2g.test_mode) ? 9999 : 10001;
-    
-    hex_id |= ((uint64_t)tac & 0xFFFF) << 27;
-    hex_id |= ((uint64_t)beacon_config_2g.beacon_id & 0x3FFF) << 13;
-    hex_id |= ((uint64_t)beacon_config_2g.country_code & 0x3FF) << 3;
-    hex_id |= (beacon_config_2g.protocol_code & 0x7);
-    
-    set_bit_field(info_bits, 0, 43, hex_id);
-}
-
-void encode_location_2g(uint8_t* info_bits, float latitude, float longitude) {
-    // Convert to binary encoding per T.018 Appendix C
-    // Latitude: 23 bits (-90 to +90 degrees)
-    // Longitude: 24 bits (-180 to +180 degrees)
-    
-    int32_t lat_encoded = (int32_t)((latitude + 90.0) * (1L << 23) / 180.0);
-    int32_t lon_encoded = (int32_t)((longitude + 180.0) * (1L << 24) / 360.0);
-    
-    // Ensure within bounds
-    lat_encoded &= 0x7FFFFF;  // 23 bits
-    lon_encoded &= 0xFFFFFF;  // 24 bits
-    
-    // Set in frame (bits 44-90)
-    set_bit_field(info_bits, 43, 23, lat_encoded);
-    set_bit_field(info_bits, 66, 24, lon_encoded);
-}
-
-void set_vessel_id_2g(uint8_t* info_bits) {
-    uint64_t vessel_id = get_configured_vessel_id_2g();
-    set_bit_field(info_bits, 90, 47, vessel_id);
-}
-
 void set_rotating_field_2g(uint8_t* info_bits, rotating_field_type_2g_t rf_type) {
     rotating_field_data_2g_t rf_data = {0};
     prepare_rotating_field_data_2g(&rf_data);
 
-    // Set rotating field type identifier (4 bits)
-    set_bit_field(info_bits, 154, 4, rf_type);
+    // Set rotating field type identifier (4 bits) at position 154
+    write_bits(info_bits, 154, 4, rf_type);
 
     switch(rf_type) {
         case RF_TYPE_G008_2G:
@@ -188,31 +223,31 @@ void set_rotating_field_2g(uint8_t* info_bits, rotating_field_type_2g_t rf_type)
                 uint8_t elapsed_hours = get_elapsed_activation_hours_2g();
                 uint16_t last_pos_minutes = get_time_since_last_location_minutes_2g();
 
-                set_bit_field(info_bits, 158, 6, elapsed_hours);           // T.018 bits 159-164
-                set_bit_field(info_bits, 164, 11, last_pos_minutes);       // T.018 bits 165-175
-                set_bit_field(info_bits, 175, 10, rf_data.altitude_code);  // T.018 bits 176-185
-                set_bit_field(info_bits, 185, 17, 0);                      // T.018 bits 186-202
+                write_bits(info_bits, 158, 6, elapsed_hours);           // T.018 bits 159-164
+                write_bits(info_bits, 164, 11, last_pos_minutes);       // T.018 bits 165-175
+                write_bits(info_bits, 175, 10, rf_data.altitude_code);  // T.018 bits 176-185
+                write_bits(info_bits, 185, 17, 0);                      // T.018 bits 186-202
             }
             break;
 
         case RF_TYPE_ELTDT_2G:
             // ELT-DT Time/Altitude data (44 bits)
-            set_bit_field(info_bits, 158, 16, rf_data.time_value);
-            set_bit_field(info_bits, 174, 10, rf_data.altitude_code);
-            set_bit_field(info_bits, 184, 18, 0);  // Spare bits
+            write_bits(info_bits, 158, 16, rf_data.time_value);
+            write_bits(info_bits, 174, 10, rf_data.altitude_code);
+            write_bits(info_bits, 184, 18, 0);  // Spare bits
             break;
 
         case RF_TYPE_RLS_2G:
             // RLS provider and data
-            set_bit_field(info_bits, 158, 8, rf_data.rls_provider);
-            set_bit_field(info_bits, 166, 36, rf_data.rls_data);
+            write_bits(info_bits, 158, 8, rf_data.rls_provider);
+            write_bits(info_bits, 166, 36, rf_data.rls_data);
             break;
 
         case RF_TYPE_CANCEL_2G:
             // Cancellation method
-            set_bit_field(info_bits, 158, 2, rf_data.deactivation_method);
+            write_bits(info_bits, 158, 2, rf_data.deactivation_method);
             // Fixed bits - all 42 bits set to 1 (T.018 spec)
-            set_bit_field_64(info_bits, 160, 42, 0x3FFFFFFFFFFULL);
+            write_bits(info_bits, 160, 42, 0x3FFFFFFFFFFULL);
             break;
     }
 }
@@ -224,65 +259,11 @@ void set_rotating_field_2g(uint8_t* info_bits, rotating_field_type_2g_t rf_type)
 uint64_t encode_gps_position_2g(double lat, double lon) {
     int32_t lat_encoded = (int32_t)((lat + 90.0) * (1L << 23) / 180.0);
     int32_t lon_encoded = (int32_t)((lon + 180.0) * (1L << 24) / 360.0);
-    
+
     lat_encoded &= 0x7FFFFF;  // 23 bits
     lon_encoded &= 0xFFFFFF;  // 24 bits
-    
+
     return ((uint64_t)lat_encoded << 24) | lon_encoded;
-}
-
-void encode_location_appendix_c(uint8_t* info_bits, float latitude, float longitude) {
-    uint64_t encoded_pos = encode_gps_position_2g(latitude, longitude);
-    set_bit_field(info_bits, 43, 47, encoded_pos);
-}
-
-// =============================================================================
-// 23 HEX ID GENERATION
-// =============================================================================
-
-void generate_23hex_id_2g(const uint8_t *frame_202bits, char *hex_id) {
-    // Generate 23 HEX ID according to T.018 Section 3.6 and Appendix B.2
-    // Format: 1 + Country(10) + 101 + TAC(16) + Serial(14) + Test(1) + VesselType(3) + VesselID(44)
-    // Total: 92 bits = 23 hex chars
-
-    uint16_t tac = (beacon_config_2g.test_mode) ? 9999 : 10001;
-    uint16_t serial = beacon_config_2g.beacon_id & 0x3FFF;
-    uint16_t country = beacon_config_2g.country_code & 0x3FF;
-    uint8_t test_flag = beacon_config_2g.test_mode ? 1 : 0;
-    uint8_t vessel_type = 1;  // Maritime MMSI
-    uint64_t vessel_id = beacon_config_2g.vessel_id & 0xFFFFFFFFFFFULL;  // 44 bits
-
-    // Build 92-bit value according to T.018 format
-    // Bit layout: [1][country:10][1][0][1][tac:16][serial:14][test:1][type:3][vessel:44]
-    uint64_t hex_id_high = 0;  // Upper 28 bits
-    uint64_t hex_id_low = 0;   // Lower 64 bits
-
-    // Upper part: 1 + country(10) + 101 + tac(16) = 28 bits
-    hex_id_high |= (1ULL << 27);                    // Fixed bit 1
-    hex_id_high |= ((uint64_t)country << 17);       // Country code
-    hex_id_high |= (1ULL << 16);                    // Fixed bit 1
-    hex_id_high |= (0ULL << 15);                    // Fixed bit 0
-    hex_id_high |= (1ULL << 14);                    // Fixed bit 1
-    hex_id_high |= ((uint64_t)tac >> 2);            // TAC upper 14 bits
-
-    // Lower part: tac(2) + serial(14) + test(1) + type(3) + vessel(44) = 64 bits
-    hex_id_low |= ((uint64_t)(tac & 0x3) << 62);    // TAC lower 2 bits
-    hex_id_low |= ((uint64_t)serial << 48);         // Serial number
-    hex_id_low |= ((uint64_t)test_flag << 47);      // Test flag
-    hex_id_low |= ((uint64_t)vessel_type << 44);    // Vessel type
-    hex_id_low |= vessel_id;                         // Vessel ID
-
-    // Convert to hex string (92 bits = 23 hex chars)
-    for(int i = 0; i < 23; i++) {
-        uint8_t nibble;
-        if(i < 7) {  // First 7 chars from hex_id_high (28 bits)
-            nibble = (hex_id_high >> ((6 - i) * 4)) & 0xF;
-        } else {     // Remaining 16 chars from hex_id_low (64 bits)
-            nibble = (hex_id_low >> ((22 - i) * 4)) & 0xF;
-        }
-        hex_id[i] = "0123456789ABCDEF"[nibble];
-    }
-    hex_id[23] = '\0';
 }
 
 // =============================================================================

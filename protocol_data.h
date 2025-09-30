@@ -39,19 +39,10 @@ void build_2g_complete_frame(uint8_t* info_bits, uint8_t* complete_frame);
 void build_compliant_frame_2g(void);
 
 // Frame components
-void set_23_hex_id_2g(uint8_t* info_bits);
-void encode_location_2g(uint8_t* info_bits, float latitude, float longitude);
-void set_vessel_id_2g(uint8_t* info_bits);
 void set_rotating_field_2g(uint8_t* info_bits, rotating_field_type_2g_t rf_type);
 
 // GPS position encoding (T018 specific)
 uint64_t encode_gps_position_2g(double lat, double lon);
-void encode_location_appendix_c(uint8_t* info_bits, float latitude, float longitude);
-
-// 23 HEX ID generation (T018 Appendix B.2)
-void generate_23hex_id_2g(const uint8_t *frame_202bits, char *hex_id);
-void build_23hex_from_components(uint16_t tac, uint16_t serial, uint16_t country, 
-                                uint8_t protocol, char *hex_id);
 
 // Dynamic field functions
 uint16_t get_last_location_time_2g(void);

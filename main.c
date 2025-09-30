@@ -131,7 +131,7 @@ void start_beacon_frame_2g(beacon_frame_type_2g_t frame_type) {
     if(frame_type == BEACON_TEST_FRAME_2G) {
         beacon_config_2g.test_mode = 1;
         beacon_config_2g.rotating_type = RF_TYPE_G008_2G;
-        DEBUG_LOG_FLUSH("Mode: TEST - Fixed position (Grenoble)\r\n");
+        DEBUG_LOG_FLUSH("Mode: TEST - Fixed position (Marseille offshore)\r\n");
     } else {
         beacon_config_2g.test_mode = 0;
         beacon_config_2g.rotating_type = RF_TYPE_ELTDT_2G;
