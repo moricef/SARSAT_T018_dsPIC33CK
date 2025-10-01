@@ -472,32 +472,26 @@ void transmission_task_2g(void) {
     // Generate chips outside critical section (takes time)
     uint8_t data_bit = oqpsk_state_2g.frame_bits[bit_to_generate];
 
-    // Temporary buffers for generation
-    static int8_t temp_i[256];
-    static int8_t temp_q[256];
+    // Select target buffer pointers (ISR won't touch inactive buffer)
+    int8_t* target_i = (target_buffer == 0) ?
+        oqpsk_state_2g.chip_buffer_a_i : oqpsk_state_2g.chip_buffer_b_i;
+    int8_t* target_q = (target_buffer == 0) ?
+        oqpsk_state_2g.chip_buffer_a_q : oqpsk_state_2g.chip_buffer_b_q;
 
-    // Generate T.018 PRN chips for this bit (256 chips per bit)
-    generate_prn_sequence_i(temp_i, PRN_MODE_NORMAL);
-    generate_prn_sequence_q(temp_q, PRN_MODE_NORMAL);
+    // Generate T.018 PRN chips directly into target buffer (no intermediate copy)
+    generate_prn_sequence_i(target_i, PRN_MODE_NORMAL);
+    generate_prn_sequence_q(target_q, PRN_MODE_NORMAL);
 
     // T.018 DSSS spreading: XOR data bit with PRN chips
-    for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
-        // DSSS spreading: bit XOR PRN (invert if data_bit=0)
-        if(!data_bit) {
-            temp_i[i] = -temp_i[i];
-            temp_q[i] = -temp_q[i];
+    if(!data_bit) {
+        for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
+            target_i[i] = -target_i[i];
+            target_q[i] = -target_q[i];
         }
     }
 
-    // Copy to target buffer and mark ready atomically
+    // Mark ready atomically (short critical section)
     __builtin_disable_interrupts();
-    if(target_buffer == 0) {
-        memcpy(oqpsk_state_2g.chip_buffer_a_i, temp_i, 256);
-        memcpy(oqpsk_state_2g.chip_buffer_a_q, temp_q, 256);
-    } else {
-        memcpy(oqpsk_state_2g.chip_buffer_b_i, temp_i, 256);
-        memcpy(oqpsk_state_2g.chip_buffer_b_q, temp_q, 256);
-    }
     oqpsk_state_2g.next_bit_to_gen++;
     oqpsk_state_2g.next_chips_ready = 1;
     __builtin_enable_interrupts();
@@ -558,14 +552,19 @@ void transmit_beacon_2g(void) {
     // Expected: 300 bits × 256 chips ÷ 38400 Hz = 2.0s + margin
     uint32_t timeout = millis_counter + 3000;  // 3 second timeout
     while(oqpsk_is_transmitting()) {
+        // Call chip generation continuously without delay
+        // ISR needs chips generated faster than consumption rate
         transmission_task_2g();
-        system_delay_ms(1);
 
-        // Safety timeout
-        if(millis_counter > timeout) {
-            DEBUG_LOG_FLUSH("WARNING: Transmission timeout - forcing stop\r\n");
-            oqpsk_stop_transmission();
-            break;
+        // Check timeout every 10 calls (reduce overhead)
+        static uint16_t loop_count = 0;
+        if(++loop_count >= 10) {
+            loop_count = 0;
+            if(millis_counter > timeout) {
+                DEBUG_LOG_FLUSH("WARNING: Transmission timeout - forcing stop\r\n");
+                oqpsk_stop_transmission();
+                break;
+            }
         }
     }
 
