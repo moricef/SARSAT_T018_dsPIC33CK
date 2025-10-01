@@ -548,6 +548,9 @@ void transmit_beacon_2g(void) {
     // Build compliant frame
     build_compliant_frame_2g();
 
+    // Timestamp LED on
+    uint32_t led_on_time = millis_counter;
+
     // Turn ON transmission LED (RD10)
     LED_TX_PIN = 1;
 
@@ -577,13 +580,18 @@ void transmit_beacon_2g(void) {
     // Turn OFF transmission LED (RD10)
     LED_TX_PIN = 0;
 
+    // Timestamp LED off
+    uint32_t led_off_time = millis_counter;
+    uint32_t led_duration = led_off_time - led_on_time;
+
     // Debug statistics
     DEBUG_LOG_FLUSH("2G transmission complete\r\n");
-    char debug_buf[100];
-    sprintf(debug_buf, "ISR calls: %lu, Bits TX: %u, Buffer misses: %u\r\n",
+    char debug_buf[120];
+    sprintf(debug_buf, "ISR calls: %lu, Bits TX: %u, Buffer misses: %u, LED: %lums\r\n",
             oqpsk_state_2g.isr_call_count,
             oqpsk_state_2g.bits_transmitted,
-            oqpsk_state_2g.buffer_misses);
+            oqpsk_state_2g.buffer_misses,
+            led_duration);
     DEBUG_LOG_FLUSH(debug_buf);
 }
 
