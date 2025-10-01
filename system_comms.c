@@ -265,6 +265,8 @@ void chip_timer_callback(void) {
         return;
     }
 
+    oqpsk_state_2g.isr_call_count++;
+
     // Select chips from active buffer
     int8_t i_chip, q_chip;
     if(oqpsk_state_2g.active_buffer == 0) {
@@ -292,11 +294,14 @@ void chip_timer_callback(void) {
     if(oqpsk_state_2g.current_chip >= PRN_CHIPS_PER_BIT) {
         oqpsk_state_2g.current_chip = 0;
         oqpsk_state_2g.current_bit++;
+        oqpsk_state_2g.bits_transmitted++;
 
         // Switch to next buffer if ready
         if(oqpsk_state_2g.next_chips_ready) {
             oqpsk_state_2g.active_buffer = !oqpsk_state_2g.active_buffer;
             oqpsk_state_2g.next_chips_ready = 0;
+        } else {
+            oqpsk_state_2g.buffer_misses++;
         }
 
         // Check if frame complete
@@ -316,6 +321,9 @@ void oqpsk_init(void) {
     oqpsk_state_2g.active_buffer = 0;
     oqpsk_state_2g.next_bit_to_gen = 0;
     oqpsk_state_2g.next_chips_ready = 0;
+    oqpsk_state_2g.isr_call_count = 0;
+    oqpsk_state_2g.bits_transmitted = 0;
+    oqpsk_state_2g.buffer_misses = 0;
 
     // Initialize MCP4922 DAC for I/Q outputs
     mcp4922_init();
@@ -358,6 +366,9 @@ void oqpsk_transmit_frame(uint8_t* info_bits) {
     oqpsk_state_2g.active_buffer = 0;  // Start with buffer A
     oqpsk_state_2g.next_bit_to_gen = 0;
     oqpsk_state_2g.next_chips_ready = 0;
+    oqpsk_state_2g.isr_call_count = 0;
+    oqpsk_state_2g.bits_transmitted = 0;
+    oqpsk_state_2g.buffer_misses = 0;
 
     // Pre-generate bit 0 chips into buffer A (active buffer)
     uint8_t data_bit = oqpsk_state_2g.frame_bits[0];
@@ -571,7 +582,14 @@ void transmit_beacon_2g(void) {
     // Turn OFF transmission LED (RD10)
     LED_TX_PIN = 0;
 
+    // Debug statistics
     DEBUG_LOG_FLUSH("2G transmission complete\r\n");
+    char debug_buf[100];
+    sprintf(debug_buf, "ISR calls: %lu, Bits TX: %u, Buffer misses: %u\r\n",
+            oqpsk_state_2g.isr_call_count,
+            oqpsk_state_2g.bits_transmitted,
+            oqpsk_state_2g.buffer_misses);
+    DEBUG_LOG_FLUSH(debug_buf);
 }
 
 uint8_t should_transmit_beacon_2g(void) {

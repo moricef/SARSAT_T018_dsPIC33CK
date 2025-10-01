@@ -60,6 +60,11 @@ typedef struct {
     volatile uint8_t next_chips_ready;  // Flag: next bit's chips ready
 
     int8_t prev_q_chip;                 // Previous Q chip for OQPSK delay
+
+    // Debug counters
+    volatile uint32_t isr_call_count;   // Number of ISR calls
+    volatile uint16_t bits_transmitted; // Actual bits completed
+    volatile uint16_t buffer_misses;    // Times next_chips_ready was 0 at bit boundary
 } oqpsk_state_t;
 
 // OQPSK functions
