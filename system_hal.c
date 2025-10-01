@@ -15,70 +15,25 @@ static uint16_t timer_overflow_count = 0;
 void oscillator_init(void);
 void ports_init(void);
 void timer_init(void);
-void timer2_init_chip_clock(void);
 void uart_init(void);
 void uart2_init(void);
 void spi_init(void);
 
-void __attribute__((__interrupt__, __auto_psv__)) _CCP1Interrupt(void);
-
 // External chip timer callback from system_comms.c
 extern void chip_timer_callback(void);
-
-// Timer2 initialization for T.018 chip clock (38.4 kHz)
-void timer2_init_chip_clock(void) {
-    // dsPIC33CK64MC105 : Utilisation CCP1 pour timing précis 38.4 kHz
-    // Timer1 déjà utilisé pour system tick, CCP1 indépendant
-    
-    // Disable CCP1 during configuration
-    CCP1CON1Lbits.CCPON = 0;
-
-    // Configure CCP1 in Timer mode (generates interrupts on period match)
-    CCP1CON1Lbits.MOD = 0b0000;    // Timer mode (not compare)
-    CCP1CON1Lbits.T32 = 0;         // 16-bit timer mode
-    CCP1CON1Lbits.TMRSYNC = 0;     // Timer synchronization disabled
-    CCP1CON1Lbits.CLKSEL = 0b000;  // System clock (FCY) as source
-    CCP1CON1Lbits.TMRPS = 0b00;    // 1:1 prescaler for maximum precision
-
-    // Timer resets on period match (generates interrupt)
-    CCP1CON1Hbits.OPSRC = 0;       // Output source (not used)
-    
-    // Calculate compare value for 38.4 kHz
-    // FCY = 100MHz, Target = 38.4kHz
-    // Period = FCY / Target = 100,000,000 / 38,400 = 2604.17 cycles
-    // Using 2604 gives 38.402kHz (error = +0.005%)
-    CCP1PRL = 2604 - 1;            // Set period for 38.4kHz
-    CCP1PRH = 0;                   // High word = 0 for 16-bit mode
-    
-    // Clear timer
-    CCP1TMRL = 0;
-    CCP1TMRH = 0;
-    
-    // Configure interrupt for chip timing
-    IPC1bits.CCP1IP = 5;           // High priority (above system tick)
-    IFS0bits.CCP1IF = 0;           // Clear interrupt flag
-    IEC0bits.CCP1IE = 1;           // Enable CCP1 interrupt
-
-    // DO NOT enable CCP1 here - will be enabled by start_chip_timer()
-    // Activation during system_init() causes ISR before oqpsk_state_2g init
-    // CCP1CON1Lbits.CCPON = 0;  // Remains disabled
-
-    DEBUG_LOG_FLUSH("T.018 CCP1 chip clock configured (ready for 38.400 kHz)\r\n");
-}
 
 // System initialization
 void system_init(void) {
     oscillator_init();
     ports_init();
-    timer_init();
-    timer2_init_chip_clock();  // T.018 chip rate timer
+    timer_init();  // Timer1 now runs at 38.4 kHz for chip timing
     uart_init();
     uart2_init();
     spi_init();
-    
+
     // Enable global interrupts
     __builtin_enable_interrupts();
-    
+
     DEBUG_LOG_FLUSH("System initialized\r\n");
 }
 
@@ -137,48 +92,46 @@ void ports_init(void) {
     CNPUCbits.CNPUC0 = 1;     // Enable pull-up (default = TEST mode)
 }
 
-// Timer1 initialization for system tick
+// Timer1 initialization - now runs at 38.4 kHz for chip timing
 void timer_init(void) {
-    // Configure Timer1 for 1ms interrupts
+    // Configure Timer1 for 38.4 kHz interrupts (chip rate)
     T1CONbits.TON = 0;      // Disable timer
-    T1CONbits.TCKPS = 2;    // 1:64 prescaler
-    T1CONbits.TCS = 0;      // Internal clock source
-    
-    // Set period for 1ms: FCY/64/1000 - 1
-    PR1 = (FCY/64/1000) - 1;
+    T1CONbits.TCKPS = 0;    // 1:1 prescaler (no division)
+    T1CONbits.TCS = 0;      // Internal clock source (FCY = 100 MHz)
+
+    // Set period for 38.4 kHz: FCY/38400 - 1 = 2604 - 1
+    // FCY = 100,000,000 Hz, Target = 38,400 Hz
+    // Period = 100,000,000 / 38,400 = 2604.17 cycles
+    PR1 = 2604 - 1;
     TMR1 = 0;               // Clear counter
-    
+
     // Configure interrupt
-    IPC0bits.T1IP = 4;      // Interrupt priority 4
+    IPC0bits.T1IP = 5;      // Interrupt priority 5 (high, for chip timing)
     IFS0bits.T1IF = 0;      // Clear interrupt flag
     IEC0bits.T1IE = 1;      // Enable interrupt
-    
+
     T1CONbits.TON = 1;      // Start timer
 }
 
 // Timer2 initialization for T.018 chip clock (38.4 kHz)
 // Duplicate function removed - only one timer2_init_chip_clock needed
 
-// Timer1 interrupt service routine
+// Timer1 interrupt service routine - now runs at 38.4 kHz
 void __attribute__((__interrupt__, __auto_psv__)) _T1Interrupt(void) {
-    millis_counter++;
-    timer_overflow_count++;
+    static uint16_t chip_tick_counter = 0;
 
-    // LED RD10 controlled only during transmission (system_comms.c)
-
-    IFS0bits.T1IF = 0;  // Clear interrupt flag
-}
-
-// CCP1 interrupt service routine - T.018 chip clock à 38.4 kHz précis
-void __attribute__((__interrupt__, __auto_psv__)) _CCP1Interrupt(void) {
-    // ISR appelée exactement à 38.400 kHz pour sortie chip T.018
-    // Gestion des symboles OQPSK avec timing hardware précis
-
-    // Call chip output callback
+    // Call chip timer callback at 38.4 kHz (every interrupt)
     chip_timer_callback();
 
-    // Clear CCP1 interrupt flag
-    IFS0bits.CCP1IF = 0;
+    // Maintain millis_counter: 38.4 kHz / 38.4 = 1 kHz (1ms)
+    chip_tick_counter++;
+    if(chip_tick_counter >= 38) {  // ~38.4 ticks = 1ms
+        chip_tick_counter = 0;
+        millis_counter++;
+        timer_overflow_count++;
+    }
+
+    IFS0bits.T1IF = 0;  // Clear interrupt flag
 }
 
 // UART initialization for debug output

@@ -240,22 +240,17 @@ void reset_prn_generator(void) {
 volatile uint8_t chip_timer_active = 0;
 
 void start_chip_timer(void) {
-    // Start CCP1 for precise 38.4 kHz chip rate (already initialized)
-    CCP1TMRL = 0;               // Clear counter
-    CCP1TMRH = 0;               
-    IFS0bits.CCP1IF = 0;        // Clear interrupt flag
-    
+    // Enable chip callback in Timer1 ISR (already running at 38.4 kHz)
     chip_timer_active = 1;
-    CCP1CON1Lbits.CCPON = 1;    // Enable CCP1
-    
-    DEBUG_LOG_FLUSH("T.018 CCP1 chip timer started (38.400 kHz)\r\n");
+
+    DEBUG_LOG_FLUSH("T.018 chip timer started (38.400 kHz via Timer1)\r\n");
 }
 
 void stop_chip_timer(void) {
-    CCP1CON1Lbits.CCPON = 0;    // Stop CCP1
+    // Disable chip callback in Timer1 ISR
     chip_timer_active = 0;
 
-    DEBUG_LOG_FLUSH("T.018 CCP1 chip timer stopped\r\n");
+    DEBUG_LOG_FLUSH("T.018 chip timer stopped\r\n");
 }
 
 // Hardware chip timer callback - called by CCP1 ISR at 38.4 kHz
