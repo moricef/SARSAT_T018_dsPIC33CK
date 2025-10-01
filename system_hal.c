@@ -32,13 +32,16 @@ void timer2_init_chip_clock(void) {
     
     // Disable CCP1 during configuration
     CCP1CON1Lbits.CCPON = 0;
-    
-    // Configure CCP1 in Compare mode with Special Event Trigger
-    CCP1CON1Lbits.MOD = 0b0101;    // Compare mode, trigger special event
+
+    // Configure CCP1 in Timer mode (generates interrupts on period match)
+    CCP1CON1Lbits.MOD = 0b0000;    // Timer mode (not compare)
     CCP1CON1Lbits.T32 = 0;         // 16-bit timer mode
     CCP1CON1Lbits.TMRSYNC = 0;     // Timer synchronization disabled
-    CCP1CON1Lbits.CLKSEL = 0;      // System clock (FCY) as source
-    CCP1CON1Lbits.TMRPS = 0;       // 1:1 prescaler for maximum precision
+    CCP1CON1Lbits.CLKSEL = 0b000;  // System clock (FCY) as source
+    CCP1CON1Lbits.TMRPS = 0b00;    // 1:1 prescaler for maximum precision
+
+    // Timer resets on period match (generates interrupt)
+    CCP1CON1Hbits.OPSRC = 0;       // Output source (not used)
     
     // Calculate compare value for 38.4 kHz
     // FCY = 100MHz, Target = 38.4kHz
