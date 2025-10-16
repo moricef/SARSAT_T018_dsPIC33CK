@@ -196,8 +196,8 @@ void generate_prn_sequence_i(int8_t* sequence, uint8_t mode) {
     uint32_t lfsr = prn_state_2g.lfsr_i;
     
     for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
-        // Extract output bit (LSB)
-        sequence[i] = (lfsr & 1) ? 1 : -1;
+        // Extract output bit (LSB) - T.018 Table 2.3: Logic 1→-1, Logic 0→+1
+        sequence[i] = (lfsr & 1) ? -1 : 1;
         
         // T.018 LFSR feedback: x^23 + x^18 + 1 (taps at positions 23 and 18)
         uint8_t feedback = ((lfsr >> 22) ^ (lfsr >> 17)) & 1;
@@ -215,7 +215,8 @@ void generate_prn_sequence_q(int8_t* sequence, uint8_t mode) {
     uint32_t lfsr = prn_state_2g.lfsr_q;
     
     for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
-        sequence[i] = (lfsr & 1) ? 1 : -1;
+        // T.018 Table 2.3: Logic 1→-1, Logic 0→+1
+        sequence[i] = (lfsr & 1) ? -1 : 1;
         
         // T.018 LFSR feedback: x^23 + x^18 + 1 (same as I channel)
         uint8_t feedback = ((lfsr >> 22) ^ (lfsr >> 17)) & 1;
