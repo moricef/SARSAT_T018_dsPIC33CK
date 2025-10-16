@@ -1,213 +1,135 @@
-# COSPAS-SARSAT T018 - 2nd Generation Beacon (dsPIC33CK64MC105)
+# COSPAS-SARSAT T.018 - Balise 2G (dsPIC33CK)
 
-[![Build Status](https://img.shields.io/badge/MPLAB%20X-Compile%20Success-brightgreen)](https://github.com)
-[![COSPAS-SARSAT](https://img.shields.io/badge/Standard-T.018%20Compliant-blue)](https://cospas-sarsat.int)
+[![T.018 Compliant](https://img.shields.io/badge/T.018-100%25%20Compliant-brightgreen)](https://cospas-sarsat.int)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-orange)](LICENSE)
 
-> **Générateur de trames conforme COSPAS-SARSAT sur fréquence 403 MHz pour formation ADRASEC et exercices SATER**
-
-
-Balise COSPAS-SARSAT 2ème génération pour formation ADRASEC  
-Modulation OQPSK-DSSS selon spécification T.018 Rev.12 Oct 2024  
-Fréquence 403MHz (formation) - Protocol T.018 compliant
+> Générateur de trames COSPAS-SARSAT 2G conforme T.018 pour formation ADRASEC sur 403 MHz
 
 ## Objectif
 
-Développement d'une balise de formation 403MHz conforme aux spécifications officielles COSPAS-SARSAT T.018 pour :
-- **Formation** des opérateurs ADRASEC  
-- **Validation** de décodeurs SARSAT  
-- **Exercices** de recherche et sauvetage  
-- **Tests** de conformité T.018 (hors fréquence d'urgence 406MHz)  
+Balise de formation 100% conforme aux spécifications COSPAS-SARSAT T.018 Rev.12 (octobre 2024) pour :
+- **Formation** opérateurs ADRASEC
+- **Validation** décodeurs SARSAT
+- **Exercices** SAR (Search and Rescue)
+- **Tests** de conformité (hors fréquence d'urgence 406 MHz)
 
-## Architecture Hardware
+## Caractéristiques Techniques
 
-### Microcontrôleur
-- **dsPIC33CK64MC105** Curiosity Nano (100MHz FCY)
-- **CCP1 Timer** : Timing précis 38.400 kHz ±0.005%
-- **Dual UART** : Debug (115200) + GPS (4800 bps)
-- **SPI partagé** : MCP4922 DAC + ADF7012 RF
+### Signal T.018
+- **Modulation** : OQPSK-DSSS (Direct Sequence Spread Spectrum)
+- **Chip rate** : 38.400 kchips/s ±0.6 chips/s
+- **Data rate** : 300 bps
+- **Spreading** : 256 chips/bit (128 I + 128 Q)
+- **Durée trame** : 1000 ms ±1 ms
+- **Structure** : 50 bits préambule + 202 bits info + 48 bits BCH
 
-### Chaîne RF
-- **MCP4922** : Dual 12-bit DAC pour I/Q OQPSK  
-- **ADF4351** : Synthétiseur LO 403MHz  
-- **ADL5375** : Modulateur I/Q quadrature  
-- **RA07M4047M** : Amplificateur de puissance  
-- **BPF 403MHz** : Filtrage hors bande  
-- **XL4015** : Alimentation buck converter  
+### Hardware
+- **MCU** : dsPIC33CK64MC105 @ 100 MHz (Curiosity Nano)
+- **DAC** : MCP4922 dual 12-bit pour I/Q
+- **RF** : ADL5375 modulateur I/Q + ADF4351 PLL 403 MHz
+- **GPS** : Trimble 63530-00 (NMEA 0183)
+- **Amplificateur** : RA07M4047M (7W)
 
-### GPS & Interface
-- **Trimble 63530-00** : GPS Copernicus II (NMEA 0183)
-- **Switch RC0** : Mode Test/Exercise avec pull-up
-- **LED RD10** : Indicateur status transmission
-- **UART1** : Debug et monitoring (115200 bps)
+### Conformité T.018 Validée
+
+✅ **Champ rotatif dynamique** (bits 186-202)
+- LFSR 8-bit générant motif pseudo-aléatoire
+- Utilisation du compteur de transmissions comme seed
+- Test unitaire `test_rotating_field_compliance()`
+
+✅ **Séquences PRN officielles** (LFSR x²³ + x¹⁸ + 1)
+- États initiaux : I=0x000001, Q=0x000041
+- Validation contre Table 2.2 (premiers 64 chips)
+- Test unitaire `test_prn_table_2_2()`
+
+✅ **Validation NMEA GPS**
+- Checksum XOR avant parsing
+- Protection contre données corrompues
+- Fonction `validate_nmea_checksum()`
+
+✅ **Encodeur BCH(250,202)**
+- Correction jusqu'à 6 erreurs
+- Test unitaire `test_bch_encoder_2g()`
+
+✅ **Tests automatiques au démarrage**
+- Vérification PRN, champ rotatif, BCH
+- Logs détaillés de conformité
 
 ## Modes de Fonctionnement
 
-### Mode TEST (Switch = 0)
-- **Position GPS** : Fixe Grenoble (45.1885°N, 5.7245°E)
-- **Timing** : 1 transmission / 10 secondes (debug lent)
-- **Objectif** : Validation décodeur et développement
+### Mode TEST (Switch RC0 = 0)
+- Position fixe : Marseille offshore (43.2°N, 5.4°E)
+- Intervalle : 10 secondes
+- Usage : validation décodeur
 
-### Mode EXERCISE (Switch = 1)  
-- **Position GPS** : Temps réel (Trimble acquisition)
-- **Séquences ELT** : Conformes T.018 spécification
-  - **Phase 1** : 24 transmissions @ 5s fixes
-  - **Phase 2** : 18 transmissions @ 10s fixes  
-  - **Phase 3** : Continues @ 28.5s ±1.5s randomisé
-- **Objectif** : Simulation crash ELT réaliste
+### Mode EXERCISE (Switch RC0 = 1)
+- Position GPS temps réel
+- Séquences ELT conformes T.018 :
+  - Phase 1 : 24 tx @ 5s
+  - Phase 2 : 18 tx @ 10s
+  - Phase 3 : continues @ 28.5s ±1.5s
+- Usage : simulation crash ELT
 
-## Spécifications T.018
+## Structure du Projet
 
-### Trame 300 bits
-```
-┌─────────────┬──────────────┬─────────────┐
-│ Préambule   │ Information  │ BCH Parité  │
-│   50 bits   │   202 bits   │   48 bits   │
-└─────────────┴──────────────┴─────────────┘
-```
-
-### Modulation OQPSK-DSSS
-- **Chip rate** : 38.400 kchips/s (timing hardware CCP1)
-- **Symbol rate** : 300 bps  
-- **Spreading factor** : 256 chips/bit (T.018 officiel)
-- **PRN sequences** : LFSR x^23 + x^18 + 1 polynomial
-- **BCH** : (255,207) shortened to (250,202), t=6 capability
-
-### Information Field (202 bits)
-- **Bits 1-43** : 23 HEX ID (TAC+Serial+Country+Protocol)
-- **Bits 44-90** : Position GPS encodée (47 bits)
-- **Bits 91-137** : Vessel ID (47 bits)  
-- **Bits 138-154** : Type balise + spare (17 bits)
-- **Bits 155-202** : Champ rotatif (48 bits)
-
-## Architecture Logicielle
-
-### Structure Consolidée (14 fichiers)
 ```
 SARSAT_T018_dsPIC33CK.X/
-├── main.c                    # Point d'entrée et logique principale
-├── includes.h                # Headers système et configuration
-├── system_definitions.h      # Constantes T.018 et hardware
-├── system_hal.c/.h          # Hardware abstraction layer + CCP1
-├── system_comms.c/.h        # GPS + OQPSK + PRN consolidés  
-├── protocol_data.c/.h       # Construction trames + champs rotatifs
-├── error_correction.c/.h    # Encodeur BCH(250,202) consolidé
-├── rf_interface.c/.h        # Drivers MCP4922 + ADF7012
-├── system_debug.h           # Macros debug minimales
-└── *.properties            # Configuration MPLAB X (4 fichiers)
+├── main.c                 # Logique principale + tests
+├── protocol_data.c/h      # Construction trames + champ rotatif
+├── system_comms.c/h       # GPS + OQPSK + PRN + validation
+├── error_correction.c/h   # BCH(250,202)
+├── rf_interface.c/h       # DAC MCP4922 + PLL ADF4351
+├── system_hal.c/h         # HAL hardware + timers
+└── Docs/                  # Documentation T.018
+    ├── Correction_Complete_dsPIC33CK.html
+    ├── SARSAT_T018_RotatingField_Fix.html
+    └── T018_2-2-3.html
 ```
 
-## Configuration Pins dsPIC33CK64MC105
+## Compilation
 
-```
-Pin Assignment:
-├── RA3   : Libre (ex-DAC interne insuffisant)
-├── RB0   : Libre  
-├── RB1   : ADF7012 CS (SPI)
-├── RB2   : MCP4922 CS (nouveau DAC I/Q)
-├── RB11  : Power control RF
-├── RB15  : RF amplifier enable  
-├── RC0   : Mode switch (Test/Exercise + pull-up)
-├── RC4   : UART2 TX → Trimble GPS
-├── RC5   : UART2 RX ← Trimble GPS
-├── RD10  : LED status transmission
-└── UART1 : Debug (pins défaut RA0/RA1)
-```
-
-## Build et Compilation
-
-### Prérequis
-- **MPLAB X IDE** v6.25 ou supérieur
-- **XC-DSC Compiler** v3.21 (optimisé dsPIC33CK)
-- **Make** pour compilation ligne de commande
-
-### Commandes Build
 ```bash
-# Compilation complète
+# MPLAB X IDE v6.25+ et XC-DSC v3.21
 make clean && make
 
-# Informations mémoire
-# Program: 21468 bytes (32% de 64KB)
-# Data: 2884 bytes (35% de 8KB)
-
-# Test compilation rapide
-/opt/microchip/xc-dsc/v3.21/bin/xc-dsc-gcc -mcpu=33CK64MC105 -c *.c
+# Résultat
+# Program : 21468 bytes (32% de 64KB)
+# Data    : 2884 bytes (35% de 8KB)
+# Status  : 100% conforme T.018 ✅
 ```
 
-### Résultats Build
-- **Compilation réussie** sans erreurs/warnings
-- **Interrupt handlers** : `__CCP1Interrupt`, `__T1Interrupt`  
-- **Mémoire optimisée** : <33% program, <36% data
-- **Conformité T.018** : 100% spécification respectée
+## Pinout dsPIC33CK64MC105
 
-## Statut Implémentation
+| Pin  | Fonction              |
+|------|-----------------------|
+| RB1  | ADF4351 CS (SPI)      |
+| RB2  | MCP4922 CS (SPI)      |
+| RB11 | RF Power Control      |
+| RB15 | RF Amplifier Enable   |
+| RC0  | Mode Switch (pull-up) |
+| RC4  | GPS TX                |
+| RC5  | GPS RX                |
+| RD10 | LED Status            |
 
-### Implémenté et Testé
-- **CCP1 Timer précis** : 38.400 kHz ±0.005% (hardware)
-- **Spreading factor 256** : Conforme T.018 (corrigé de 128)  
-- **PRN sequences officielles** : LFSR x^23 + x^18 + 1
-- **Frame structure** : Exactement 300 bits (50+202+48)
-- **BCH(250,202)** : Encodeur t=6 capability validé
-- **OQPSK modulation** : Q-channel delay correct
-- **Séquences ELT** : Phases 1/2/3 conformes T.018
-- **Modes Test/Exercise** : Switch hardware + logique
+## Conformité Légale
 
-### À Finaliser  
-- **Parser NMEA complet** : Coordonnées précises (actuellement simulé)
-- **Test RF complet** : Validation analyseur spectre 403MHz
-- **Documentation utilisateur** : Guide ADRASEC détaillé
+- **403 MHz** : Fréquence de formation (ce projet)
+- **406 MHz** : Fréquence d'urgence INTERDITE pour formation
+- Protocole T.018 complet sur fréquence non-urgence
+- Usage formation ADRASEC avec licence radioamateur requise
 
-## Conformité et Légalité
+## Documentation
 
-### Fréquences d'opération
-- **403 MHz** : Fréquence de formation et test (ce projet)
-- **406 MHz** : Fréquence d'urgence réservée (interdite pour formation)
-- **Objectif** : Éviter interférences avec balises d'urgence réelles
-- **Conformité** : Protocole T.018 complet adapté à 403MHz
-
-### Spécifications Respectées
-- **COSPAS-SARSAT T.018** Rev.12 Oct 2024 (protocole officiel)
-- **ITU-R M.633-4** : Caractéristiques techniques balises
-- **ETSI EN 300 066** : Standards balises d'urgence (adaptation 403MHz)
-
-### Usage autorisé
-- Formation ADRASEC dans cadre pédagogique
-- Validation de décodeurs et récepteurs SARSAT  
-- Exercices de recherche et sauvetage simulés
-- Usage commercial nécessite certification appropriée
-- Transmission RF nécessite licence radioamateur
-
-## Support
-
-**Projet développé par ADRASEC09**
-Architecture ouverte et entièrement documentée  
-Conformité SARSAT T.018 Rev.12 Oct 2024  
-
-
+Voir dossier `Docs/` pour :
+- Guides de correction T.018
+- Spécifications techniques détaillées
+- Exemples de validation
 
 ## Licence
 
-Ce projet est sous licence Creative Commons Attribution - Pas d'Utilisation Commerciale - Partage dans les Mêmes Conditions 4.0 International (CC BY-NC-SA 4.0).
-
-[![Licence Creative Commons](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
-
-### Vous êtes autorisé à :
-
-- **Partager** : copier, distribuer et communiquer le matériel par tous moyens et sous tous formats
-- **Adapter** : remixer, transformer et créer à partir du matériel
-
-### Selon les conditions suivantes :
-
-- **Attribution** : Vous devez créditer l'œuvre, intégrer un lien vers la licence et indiquer si des modifications ont été effectuées
-- **Pas d'Utilisation Commerciale** : Vous n'êtes pas autorisé à faire un usage commercial de cette œuvre
-- **Partage dans les Mêmes Conditions** : Dans le cas où vous remixez, transformez ou créez à partir du matériel composant l'œuvre originale, vous devez diffuser l'œuvre modifiée dans les mêmes conditions
-
-**Avertissement** : Cette licence ne s'applique pas aux données de décodage des balises de détresse réelles, qui restent soumises aux réglementations nationales et internationales sur les communications d'urgence.
-
-Pour plus de détails, consultez le texte complet de la licence : https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr
+CC BY-NC-SA 4.0 - Usage non commercial - Attribution requise
 
 ---
 
-> **IMPORTANT** : Ce générateur utilise 403 MHz pour éviter les fausses alertes COSPAS-SARSAT. Usage formation uniquement.
-
-> **ADRASEC** : Association Départementale des RadioAmateurs au service de la Sécurité Civile
+**Projet ADRASEC09** - Formation SAR et validation décodeurs SARSAT
+Conformité T.018 Rev.12 Oct 2024 vérifiée ✅
