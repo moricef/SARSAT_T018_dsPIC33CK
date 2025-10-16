@@ -65,10 +65,18 @@ void oscillator_init(void) {
 // GPIO port initialization
 void ports_init(void) {
     // Disable analog functionality on all ports
-    ANSELA = 0x0000; 
+    ANSELA = 0x0000;
     ANSELB = 0x0000;
-    ANSELD = 0x0000;    
-    
+    ANSELD = 0x0000;
+
+    // DEBUG: RB0 for oscilloscope measurement of Timer1 ISR rate
+    TRISBbits.TRISB0 = 0;     // RB0 output
+    LATBbits.LATB0 = 0;       // Initially low
+
+    // DEBUG: RA3 for oscilloscope measurement of SPI transfer time
+    TRISAbits.TRISA3 = 0;     // RA3 output
+    LATAbits.LATA3 = 0;       // Initially low
+
     // MCP4922 dual DAC CS pin configuration
     TRISBbits.TRISB2 = 0;     // RB2 output for MCP4922 CS
     LATBbits.LATB2 = 1;       // CS inactive (high)
@@ -119,6 +127,15 @@ void timer_init(void) {
 // Timer1 interrupt service routine - now runs at 38.4 kHz
 void __attribute__((__interrupt__, __auto_psv__)) _T1Interrupt(void) {
     static uint16_t chip_tick_counter = 0;
+    static uint16_t debug_toggle_counter = 0;
+
+    // DEBUG: Toggle RB0 every 1000 ISR calls = 26.04ms @ 38.4kHz (should be 38.4Hz = 26ms period)
+    // Measure with oscilloscope to verify actual ISR rate
+    debug_toggle_counter++;
+    if(debug_toggle_counter >= 1000) {
+        debug_toggle_counter = 0;
+        LATBbits.LATB0 = !LATBbits.LATB0;  // Toggle RB0 for scope measurement
+    }
 
     // Call chip timer callback at 38.4 kHz (every interrupt)
     chip_timer_callback();
@@ -176,21 +193,34 @@ void uart2_init(void) {
     U2MODEbits.UTXEN = 1;     // Enable transmitter
 }
 
-// SPI initialization for dsPIC33CK (official datasheet DS70005399D)
+// SPI initialization
 void spi_init(void) {
     // Clear SPIx buffers
     SPI1BUFL = 0;
     SPI1BUFH = 0;
-    
+
     // Configure SPI1 Master mode (SPIxCON1L[5] = 1)
     SPI1CON1L = 0x0000;         // Clear all bits
     SPI1CON1Lbits.MSTEN = 1;    // Master mode
-    
+
+    // Configure SPI baud rate: FCY=100MHz, MCP4922 max=20MHz
+    // SPI_CLK = FCY / (2 × (SPI1BRGL + 1))
+    // For 12.5MHz: 100MHz / (2 × (SPI1BRGL + 1)) = 12.5MHz → SPI1BRGL = 3
+    // For 10MHz:   100MHz / (2 × (SPI1BRGL + 1)) = 10MHz   → SPI1BRGL = 4
+    SPI1BRGL = 3;  // 100MHz / (2×4) = 12.5 MHz (safe for MCP4922 @ 20MHz max)
+    // Result: 16-bit transfer @ 12.5MHz = 1.28µs (vs 26µs ISR period = OK!)
+
     // Clear SPIROV bit (SPIxSTATL[6])
     SPI1STATLbits.SPIROV = 0;
-    
+
     // Enable SPI operation (SPIxCON1L[15])
     SPI1CON1Lbits.SPIEN = 1;
+
+    // Verify SPI configuration (debug)
+    char spi_debug[80];
+    sprintf(spi_debug, "SPI init: BRGL=%u, MSTEN=%u, SPIEN=%u\r\n",
+            SPI1BRGL, SPI1CON1Lbits.MSTEN, SPI1CON1Lbits.SPIEN);
+    debug_print_string(spi_debug);
 }
 
 // Utility function: Set bit field in byte array

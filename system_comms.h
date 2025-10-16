@@ -119,6 +119,7 @@ void start_chip_timer(void);
 void stop_chip_timer(void);
 void chip_timer_callback(void);     // Called by CCP1 ISR at 38.4 kHz
 extern volatile uint8_t chip_timer_active;
+void test_prn_table_2_2(void);
 
 // =============================================================================
 // TRANSMISSION CONTROL

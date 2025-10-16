@@ -102,7 +102,7 @@ void mcp4922_write_both(uint16_t i_value, uint16_t q_value) {
     if(rf_calibration.calibrated) {
         rf_apply_calibration(&i_value, &q_value);
     }
-    
+
     mcp4922_write_dac_a(i_value);  // I channel
     mcp4922_write_dac_b(q_value);  // Q channel
 }
@@ -209,11 +209,11 @@ void rf_amplifier_enable(uint8_t enable) {
     if(enable) {
         LATBbits.LATB15 = 1;
         rf_status.amplifier_enabled = 1;
-        DEBUG_LOG_FLUSH("RF amplifier enabled\r\n");
+        // No logging here - called during LED ON period
     } else {
         LATBbits.LATB15 = 0;
         rf_status.amplifier_enabled = 0;
-        DEBUG_LOG_FLUSH("RF amplifier disabled\r\n");
+        // No logging here - called during LED ON period
     }
 }
 

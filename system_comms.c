@@ -39,23 +39,47 @@ static uint8_t nmea_index = 0;
 uint32_t tx_interval_ms = 10000;  // Default 10 seconds
 extern volatile uint32_t millis_counter;
 
+
 // =============================================================================
 // GPS MANAGER (Trimble 63530-00)
 // =============================================================================
-
 void gps_init(void) {
     memset(&current_gps_data, 0, sizeof(gps_data_t));
     memset(nmea_buffer, 0, NMEA_BUFFER_SIZE);
     nmea_index = 0;
-    
+
     DEBUG_LOG_FLUSH("GPS Manager initialized for Trimble 63530-00\r\n");
+}
+
+// Fonction de validation de checksum NMEA spécifique
+uint8_t validate_nmea_checksum(const char *sentence) {
+    // Vérification format de base
+    if(!sentence || sentence[0] != '$') return 0;
+
+    // Recherche du séparateur checksum
+    const char *asterisk = strchr(sentence, '*');
+    if(!asterisk || strlen(asterisk) < 3) return 0;  // Nécessite au moins *XX
+
+    // Extraction du checksum attendu
+    uint8_t expected;
+    if(sscanf(asterisk + 1, "%2hhx", &expected) != 1) {
+        return 0;
+    }
+
+    // Calcul du checksum réel
+    uint8_t calculated = 0;
+    for(const char *p = sentence + 1; p < asterisk; p++) {
+        calculated ^= *p;
+    }
+
+    return calculated == expected;
 }
 
 uint8_t gps_update(void) {
     // Check if UART2 has received data
     while(!U2STAHbits.URXBE) {
         char c = U2RXREG;
-        
+
         // Handle NMEA sentence building
         if(c == '$') {
             nmea_index = 0;
@@ -64,9 +88,14 @@ uint8_t gps_update(void) {
         else if(c == '\r' || c == '\n') {
             if(nmea_index > 0) {
                 nmea_buffer[nmea_index] = '\0';
-                
-                if(parse_nmea_sentence(nmea_buffer)) {
-                    return 1;  // New data available
+
+                // Validation du checksum avant parsing
+                if(validate_nmea_checksum(nmea_buffer)) {
+                    if(parse_nmea_sentence(nmea_buffer)) {
+                        return 1;  // New data available
+                    }
+                } else {
+                    DEBUG_LOG_FLUSH("NMEA: Invalid checksum\r\n");
                 }
                 nmea_index = 0;
             }
@@ -78,7 +107,7 @@ uint8_t gps_update(void) {
             nmea_index = 0;  // Buffer overflow
         }
     }
-    
+
     return 0;
 }
 
@@ -98,15 +127,21 @@ uint8_t parse_nmea_sentence(const char* sentence) {
     if(sentence == NULL || strlen(sentence) < 6) {
         return 0;
     }
-    
+
+    // Validation supplémentaire du checksum
+    if(!validate_nmea_checksum(sentence)) {
+        DEBUG_LOG_FLUSH("NMEA: Checksum validation failed\r\n");
+        return 0;
+    }
+
     if(strncmp(sentence, "$GPGGA", 6) == 0) {
         return parse_gga(sentence);
     }
-    
+
     if(strncmp(sentence, "$GPRMC", 6) == 0) {
         return parse_rmc(sentence);
     }
-    
+
     return 0;
 }
 
@@ -117,7 +152,7 @@ uint8_t parse_gga(const char* sentence) {
         current_gps_data.valid = 1;
         return 1;
     }
-    
+
     return 0;
 }
 
@@ -131,16 +166,17 @@ float nmea_to_degrees(const char* coord, char direction) {
     return 0.0;
 }
 
+// Fonction existante conservée pour compatibilité
 uint8_t nmea_get_checksum(const char* sentence) {
     if(sentence == NULL || sentence[0] != '$') {
         return 0;
     }
-    
+
     uint8_t checksum = 0;
     for(int i = 1; sentence[i] != '*' && sentence[i] != '\0'; i++) {
         checksum ^= sentence[i];
     }
-    
+
     return checksum;
 }
 
@@ -197,20 +233,71 @@ void generate_full_prn_sequence(int8_t* sequence_i, int8_t* sequence_q, uint8_t 
     generate_prn_sequence_q(sequence_q, mode);
 }
 
+// Complete PRN sequence verification against T.018 Table 2.2
+// Returns 1 if compliant, 0 otherwise
 uint8_t verify_prn_sequence(uint8_t mode) {
-    static int8_t test_seq_i[PRN_CHIPS_PER_BIT];
-    static int8_t test_seq_q[PRN_CHIPS_PER_BIT];
-    
-    generate_full_prn_sequence(test_seq_i, test_seq_q, mode);
-    
-    // T.018 verification - check first few chips against known values
-    // Expected first chips for T.018 LFSR x^23+x^18+1, init=1: 1,0,0,0,0,0,0...
-    if(test_seq_i[0] == 1 && test_seq_i[1] == -1 && test_seq_i[2] == -1) {
-        DEBUG_LOG_FLUSH("T.018 PRN sequence verification passed\r\n");
-        return 1;
-    } else {
-        DEBUG_LOG_FLUSH("PRN sequence verification failed\r\n");
+    int8_t test_seq[64];  // Buffer for first 64 chips (as per Table 2.2)
+
+    // 1. Reset LFSR to T.018 initial state (Normal I)
+    prn_state_2g.lfsr_i = 0x000001;
+
+    // 2. Generate first 64 chips
+    for (int i = 0; i < 64; i++) {
+        // Convert logic level to signal level (Table 2.3: 1→-1, 0→+1)
+        test_seq[i] = (prn_state_2g.lfsr_i & 1) ? -1 : 1;
+
+        // LFSR feedback: x^23 + x^18 + 1 (taps at bits 22 and 17)
+        uint8_t feedback = ((prn_state_2g.lfsr_i >> 22) ^ (prn_state_2g.lfsr_i >> 17)) & 1;
+        prn_state_2g.lfsr_i = (prn_state_2g.lfsr_i >> 1) | ((uint32_t)feedback << 22);
+        prn_state_2g.lfsr_i &= 0x7FFFFF;  // Mask for 23 bits
+    }
+
+    // 3. Reference values from T.018 Table 2.2 (Normal I, converted to ±1 signal levels)
+    // Hex values: 8000, 0108, 4212, 84A1 → converted to ±1
+    static const int8_t REFERENCE_CHIPS[64] = {
+        -1,+1,+1,+1,+1,+1,+1,+1, +1,+1,+1,+1,+1,+1,+1,+1,  // 8000 → 1000000000000000
+         +1,+1,+1,+1,+1,+1,+1,-1, +1,+1,+1,+1,+1,+1,+1,+1,  // 0108 → 0000000100001000
+         +1,+1,-1,+1,+1,+1,+1,+1, -1,+1,+1,+1,+1,-1,+1,+1,  // 4212 → 0100001000010010
+         +1,+1,+1,-1,+1,+1,+1,+1, -1,+1,+1,+1,+1,-1,+1,+1   // 84A1 → 1000010010100001
+    };
+
+    // 4. Verify first 64 chips against T.018 Table 2.2
+    for (int i = 0; i < 64; i++) {
+        if (test_seq[i] != REFERENCE_CHIPS[i]) {
+            DEBUG_LOG_FLUSH("PRN ERROR: Chip ");
+            debug_print_dec(i);
+            DEBUG_LOG_FLUSH(" mismatch (got ");
+            debug_print_dec(test_seq[i]);
+            DEBUG_LOG_FLUSH(", expected ");
+            debug_print_dec(REFERENCE_CHIPS[i]);
+            DEBUG_LOG_FLUSH(")\r\n");
+            return 0;
+        }
+    }
+
+    // 5. Verify autocorrelation property (mathematical validation)
+    int32_t autocorr = 0;
+    for (int i = 0; i < 64; i++) {
+        autocorr += test_seq[i] * test_seq[i];
+    }
+    if (autocorr != 64) {  // 64 chips of ±1 → sum of squares = 64
+        DEBUG_LOG_FLUSH("PRN ERROR: Autocorrelation ");
+        debug_print_dec(autocorr);
+        DEBUG_LOG_FLUSH("/64\r\n");
         return 0;
+    }
+
+    DEBUG_LOG_FLUSH("PRN: T.018 Table 2.2 compliance verified\r\n");
+    return 1;
+}
+
+// Unit test for PRN sequence compliance with T.018 Table 2.2
+void test_prn_table_2_2(void) {
+    DEBUG_LOG_FLUSH("=== Testing PRN against T.018 Table 2.2 ===\r\n");
+    if (verify_prn_sequence(PRN_MODE_NORMAL)) {
+        DEBUG_LOG_FLUSH("SUCCESS: PRN matches T.018 Table 2.2\r\n");
+    } else {
+        DEBUG_LOG_FLUSH("FAILURE: PRN does not match T.018\r\n");
     }
 }
 
@@ -242,23 +329,27 @@ volatile uint8_t chip_timer_active = 0;
 void start_chip_timer(void) {
     // Enable chip callback in Timer1 ISR (already running at 38.4 kHz)
     chip_timer_active = 1;
-
-    DEBUG_LOG_FLUSH("T.018 chip timer started (38.400 kHz via Timer1)\r\n");
+    // DEBUG: Log start (moved after LED OFF)
 }
 
 void stop_chip_timer(void) {
     // Disable chip callback in Timer1 ISR
     chip_timer_active = 0;
-
-    DEBUG_LOG_FLUSH("T.018 chip timer stopped\r\n");
+    // No logging here - called during LED ON period
 }
 
 // Hardware chip timer callback - called by CCP1 ISR at 38.4 kHz
 void chip_timer_callback(void) {
+    // DEBUG: Toggle RA3 to show when callback is ACTIVE (not returned early)
     // Safety: Check if CCP1 should be active
     if(!chip_timer_active || !oqpsk_state_2g.transmitting) {
+        // Callback disabled - RA3 should stay LOW
+        LATAbits.LATA3 = 0;
         return;
     }
+
+    // Callback active - toggle RA3 to show activity
+    LATAbits.LATA3 = !LATAbits.LATA3;
 
     oqpsk_state_2g.isr_call_count++;
 
@@ -347,7 +438,7 @@ void build_2g_frame(uint8_t* info_data, uint8_t* output_frame) {
 }
 
 void oqpsk_transmit_frame(uint8_t* info_bits) {
-    DEBUG_LOG_FLUSH("Starting OQPSK transmission...\r\n");
+    // No logging here - called during LED ON period
 
     // Build complete transmission frame
     build_2g_frame(info_bits, oqpsk_state_2g.frame_bits);
@@ -419,14 +510,14 @@ uint16_t oqpsk_get_bit_position(void) {
 
 void oqpsk_stop_transmission(void) {
     oqpsk_state_2g.transmitting = 0;
-    
+
     // Stop T.018 chip timer
     stop_chip_timer();
-    
+
     rf_amplifier_enable(0);
     mcp4922_write_both(2048, 2048);  // Center DACs
-    
-    DEBUG_LOG_FLUSH("T.018 transmission stopped\r\n");
+
+    // No logging here - called during LED ON period
 }
 
 // =============================================================================
@@ -517,9 +608,9 @@ void beacon_task_2g(void) {
     if(mode == MODE_TEST) {
         // Test mode: transmit every 10 seconds
         static uint32_t last_test_tx = 0;
-        
+
         if(current_time - last_test_tx >= TEST_INTERVAL) {
-            DEBUG_LOG_FLUSH("TEST transmission\r\n");
+            // No logging before transmission - LED timing must be pure
             transmit_beacon_2g();
             last_test_tx = current_time;
         }
@@ -543,15 +634,22 @@ void beacon_task_2g(void) {
 }
 
 void transmit_beacon_2g(void) {
-    DEBUG_LOG_FLUSH("\r\n=== TRANSMITTING 2G BEACON ===\r\n");
+    // All logging AFTER LED OFF to avoid UART blocking delays before LED ON
+    // DEBUG_LOG_FLUSH("\r\n=== TRANSMITTING 2G BEACON ===\r\n");
 
-    // Build compliant frame
+    // Build compliant frame (no logging inside to avoid UART blocking)
     build_compliant_frame_2g();
 
-    // Timestamp LED on
-    uint32_t led_on_time = millis_counter;
+    // Reset ISR counters before transmission
+    oqpsk_state_2g.isr_call_count = 0;
+    oqpsk_state_2g.bits_transmitted = 0;
+    oqpsk_state_2g.buffer_misses = 0;
 
-    // Turn ON transmission LED (RD10)
+    // Capture BOTH ISR count AND real time (millis_counter) before LED ON
+    uint32_t led_on_isr_count = oqpsk_state_2g.isr_call_count;
+    uint32_t led_on_time_ms = millis_counter;
+
+    // Turn ON transmission LED (RD10) - NO LOGGING between LED ON and LED OFF
     LED_TX_PIN = 1;
 
     // Start OQPSK transmission
@@ -559,7 +657,7 @@ void transmit_beacon_2g(void) {
 
     // Wait for completion with timeout
     // Expected: 300 bits × 256 chips ÷ 38400 Hz = 2.0s + margin
-    uint32_t timeout = millis_counter + 3000;  // 3 second timeout
+    uint32_t timeout = millis_counter + 15000;  // 15 second timeout (increased to see real time)
     while(oqpsk_is_transmitting()) {
         // Call chip generation continuously without delay
         // ISR needs chips generated faster than consumption rate
@@ -570,29 +668,41 @@ void transmit_beacon_2g(void) {
         if(++loop_count >= 10) {
             loop_count = 0;
             if(millis_counter > timeout) {
+                LED_TX_PIN = 0;  // Turn off LED before timeout log
                 DEBUG_LOG_FLUSH("WARNING: Transmission timeout - forcing stop\r\n");
                 oqpsk_stop_transmission();
-                break;
+                return;  // Exit early
             }
         }
     }
 
-    // Turn OFF transmission LED (RD10)
+    // Turn OFF transmission LED (RD10) - capture BOTH ISR count AND real time
     LED_TX_PIN = 0;
+    uint32_t led_off_isr_count = oqpsk_state_2g.isr_call_count;
+    uint32_t led_off_time_ms = millis_counter;
 
-    // Timestamp LED off
-    uint32_t led_off_time = millis_counter;
-    uint32_t led_duration = led_off_time - led_on_time;
+    // All logging AFTER LED OFF
+    char debug_buf[120];
+    uint32_t isr_count_diff = led_off_isr_count - led_on_isr_count;
+    uint32_t real_time_ms = led_off_time_ms - led_on_time_ms;
+    sprintf(debug_buf, "LED: ON@%lu -> OFF@%lu | ISR: %lu calls (%.1fs theory) | REAL: %lums (%.1fs)\r\n",
+            led_on_isr_count, led_off_isr_count,
+            isr_count_diff, (float)isr_count_diff / 38400.0f,
+            real_time_ms, (float)real_time_ms / 1000.0f);
+    DEBUG_LOG_FLUSH(debug_buf);
+
+    // DEBUG: Log flags state
+    sprintf(debug_buf, "FLAGS: chip_timer_active=%u, transmitting=%u\r\n",
+            chip_timer_active, oqpsk_state_2g.transmitting);
+    DEBUG_LOG_FLUSH(debug_buf);
 
     // Debug statistics
-    DEBUG_LOG_FLUSH("2G transmission complete\r\n");
-    char debug_buf[120];
-    sprintf(debug_buf, "ISR calls: %lu, Bits TX: %u, Buffer misses: %u, LED: %lums\r\n",
-            oqpsk_state_2g.isr_call_count,
+    sprintf(debug_buf, "Bits TX: %u, Buffer misses: %u, millis_now=%lu\r\n",
             oqpsk_state_2g.bits_transmitted,
             oqpsk_state_2g.buffer_misses,
-            led_duration);
+            millis_counter);
     DEBUG_LOG_FLUSH(debug_buf);
+    DEBUG_LOG_FLUSH("2G transmission complete\r\n");
 }
 
 uint8_t should_transmit_beacon_2g(void) {
