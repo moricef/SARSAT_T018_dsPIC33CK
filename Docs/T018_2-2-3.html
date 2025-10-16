@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T.018 - Section 2.2.3 : Étalement de spectre par séquence directe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #005691;
+            border-bottom: 2px solid #005691;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #003d6b;
+            margin-top: 30px;
+        }
+        pre {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+    <h1>T.018 - Section 2.2.3</h1>
+    <h2>Étalement de spectre par séquence directe</h2>
+
+    <div class="section">
+        <pre>
+        
+Tap : Point de prélèvement de bit pour la rétroaction XOR dans un LFSR (positions 22 et 17 pour x²³ + x¹⁸ + 1).
+Chip : Symbole binaire d'une séquence PRN (256 chips = 1 bit de donnée).
+
+2.2.3. Étalement de spectre par séquence directe
+
+Le message numérique doit être étalé en utilisant deux segments tronqués d'une séquence
+pseudo-aléatoire (PRN) de longueur maximale (m-séquence) produisant des symboles connus
+sous le nom de « chips ». Ces segments de séquence doivent être déterministes et doivent être
+connus par le récepteur.
+
+Les deux segments de séquence d'étalement PRN tronqués doivent :
+a) être appliqués séparément à la durée totale de chaque transmission de burst de balise
+   avec un segment appliqué au composant en phase (I) et l'autre au composant en
+   quadrature (Q) du signal ;
+b) être transmis comme des bits impairs et pairs, en commençant par 1 comme premier bit.
+   Les bits impairs sont transmis par le canal I et les bits pairs par le canal Q. Pour
+   chaque bit, 256 chips sont prélevés dans la séquence PRN de sorte qu'un bit 0 est représenté
+   par la séquence non inversée et un bit 1 par la séquence inversée, équivalent à une
+   opération OU exclusif (XOR). Les composantes de signal I et Q sont étalées séparément,
+   chacune par un facteur de 256 (avec un décalage de demi-chip comme montré dans la
+   section 2.3.3). Ensuite, lorsque les canaux I et Q sont combinés, le facteur d'étalement
+   global est de 128 chips/bit.
+c) être générés par une méthode équivalente à un registre à décalage avec rétroaction linéaire
+   (LFSR) utilisant le même polynôme générateur G(x) = x²³ + x¹⁸ + 1 (voir Figure 2-2) ;
+d) être générés en paires appariées pour les composantes I et Q définies dans le Tableau 2.2
+   pour chaque mode de balise ;
+e) être tronqués aux 38 400 premiers chips de la m-séquence générée en utilisant les valeurs
+   d'initialisation prescrites pour chacune des composantes I et Q avec un décalage de ½
+   période de chip imposé sur la composante Q par rapport à la composante I (voir section
+   2.3.3) ;
+f) être appliqués aux composantes I et Q pour la durée totale d'une seconde de chaque
+   transmission de burst de balise, incluant le préambule, les bits d'information et les bits
+   de correction d'erreur, pour donner un taux d'étalement de 38 400 chips/seconde pour chaque
+   composante (voir 2.3.1.2 pour plus de détails) ; et
+g) être identiques pour chaque transmission de burst de balise pour un mode de burst donné.
+
+Remarque : ce schéma d'étalement de méthode permet en fait plusieurs segments de paires de
+segments d'étalement I et Q non chevauchants, chaque segment dans chaque paire étant tronqué
+à 38 400 chips. Le nombre de segments possibles, 218, est déterminé en divisant la longueur
+totale de la m-séquence pour le polynôme générateur par la longueur du segment tronqué,
+((2²³)-1)/38 400 = 218 segments. Des paires de segments non chevauchants peuvent être sélectionnées
+à partir de cet ensemble de 218 segments.
+
+Ce schéma d'étalement de la méthode de la balise doit être capable de générer plusieurs
+segments de séquences PRN, tels que le mode normal et le mode auto-test, selon le Tableau 2.2.
+Afin de générer ces segments de séquences PRN, la balise peut utiliser un LFSR avec plusieurs
+valeurs d'initialisation pour la génération de segments de séquences PRN. Le Tableau 2.2 fournit
+les valeurs d'initialisation du polynôme générateur LFSR pour les composantes I et Q pour le
+fonctionnement en mode normal de la balise et pour le fonctionnement en mode auto-test de la
+balise. Dans ce tableau, les registres sont étiquetés de 0 à 22. Les registres se déplacent de
+gauche à droite, la sortie provenant du registre 0. Pour plus de clarté, les taps de rétroaction
+à XOR sont indiqués dans le tableau et correspondent au polynôme caractéristique. La puce de
+sortie est prise à partir du registre 0. Le tableau fournit également les 64 premiers chips dans
+l'ordre de génération à partir du LFSR. La séquence binaire de 64 chips a été affichée en format
+hexadécimal comme démontré dans l'exemple sous le tableau avec le chip le plus à gauche dans la
+séquence étant la première sortie. L'implémentation LFSR (avec l'initialisation associée) conduit
+à la génération correcte de la séquence complète de 38 400 chips, qui peut être vérifiée avec
+un haut degré de confiance en confirmant une correspondance parfaite des 64 premiers chips
+donnés dans le Tableau 2.2.
+        </pre>
+    </div>
+</body>
+</html>

@@ -75,6 +75,11 @@ int main(void) {
     // Load beacon configuration
     load_beacon_configuration_2g();
     
+    DEBUG_LOG_FLUSH("Testing rotating field compliance...\r\n");
+    test_rotating_field_compliance();
+    
+    test_prn_table_2_2();
+    
     // Determine frame type from switch
     beacon_frame_type_2g_t frame_type = get_frame_type_from_switch();
     DEBUG_LOG_FLUSH("Starting transmission - Mode: ");
@@ -93,27 +98,15 @@ int main(void) {
     
     // Main loop
     while(1) {
-        uint32_t current_time = millis_counter;
-        
-        // Update GPS data
-        gps_update();
-        
-        // Check if transmission should occur
-        if(should_transmit_beacon()) {
-            start_beacon_frame_2g(frame_type);
-        }
-        
-        // Run beacon task
+        // Run beacon task (handles GPS update and transmission timing)
         beacon_task_2g();
-        
+
         // Update RF status
         rf_update_status();
-        
-        // Status indication
-        if((current_time % 1000) == 0) {  // Every second
-            toggle_status_led();
-        }
-        
+
+        // LED RD10 is controlled by transmit_beacon_2g() only
+        // No heartbeat toggle - LED indicates transmission only
+
         // Small delay to prevent watchdog timeout
         system_delay_ms(100);
     }
@@ -131,7 +124,7 @@ void start_beacon_frame_2g(beacon_frame_type_2g_t frame_type) {
     if(frame_type == BEACON_TEST_FRAME_2G) {
         beacon_config_2g.test_mode = 1;
         beacon_config_2g.rotating_type = RF_TYPE_G008_2G;
-        DEBUG_LOG_FLUSH("Mode: TEST - Fixed position (Grenoble)\r\n");
+        DEBUG_LOG_FLUSH("Mode: TEST - Fixed position (Marseille offshore)\r\n");
     } else {
         beacon_config_2g.test_mode = 0;
         beacon_config_2g.rotating_type = RF_TYPE_ELTDT_2G;

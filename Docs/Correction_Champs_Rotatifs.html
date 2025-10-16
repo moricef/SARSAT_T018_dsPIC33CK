@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Correction des Champs Rotatifs en Mode Test (SARSAT T.018)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; color: #333; }
+        h1 { color: #0066cc; border-bottom: 2px solid #0066cc; padding-bottom: 10px; }
+        h2 { color: #008000; margin-top: 25px; }
+        h3 { color: #555; margin-top: 20px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; font-family: monospace; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .cmd { background: #e6f3ff; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .file { background: #e6ffe6; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .warning { color: #cc0000; font-weight: bold; }
+        .tip { color: #006600; font-style: italic; }
+        .section { margin-bottom: 30px; border-left: 3px solid #0066cc; padding-left: 15px; }
+    </style>
+</head>
+<body>
+    <h1>Correction des Champs Rotatifs en Mode Test (SARSAT T.018)</h1>
+
+    <div class="section">
+        <h2>1. Problème Identifié</h2>
+        <p>
+            Dans le mode <strong>Test</strong>, le champ rotatif (bits 155-202) est <strong>statique</strong>,
+            ce qui n'est <strong>pas conforme à la spécification T.018</strong>. Ce champ doit être
+            <strong>rotatif</strong> même en mode Test pour garantir la conformité.
+        </p>
+        <p class="warning">
+            <strong>Impact</strong> : Un récepteur conforme pourrait rejeter la trame car elle ne respecte pas le standard.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>2. Solution Proposée</h2>
+        <p>
+            Générer un <strong>motif rotatif</strong> pour les bits 155-202, même en mode Test.
+            Plusieurs options sont possibles :
+        </p>
+        <ul>
+            <li><strong>Compteur incrémental</strong> : Simple et efficace.</li>
+            <li><strong>Motif pseudo-aléatoire</strong> : Plus réaliste, mais plus complexe.</li>
+            <li><strong>LFSR simplifié</strong> : Pour un motif déterministe mais variable.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. Implémentation pour dsPIC33CK</h2>
+
+        <h3>3.1. Modification du Code Existante</h3>
+        <p>
+            Dans le fichier <code class="file">protocol_data.c</code>, modifier la fonction de génération des trames
+            pour inclure un champ rotatif dynamique.
+        </p>
+
+        <h3>3.2. Exemple de Code (Compteur Incrémental)</h3>
+        <pre><code class="cmd">// Dans protocol_data.c
+void generate_rotating_field(uint8_t *frame, uint16_t burst_count) {
+    // Génère un motif rotatif basé sur le numéro du burst
+    for (int i = 0; i < 48; i++) {
+        frame[155 + i] = (burst_count + i) & 0x01;  // Bit 0 ou 1 en alternance
+    }
+}
+
+void build_frame(sarsat_frame_t *frame, uint16_t burst_count, uint8_t mode) {
+    // Remplir le préambule et les champs statiques...
+    generate_rotating_field(frame, burst_count);  // Champ rotatif dynamique
+    // Remplir le BCH...
+}</code></pre>
+
+        <h3>3.3. Exemple de Code (LFSR Simplifié)</h3>
+        <p>
+            Pour un motif plus réaliste, utiliser un LFSR 8-bit (simple et efficace) :
+        </p>
+        <pre><code class="cmd">// LFSR 8-bit pour générer un motif pseudo-aléatoire
+uint8_t lfsr_8bit(uint8_t state) {
+    uint8_t feedback = ((state >> 0) ^ (state >> 2) ^ (state >> 3) ^ (state >> 4)) & 1;
+    return (state >> 1) | (feedback << 7);
+}
+
+void generate_rotating_field(uint8_t *frame, uint16_t burst_count) {
+    uint8_t lfsr_state = burst_count & 0xFF;  // Initialiser avec le numéro du burst
+    for (int i = 0; i < 48; i++) {
+        lfsr_state = lfsr_8bit(lfsr_state);
+        frame[155 + i] = lfsr_state & 0x01;  // Bit 0 du LFSR
+    }
+}</code></pre>
+    </div>
+
+    <div class="section">
+        <h2>4. Implémentation pour ODROID-C4/PlutoSDR</h2>
+
+        <h3>4.1. Adaptation en C (ODROID-C4)</h3>
+        <p>
+            Le même principe s'applique sur l'ODROID-C4. Voici un exemple en C :
+        </p>
+        <pre><code class="cmd">#include &lt;stdint.h&gt;
+
+// Structure de la trame
+typedef struct {
+    uint8_t preamble[50];
+    uint8_t info[202];
+    uint8_t bch[48];
+} sarsat_frame_t;
+
+// Génère un champ rotatif avec un LFSR 8-bit
+void generate_rotating_field(uint8_t *frame, uint16_t burst_count) {
+    uint8_t lfsr_state = burst_count & 0xFF;
+    for (int i = 0; i < 48; i++) {
+        uint8_t feedback = ((lfsr_state >> 0) ^ (lfsr_state >> 2) ^ (lfsr_state >> 3) ^ (lfsr_state >> 4)) & 1;
+        lfsr_state = (lfsr_state >> 1) | (feedback << 7);
+        frame[155 + i] = lfsr_state & 0x01;
+    }
+}
+
+// Exemple d'utilisation
+int main() {
+    sarsat_frame_t frame;
+    generate_rotating_field(frame.info, 0);  // Premier burst
+    return 0;
+}</code></pre>
+
+        <h3>4.2. Adaptation en Python (Prototypage)</h3>
+        <p>
+            Pour un prototypage rapide sur l'ODROID-C4 :
+        </p>
+        <pre><code class="cmd">def generate_rotating_field(burst_count):
+    lfsr_state = burst_count & 0xFF
+    field = []
+    for _ in range(48):
+        feedback = (lfsr_state ^ (lfsr_state >> 2) ^ (lfsr_state >> 3) ^ (lfsr_state >> 4)) & 1
+        lfsr_state = ((lfsr_state >> 1) | (feedback << 7)) & 0xFF
+        field.append(lfsr_state & 1)
+    return field
+
+# Exemple d'utilisation
+rotating_field = generate_rotating_field(0)  # Premier burst
+print(rotating_field)</code></pre>
+    </div>
+
+    <div class="section">
+        <h2>5. Validation</h2>
+        <p>
+            Pour valider que le champ rotatif est correctement généré :
+        </p>
+        <ol>
+            <li>
+                <strong>Simuler plusieurs bursts</strong> :
+                Génère 10 bursts consécutifs et vérifie que le champ rotatif change à chaque fois.
+            </li>
+            <li>
+                <strong>Vérifier la conformité</strong> :
+                Utilise un analyseur logique ou un script pour vérifier que les bits 155-202 ne sont pas statiques.
+            </li>
+            <li>
+                <strong>Tester avec un récepteur SARSAT</strong> :
+                Si disponible, vérifie que le récepteur accepte les trames en mode Test.
+            </li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>6. Exemple Complet pour dsPIC33CK</h2>
+        <p>
+            Voici un exemple complet de la fonction <code class="file">build_frame</code> modifiée :
+        </p>
+        <pre><code class="cmd">// Dans protocol_data.c
+void build_frame(sarsat_frame_t *frame, uint16_t burst_count, uint8_t mode) {
+    // 1. Préambule (50 bits à 0)
+    memset(frame->preamble, 0, 50);
+
+    // 2. Champ d'information (202 bits)
+    //    - Remplir les bits 1-43 (ID), 44-90 (GPS), etc.
+    //    - Exemple simplifié : motif rotatif pour les bits 155-202
+    uint8_t lfsr_state = burst_count & 0xFF;
+    for (int i = 0; i < 48; i++) {
+        uint8_t feedback = ((lfsr_state >> 0) ^ (lfsr_state >> 2) ^ (lfsr_state >> 3) ^ (lfsr_state >> 4)) & 1;
+        lfsr_state = (lfsr_state >> 1) | (feedback << 7);
+        frame->info[155 + i] = lfsr_state & 0x01;
+    }
+
+    // 3. Calcul du BCH (à implémenter)
+    memset(frame->bch, 0, 48);  // Placeholder
+}</code></pre>
+    </div>
+
+    <div class="section">
+        <h2>7. Résumé des Actions</h2>
+        <ol>
+            <li>
+                <strong>Modifier la fonction de génération des trames</strong> pour inclure un champ rotatif dynamique
+                (compteur incrémental ou LFSR).
+            </li>
+            <li>
+                <strong>Tester avec plusieurs bursts</strong> pour vérifier que le champ rotatif change correctement.
+            </li>
+            <li>
+                <strong>Valider la conformité</strong> avec un analyseur logique ou un récepteur SARSAT.
+            </li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>8. Ressources Complémentaires</h2>
+        <ul>
+            <li>
+                <a href="https://github.com/moricef/SARSAT_T018_dsPIC33CK/">Projet Original (dsPIC33CK)</a>
+            </li>
+            <li>
+                <a href="https://wiki.analog.com/resources/tools-software/linux-software/libiio">Libiio (PlutoSDR)</a>
+            </li>
+            <li>
+                <a href="https://docs.python.org/3/library/struct.html">Struct (Python) pour manipuler les bits</a>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

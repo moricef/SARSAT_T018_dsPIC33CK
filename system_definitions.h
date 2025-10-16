@@ -8,6 +8,9 @@
 #include <xc.h>
 #include <stdint.h>
 
+// Enable debug output via UART
+#define DEBUG_ENABLED 1
+
 // Global system timer counter (expected by beacon_2g_main.c:293)
 extern volatile uint32_t millis_counter;
 

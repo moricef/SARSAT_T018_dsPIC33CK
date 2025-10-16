@@ -41,13 +41,30 @@ uint8_t nmea_get_checksum(const char* sentence);
 #define OQPSK_BIT_RATE      300         // 300 bps
 #define OQPSK_SYMBOLS_PER_BIT 128       // Spreading factor
 
-// OQPSK state
+// OQPSK state with double buffering for pipeline chip generation
 typedef struct {
-    uint8_t transmitting;
-    uint16_t current_bit;
-    uint16_t current_symbol;
+    volatile uint8_t transmitting;
+    volatile uint16_t current_bit;
+    volatile uint16_t current_chip;     // Current chip position within bit (0-255)
     uint8_t frame_bits[252];
     uint32_t start_time;
+
+    // Double buffer: ISR consumes buffer A while main generates buffer B
+    int8_t chip_buffer_a_i[256];        // Buffer A - I chips
+    int8_t chip_buffer_a_q[256];        // Buffer A - Q chips
+    int8_t chip_buffer_b_i[256];        // Buffer B - I chips
+    int8_t chip_buffer_b_q[256];        // Buffer B - Q chips
+
+    volatile uint8_t active_buffer;     // 0=A is transmitting, 1=B is transmitting
+    volatile uint16_t next_bit_to_gen;  // Which bit to generate next
+    volatile uint8_t next_chips_ready;  // Flag: next bit's chips ready
+
+    int8_t prev_q_chip;                 // Previous Q chip for OQPSK delay
+
+    // Debug counters
+    volatile uint32_t isr_call_count;   // Number of ISR calls
+    volatile uint16_t bits_transmitted; // Actual bits completed
+    volatile uint16_t buffer_misses;    // Times next_chips_ready was 0 at bit boundary
 } oqpsk_state_t;
 
 // OQPSK functions
@@ -100,7 +117,9 @@ void reset_prn_generator(void);
 // T.018 Hardware timing functions
 void start_chip_timer(void);
 void stop_chip_timer(void);
+void chip_timer_callback(void);     // Called by CCP1 ISR at 38.4 kHz
 extern volatile uint8_t chip_timer_active;
+void test_prn_table_2_2(void);
 
 // =============================================================================
 // TRANSMISSION CONTROL
