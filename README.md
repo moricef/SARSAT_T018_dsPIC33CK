@@ -27,7 +27,7 @@ Développement d'une balise de formation 403MHz conforme aux spécifications off
 - **Dual UART** : Debug (115200) + GPS (4800 bps)
 - **SPI partagé** : MCP4922 DAC + ADF7012 RF
 
-### Chaîne RF Complète (~95€)
+### Chaîne RF
 - **MCP4922** : Dual 12-bit DAC pour I/Q OQPSK  
 - **ADF4351** : Synthétiseur LO 403MHz  
 - **ADL5375** : Modulateur I/Q quadrature  
@@ -150,8 +150,6 @@ make clean && make
 - **BCH(250,202)** : Encodeur t=6 capability validé
 - **OQPSK modulation** : Q-channel delay correct
 - **Séquences ELT** : Phases 1/2/3 conformes T.018
-- **MCP4922 driver** : SPI dual DAC fonctionnel  
-- **GPS NMEA parser** : Basique mais opérationnel
 - **Modes Test/Exercise** : Switch hardware + logique
 
 ### À Finaliser  
