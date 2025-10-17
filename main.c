@@ -74,12 +74,11 @@ int main(void) {
     
     // Load beacon configuration
     load_beacon_configuration_2g();
-    
-    DEBUG_LOG_FLUSH("Testing rotating field compliance...\r\n");
-    test_rotating_field_compliance();
-    
-    test_prn_table_2_2();
-    
+
+    // DISABLED: test_rotating_field_compliance() causes watchdog reset
+    // DEBUG_LOG_FLUSH("Testing rotating field compliance...\r\n");
+    // test_rotating_field_compliance();
+
     // Determine frame type from switch
     beacon_frame_type_2g_t frame_type = get_frame_type_from_switch();
     DEBUG_LOG_FLUSH("Starting transmission - Mode: ");

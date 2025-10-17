@@ -199,8 +199,8 @@ void generate_prn_sequence_i(int8_t* sequence, uint8_t mode) {
         // Extract output bit (LSB) - T.018 Table 2.3: Logic 1→-1, Logic 0→+1
         sequence[i] = (lfsr & 1) ? -1 : 1;
         
-        // T.018 LFSR feedback: x^23 + x^18 + 1 (taps at positions 23 and 18)
-        uint8_t feedback = ((lfsr >> 22) ^ (lfsr >> 17)) & 1;
+        // T.018 LFSR feedback: x^23 + x^18 + 1 (X0 ⊕ X18 per Appendix D)
+        uint8_t feedback = (lfsr ^ (lfsr >> 18)) & 1;
         lfsr = (lfsr >> 1) | ((uint32_t)feedback << 22);
         
         // Ensure 23-bit register (mask upper bits)
@@ -218,8 +218,8 @@ void generate_prn_sequence_q(int8_t* sequence, uint8_t mode) {
         // T.018 Table 2.3: Logic 1→-1, Logic 0→+1
         sequence[i] = (lfsr & 1) ? -1 : 1;
         
-        // T.018 LFSR feedback: x^23 + x^18 + 1 (same as I channel)
-        uint8_t feedback = ((lfsr >> 22) ^ (lfsr >> 17)) & 1;
+        // T.018 LFSR feedback: x^23 + x^18 + 1 (X0 ⊕ X18 per Appendix D)
+        uint8_t feedback = (lfsr ^ (lfsr >> 18)) & 1;
         lfsr = (lfsr >> 1) | ((uint32_t)feedback << 22);
         
         // Ensure 23-bit register (mask upper bits)
@@ -247,19 +247,19 @@ uint8_t verify_prn_sequence(uint8_t mode) {
         // Convert logic level to signal level (Table 2.3: 1→-1, 0→+1)
         test_seq[i] = (prn_state_2g.lfsr_i & 1) ? -1 : 1;
 
-        // LFSR feedback: x^23 + x^18 + 1 (taps at bits 22 and 17)
-        uint8_t feedback = ((prn_state_2g.lfsr_i >> 22) ^ (prn_state_2g.lfsr_i >> 17)) & 1;
+        // LFSR feedback: x^23 + x^18 + 1 (X0 ⊕ X18 per T.018 Appendix D Figure D-1)
+        uint8_t feedback = (prn_state_2g.lfsr_i ^ (prn_state_2g.lfsr_i >> 18)) & 1;
         prn_state_2g.lfsr_i = (prn_state_2g.lfsr_i >> 1) | ((uint32_t)feedback << 22);
         prn_state_2g.lfsr_i &= 0x7FFFFF;  // Mask for 23 bits
     }
 
     // 3. Reference values from T.018 Table 2.2 (Normal I, converted to ±1 signal levels)
-    // Hex values: 8000, 0108, 4212, 84A1 → converted to ±1
+    // Hex values: 8000, 0108, 4212, 84A1 → Logic bit to signal level (1→-1, 0→+1)
     static const int8_t REFERENCE_CHIPS[64] = {
-        -1,+1,+1,+1,+1,+1,+1,+1, +1,+1,+1,+1,+1,+1,+1,+1,  // 8000 → 1000000000000000
-         +1,+1,+1,+1,+1,+1,+1,-1, +1,+1,+1,+1,+1,+1,+1,+1,  // 0108 → 0000000100001000
-         +1,+1,-1,+1,+1,+1,+1,+1, -1,+1,+1,+1,+1,-1,+1,+1,  // 4212 → 0100001000010010
-         +1,+1,+1,-1,+1,+1,+1,+1, -1,+1,+1,+1,+1,-1,+1,+1   // 84A1 → 1000010010100001
+        -1,+1,+1,+1,+1,+1,+1,+1, +1,+1,+1,+1,+1,+1,+1,+1, // 8000
+        +1,+1,+1,+1,+1,+1,+1,-1, +1,+1,+1,+1,-1,+1,+1,+1, // 0108
+        +1,-1,+1,+1,+1,+1,-1,+1, +1,+1,+1,-1,+1,+1,-1,+1, // 4212
+        -1,+1,+1,+1,+1,-1,+1,+1, -1,+1,-1,+1,+1,+1,+1,-1  // 84A1
     };
 
     // 4. Verify first 64 chips against T.018 Table 2.2
@@ -638,8 +638,12 @@ void transmit_beacon_2g(void) {
     // All logging AFTER LED OFF to avoid UART blocking delays before LED ON
     // DEBUG_LOG_FLUSH("\r\n=== TRANSMITTING 2G BEACON ===\r\n");
 
+    uint32_t func_start_ms = millis_counter;
+
     // Build compliant frame (no logging inside to avoid UART blocking)
     build_compliant_frame_2g();
+
+    uint32_t frame_build_duration = millis_counter - func_start_ms;
 
     // Reset ISR counters before transmission
     oqpsk_state_2g.isr_call_count = 0;
@@ -651,7 +655,8 @@ void transmit_beacon_2g(void) {
     uint32_t led_on_time_ms = millis_counter;
 
     // Turn ON transmission LED (RD10) - NO LOGGING between LED ON and LED OFF
-    LED_TX_PIN = 1;
+    // LED RD10 has inverted polarity: 0=ON, 1=OFF
+    LED_TX_PIN = 0;
 
     // Start OQPSK transmission
     oqpsk_transmit_frame(frame_2g_info);
@@ -669,7 +674,7 @@ void transmit_beacon_2g(void) {
         if(++loop_count >= 10) {
             loop_count = 0;
             if(millis_counter > timeout) {
-                LED_TX_PIN = 0;  // Turn off LED before timeout log
+                LED_TX_PIN = 1;  // Turn off LED before timeout log (inverted polarity)
                 DEBUG_LOG_FLUSH("WARNING: Transmission timeout - forcing stop\r\n");
                 oqpsk_stop_transmission();
                 return;  // Exit early
@@ -678,32 +683,50 @@ void transmit_beacon_2g(void) {
     }
 
     // Turn OFF transmission LED (RD10) - capture BOTH ISR count AND real time
-    LED_TX_PIN = 0;
+    // LED RD10 has inverted polarity: 0=ON, 1=OFF
+    LED_TX_PIN = 1;
     uint32_t led_off_isr_count = oqpsk_state_2g.isr_call_count;
     uint32_t led_off_time_ms = millis_counter;
 
     // All logging AFTER LED OFF
+    uint32_t log_start_ms = millis_counter;
+
+    // DEBUG: Set RB0=HIGH to mark start of logging (scope trigger)
+    LATBbits.LATB0 = 1;
+
+    // Display transmitted frame in hexadecimal (252 bits = 63 hex chars)
+    DEBUG_LOG_FLUSH("\r\nTX: ");
+    for(int i = 0; i < 63; i++) {
+        uint8_t nibble = 0;
+        for(int j = 0; j < 4; j++) {
+            if(beacon_frame_2g[i*4 + j]) {
+                nibble |= (1 << (3 - j));
+            }
+        }
+        char hex_char = "0123456789ABCDEF"[nibble];
+        debug_print_char(hex_char);
+    }
+    DEBUG_LOG_FLUSH("\r\n");
+
     char debug_buf[120];
     uint32_t isr_count_diff = led_off_isr_count - led_on_isr_count;
     uint32_t real_time_ms = led_off_time_ms - led_on_time_ms;
-    sprintf(debug_buf, "LED: ON@%lu -> OFF@%lu | ISR: %lu calls (%.1fs theory) | REAL: %lums (%.1fs)\r\n",
-            led_on_isr_count, led_off_isr_count,
-            isr_count_diff, (float)isr_count_diff / 38400.0f,
-            real_time_ms, (float)real_time_ms / 1000.0f);
-    DEBUG_LOG_FLUSH(debug_buf);
-
-    // DEBUG: Log flags state
-    sprintf(debug_buf, "FLAGS: chip_timer_active=%u, transmitting=%u\r\n",
-            chip_timer_active, oqpsk_state_2g.transmitting);
+    uint32_t log_duration_ms = millis_counter - log_start_ms;
+    sprintf(debug_buf, "FRAME_BUILD: %lums | LED_ON_DURATION: %lums | LOG: %lums | TOTAL: %lums\r\n",
+            frame_build_duration, real_time_ms, log_duration_ms,
+            millis_counter - func_start_ms);
     DEBUG_LOG_FLUSH(debug_buf);
 
     // Debug statistics
-    sprintf(debug_buf, "Bits TX: %u, Buffer misses: %u, millis_now=%lu\r\n",
+    sprintf(debug_buf, "Bits TX: %u, Buffer misses: %u, ISR calls: %lu\r\n",
             oqpsk_state_2g.bits_transmitted,
             oqpsk_state_2g.buffer_misses,
-            millis_counter);
+            isr_count_diff);
     DEBUG_LOG_FLUSH(debug_buf);
-    DEBUG_LOG_FLUSH("2G transmission complete\r\n");
+    DEBUG_LOG_FLUSH("2G TX complete\r\n");
+
+    // DEBUG: Clear RB0=LOW to mark end of logging (scope pulse)
+    LATBbits.LATB0 = 0;
 }
 
 uint8_t should_transmit_beacon_2g(void) {

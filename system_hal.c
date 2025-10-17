@@ -87,9 +87,9 @@ void ports_init(void) {
     TRISBbits.TRISB11 = 0;    // Power level control
     LATBbits.LATB11 = 0;      // Low power mode
     
-    // Status LED
+    // Status LED (RD10 has inverted polarity: 0=ON, 1=OFF)
     STATUS_LED_TRIS = 0;      // LED output
-    STATUS_LED_LAT = 0;       // Initially off
+    STATUS_LED_LAT = 1;       // Initially off (inverted polarity)
     
     // SPI chip select pin
     ADF_CS_TRIS = 0;          // CS output
