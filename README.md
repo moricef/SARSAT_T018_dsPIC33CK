@@ -4,7 +4,8 @@
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-orange)](LICENSE)
 
 > Générateur de trames COSPAS-SARSAT 2G conforme T.018 pour formation ADRASEC sur 403 MHz
-> Stade actuel : Génération de la trame hexadécimale
+> 
+> ( Stade actuel : Génération de la trame hexadécimale)
 
 ## Objectif
 
