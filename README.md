@@ -70,7 +70,6 @@ Balise de formation 100% conforme aux spécifications COSPAS-SARSAT T.018 Rev.12
   - Phase 1 : 24 tx @ 5s
   - Phase 2 : 18 tx @ 10s
   - Phase 3 : continues @ 28.5s ±1.5s
-- Usage : simulation crash ELT
 
 ## Structure du Projet
 
