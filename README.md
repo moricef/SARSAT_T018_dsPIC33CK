@@ -5,7 +5,7 @@
 
 > Générateur de trames COSPAS-SARSAT 2G conforme T.018 pour formation ADRASEC sur 403 MHz
 > 
-> ( Stade actuel : Génération de la trame hexadécimale)
+> ( Stade actuel : Génération des trames hexadécimales validées sur décodeur Cospas-Sarsat)
 
 ## Objectif
 
