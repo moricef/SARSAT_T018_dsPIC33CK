@@ -99,7 +99,7 @@ make clean && make
 # Status  : 100% conforme T.018 ✅
 ```
 
-## Pinout dsPIC33CK64MC105
+## Pinout dsPIC33CK64MC105 Curiosity Nano
 
 | Pin  | Fonction              |
 |------|-----------------------|
