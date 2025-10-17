@@ -25,9 +25,9 @@ Balise de formation 100% conforme aux spécifications COSPAS-SARSAT T.018 Rev.12
 
 ### Hardware
 - **MCU** : dsPIC33CK64MC105 @ 100 MHz (Curiosity Nano)
-- *=*=* Prévisionnel *=*=*
+- **== Prévisionnel ==**
 - **DAC** : MCP4922 dual 12-bit pour I/Q
--  ** Filtre Passe-bas de Tchebichev 5ème ou 6èmè ordre **
+- **Filtre Passe-bas** : Tchebichev 5ème ou 6èmè ordre
 - **RF** : ADL5375 modulateur I/Q + ADF4351 PLL 403 MHz
 - **GPS** : Trimble 63530-00 (NMEA 0183)
 - **Amplificateur** : RA07M4047M (7W)
