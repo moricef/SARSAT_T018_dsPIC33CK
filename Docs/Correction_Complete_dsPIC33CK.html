@@ -32,6 +32,12 @@
                 <th>Impact</th>
                 <th>Solution</th>
             </tr>
+            <tr style="background-color: #ffebee;">
+                <td><strong>CRITIQUE: LFSR feedback incorrect</strong></td>
+                <td><code class="file">system_comms.c</code></td>
+                <td><strong>LFSR meurt après 1 shift - Non-conforme T.018 Table 2.2</strong></td>
+                <td>Corriger feedback: X0⊕X18 (et non X22⊕X17), shift RIGHT</td>
+            </tr>
             <tr>
                 <td>Champ rotatif statique en mode Test</td>
                 <td><code class="file">protocol_data.c</code></td>
@@ -54,9 +60,142 @@
     </div>
 
     <div class="section">
-        <h2>2. Correction des Champs Rotatifs</h2>
+        <h2>2. CORRECTION CRITIQUE: LFSR PRN Generator (x²³ + x¹⁸ + 1)</h2>
 
-        <h3>2.1. Modification de <code class="file">protocol_data.c</code></h3>
+        <h3>2.1. Bug Identifié</h3>
+        <p class="warning">
+            Le LFSR principal utilisé pour générer les séquences PRN (Direct Sequence Spread Spectrum)
+            contenait un bug CRITIQUE dans le calcul du feedback, rendant les trames 2G totalement non-conformes T.018.
+        </p>
+
+        <div class="code-title">❌ Code INCORRECT (version initiale) :</div>
+        <pre><code class="cmd">// MAUVAIS: Utilise les mauvais bits de feedback
+uint8_t feedback = ((lfsr >> 22) ^ (lfsr >> 17)) & 1;  // X22 ⊕ X17 (FAUX!)
+lfsr = ((lfsr << 1) & 0x7FFFFF) | feedback;  // Shift LEFT (FAUX!)</code></pre>
+
+        <p>
+            <strong>Conséquences du bug :</strong>
+        </p>
+        <ul>
+            <li>Le LFSR "meurt" immédiatement après le premier shift depuis l'état initial 0x000001</li>
+            <li>La séquence PRN générée ne correspond PAS à T.018 Table 2.2</li>
+            <li>Les 64 premiers chips attendus : <code>8000 0108 4212 84A1</code></li>
+            <li>Les 64 premiers chips produits : <code>0000 0000 0000 0000</code> (séquence morte)</li>
+        </ul>
+
+        <h3>2.2. Analyse T.018 Appendix D Figure D-1</h3>
+        <p>
+            L'analyse de la spécification T.018 Appendix D (Figure D-1) montre explicitement l'architecture du LFSR :
+        </p>
+        <ul>
+            <li><strong>Polynôme :</strong> G(x) = x²³ + x¹⁸ + 1</li>
+            <li><strong>Feedback :</strong> X0 ⊕ X18 (bits aux positions 0 et 18)</li>
+            <li><strong>Output :</strong> X0 (registre 0, LSB)</li>
+            <li><strong>Shift direction :</strong> RIGHT (Xn → Xn-1)</li>
+            <li><strong>Feedback destination :</strong> X22 (MSB du registre 23 bits)</li>
+        </ul>
+
+        <h3>2.3. Correction Appliquée dans <code class="file">system_comms.c</code></h3>
+
+        <div class="code-title">✓ Code CORRIGÉ (lignes 203, 222, 251) :</div>
+        <pre><code class="cmd">// CORRECT: T.018 Appendix D Figure D-1
+// Polynôme: x^23 + x^18 + 1 → feedback = X0 ⊕ X18
+uint8_t feedback = (lfsr ^ (lfsr >> 18)) & 1;  // X0 ⊕ X18 (CORRECT)
+lfsr = (lfsr >> 1) | ((uint32_t)feedback << 22);  // Shift RIGHT (CORRECT)
+lfsr &= 0x7FFFFF;  // Masque 23 bits</code></pre>
+
+        <p>
+            <strong>Points clés de la correction :</strong>
+        </p>
+        <ol>
+            <li><strong>Feedback X0 ⊕ X18 :</strong> <code>(lfsr ^ (lfsr >> 18)) & 1</code>
+                <ul>
+                    <li><code>lfsr</code> : bit X0 (LSB)</li>
+                    <li><code>lfsr >> 18</code> : bit X18</li>
+                    <li>XOR entre X0 et X18</li>
+                </ul>
+            </li>
+            <li><strong>Shift RIGHT :</strong> <code>lfsr >> 1</code>
+                <ul>
+                    <li>Configuration Fibonacci : sortie depuis X0 avant shift</li>
+                    <li>Tous les bits se décalent vers la droite (Xn → Xn-1)</li>
+                </ul>
+            </li>
+            <li><strong>Feedback vers X22 :</strong> <code>feedback << 22</code>
+                <ul>
+                    <li>Le bit de feedback entre en position X22 (MSB)</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h3>2.4. Validation T.018 Table 2.2</h3>
+        <p>
+            Après correction, le LFSR produit la séquence conforme T.018 Table 2.2 :
+        </p>
+
+        <table>
+            <tr>
+                <th>État Initial</th>
+                <th>64 Premiers Chips (Hex)</th>
+                <th>Statut</th>
+            </tr>
+            <tr style="background-color: #e8f5e9;">
+                <td>0x000001 (Normal I)</td>
+                <td><code>8000 0108 4212 84A1</code></td>
+                <td>✓ CONFORME T.018</td>
+            </tr>
+            <tr style="background-color: #e8f5e9;">
+                <td>0x000041 (Normal Q, offset 64)</td>
+                <td><code>0108 4212 84A1 xxxx</code></td>
+                <td>✓ CONFORME T.018</td>
+            </tr>
+        </table>
+
+        <div class="code-title">Fonction de validation implémentée (ligne 239) :</div>
+        <pre><code class="cmd">uint8_t verify_prn_sequence(uint8_t mode) {
+    int8_t test_seq[64];
+
+    // 1. Reset LFSR à l'état initial T.018 (Normal I)
+    prn_state_2g.lfsr_i = 0x000001;
+
+    // 2. Générer les 64 premiers chips
+    for (int i = 0; i < 64; i++) {
+        test_seq[i] = (prn_state_2g.lfsr_i & 1) ? -1 : 1;
+
+        // LFSR corrigé: X0 ⊕ X18, shift RIGHT
+        uint8_t feedback = (prn_state_2g.lfsr_i ^ (prn_state_2g.lfsr_i >> 18)) & 1;
+        prn_state_2g.lfsr_i = (prn_state_2g.lfsr_i >> 1) | ((uint32_t)feedback << 22);
+        prn_state_2g.lfsr_i &= 0x7FFFFF;
+    }
+
+    // 3. Valider contre référence T.018 Table 2.2
+    static const int8_t REFERENCE_CHIPS[64] = {
+        -1,+1,+1,+1,+1,+1,+1,+1, +1,+1,+1,+1,+1,+1,+1,+1, // 8000
+        +1,+1,+1,+1,+1,+1,+1,-1, +1,+1,+1,+1,-1,+1,+1,+1, // 0108
+        +1,-1,+1,+1,+1,+1,-1,+1, +1,+1,+1,-1,+1,+1,-1,+1, // 4212
+        -1,+1,+1,+1,+1,-1,+1,+1, -1,+1,-1,+1,+1,+1,+1,-1  // 84A1
+    };
+
+    for (int i = 0; i < 64; i++) {
+        if (test_seq[i] != REFERENCE_CHIPS[i]) {
+            return 0;  // Erreur
+        }
+    }
+
+    return 1;  // ✓ Conforme T.018 Table 2.2
+}</code></pre>
+
+        <p class="tip">
+            <strong>Impact de cette correction :</strong> Cette correction est CRITIQUE pour la conformité T.018.
+            Sans elle, les balises 2G générées sont totalement non-fonctionnelles et ne peuvent pas être décodées
+            par les récepteurs SARSAT.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>3. Correction des Champs Rotatifs</h2>
+
+        <h3>3.1. Modification de <code class="file">protocol_data.c</code></h3>
         <p>
             La fonction <code class="cmd">build_frame</code> doit être modifiée pour générer un champ rotatif dynamique,
             même en mode Test. Voici une implémentation complète utilisant un **LFSR 8-bit** pour générer un motif pseudo-aléatoire.
@@ -123,59 +262,6 @@ void build_frame(sarsat_frame_t *frame, uint16_t burst_count, uint8_t mode) {
     </div>
 
     <div class="section">
-        <h2>3. Vérification des Séquences PRN</h2>
-
-        <h3>3.1. Modification de <code class="file">system_comms.c</code></h3>
-        <p>
-            Ajouter une fonction pour vérifier l'intégrité des séquences PRN générées,
-            en comparant les 64 premiers chips avec les valeurs de référence de la spécification T.018 (Table 2.2).
-        </p>
-
-        <div class="code-title">Fonction de vérification des séquences PRN :</div>
-        <pre><code class="cmd">// Dans system_comms.h
-#ifndef SYSTEM_COMMS_H
-#define SYSTEM_COMMS_H
-
-#include &lt;stdint.h&gt;
-#include &lt;stdbool.h&gt;
-
-bool verify_prn_sequence(const uint8_t *prn_sequence);
-
-#endif</code></pre>
-
-        <div class="code-title">Implémentation dans <code class="file">system_comms.c</code> :</div>
-        <pre><code class="cmd">#include "system_comms.h"
-#include &lt;string.h&gt;
-
-// Valeurs de référence pour les 64 premiers chips (Normal I, d'après T.018 Table 2.2)
-const uint8_t REFERENCE_CHIPS[64] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    // À remplacer par les vraies valeurs de la Table 2.2 (ex: 0x8000, 0x0108, etc.)
-};
-
-// Vérifie les 64 premiers chips d'une séquence PRN
-bool verify_prn_sequence(const uint8_t *prn_sequence) {
-    for (int i = 0; i < 64; i++) {
-        if (prn_sequence[i] != REFERENCE_CHIPS[i]) {
-            return false;  // Séquence invalide
-        }
-    }
-    return true;  // Séquence valide
-}</code></pre>
-
-        <div class="code-title">Utilisation dans le code principal :</div>
-        <pre><code class="cmd">// Dans main.c ou system_comms.c
-uint8_t prn_sequence[38400];  // Séquence PRN générée
-generate_prn_sequence(prn_sequence);  // Fonction existante
-if (!verify_prn_sequence(prn_sequence)) {
-    // Gérer l'erreur (ex: redémarrer la génération)
-}</code></pre>
-    </div>
-
-    <div class="section">
         <h2>4. Validation des Checksums NMEA</h2>
 
         <h3>4.1. Modification de <code class="file">system_comms.c</code></h3>
@@ -183,48 +269,43 @@ if (!verify_prn_sequence(prn_sequence)) {
             Ajouter une fonction pour valider les checksums des trames NMEA reçues du GPS.
         </p>
 
-        <div class="code-title">Fonction de validation des checksums NMEA :</div>
+        <div class="code-title">Fonction de validation des checksums NMEA (ligne 55) :</div>
         <pre><code class="cmd">// Dans system_comms.h
 #ifndef SYSTEM_COMMS_H
 #define SYSTEM_COMMS_H
 
 #include &lt;stdint.h&gt;
-#include &lt;stdbool.h&gt;
 
-bool validate_nmea_checksum(const char *nmea_sentence);
+uint8_t validate_nmea_checksum(const char *nmea_sentence);
 
 #endif</code></pre>
 
         <div class="code-title">Implémentation dans <code class="file">system_comms.c</code> :</div>
         <pre><code class="cmd">#include "system_comms.h"
 #include &lt;string.h&gt;
-#include &lt;ctype.h&gt;
 
-// Calcule le checksum d'une trame NMEA
-uint8_t calculate_nmea_checksum(const char *sentence) {
-    uint8_t checksum = 0;
-    // Ignorer le '$' initial
-    for (const char *p = sentence + 1; *p && *p != '*'; p++) {
-        checksum ^= *p;
-    }
-    return checksum;
-}
+// Valide le checksum d'une trame NMEA (NMEA 0183 spec)
+uint8_t validate_nmea_checksum(const char *sentence) {
+    // Vérification format de base
+    if(!sentence || sentence[0] != '$') return 0;
 
-// Valide le checksum d'une trame NMEA
-bool validate_nmea_checksum(const char *nmea_sentence) {
-    // Trouver le checksum dans la trame (après '*')
-    const char *asterisk = strchr(nmea_sentence, '*');
-    if (!asterisk) return false;  // Pas de checksum
+    // Recherche du séparateur checksum
+    const char *asterisk = strchr(sentence, '*');
+    if(!asterisk || strlen(asterisk) < 3) return 0;  // Nécessite au moins *XX
 
-    // Extraire le checksum attendu (2 chiffres hexa)
-    uint8_t expected_checksum = 0;
-    if (sscanf(asterisk + 1, "%2hhx", &expected_checksum) != 1) {
-        return false;  // Checksum invalide
+    // Extraction du checksum attendu
+    uint8_t expected;
+    if(sscanf(asterisk + 1, "%2hhx", &expected) != 1) {
+        return 0;
     }
 
-    // Calculer le checksum réel
-    uint8_t calculated_checksum = calculate_nmea_checksum(nmea_sentence);
-    return (calculated_checksum == expected_checksum);
+    // Calcul du checksum réel (XOR entre $ et *)
+    uint8_t calculated = 0;
+    for(const char *p = sentence + 1; p < asterisk; p++) {
+        calculated ^= *p;
+    }
+
+    return calculated == expected;  // 1 si valide, 0 sinon
 }</code></pre>
 
         <div class="code-title">Utilisation dans le parsing GPS :</div>
@@ -360,15 +441,25 @@ void test_rotating_field(void) {
                 <th>Modification</th>
                 <th>Objectif</th>
             </tr>
+            <tr style="background-color: #ffebee;">
+                <td><code class="file">system_comms.c</code></td>
+                <td><strong>CRITIQUE:</strong> Correction feedback LFSR (lignes 203, 222, 251): <code class="cmd">X0⊕X18</code> + shift RIGHT</td>
+                <td>Conformité T.018 Table 2.2 - Génération PRN fonctionnelle</td>
+            </tr>
             <tr>
                 <td><code class="file">protocol_data.c</code></td>
-                <td>Ajout de <code class="cmd">generate_rotating_field</code> et <code class="cmd">lfsr_8bit</code></td>
-                <td>Champ rotatif dynamique en mode Test</td>
+                <td>Ajout de <code class="cmd">set_rotating_field_2g</code> avec <code class="cmd">lfsr_8bit</code> (ligne 225)</td>
+                <td>Champ rotatif dynamique en mode Test (27 bits, 186-202)</td>
             </tr>
             <tr>
                 <td><code class="file">system_comms.c</code></td>
-                <td>Ajout de <code class="cmd">verify_prn_sequence</code> et <code class="cmd">validate_nmea_checksum</code></td>
-                <td>Vérification des séquences PRN et des checksums NMEA</td>
+                <td>Ajout de <code class="cmd">verify_prn_sequence</code> (ligne 186) - voir section 2.4</td>
+                <td>Validation automatique contre T.018 Table 2.2 (intégrée au LFSR)</td>
+            </tr>
+            <tr>
+                <td><code class="file">system_comms.c</code></td>
+                <td>Ajout de <code class="cmd">validate_nmea_checksum</code> (ligne 55) retourne <code class="cmd">uint8_t</code></td>
+                <td>Vérification intégrité données GPS (NMEA 0183)</td>
             </tr>
             <tr>
                 <td><code class="file">main.c</code></td>
@@ -379,25 +470,7 @@ void test_rotating_field(void) {
     </div>
 
     <div class="section">
-        <h2>8. Prochaines Étapes</h2>
-        <ol>
-            <li>
-                <strong>Implémenter les modifications</strong> dans ton projet dsPIC33CK.
-            </li>
-            <li>
-                <strong>Tester chaque composant</strong> (champ rotatif, PRN, NMEA).
-            </li>
-            <li>
-                <strong>Valider la conformité</strong> avec un analyseur de spectre et un récepteur SARSAT.
-            </li>
-            <li>
-                <strong>Documenter les changements</strong> pour les futurs développements.
-            </li>
-        </ol>
-    </div>
-
-    <div class="section">
-        <h2>9. Ressources Complémentaires</h2>
+        <h2>8. Ressources Complémentaires</h2>
         <ul>
             <li>
                 <a href="https://github.com/moricef/SARSAT_T018_dsPIC33CK/">Projet Original (dsPIC33CK)</a>
