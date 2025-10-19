@@ -438,6 +438,21 @@ void build_2g_frame(uint8_t* info_data, uint8_t* output_frame) {
     }
 }
 
+/* oqpsk_transmit_frame - T.018 Section 2.1.1 compliant OQPSK-DSSS modulator
+ *
+ * Implements T.018 OQPSK modulation per Section 2.1.1:
+ * 1. D(t) 300 bps bit stream split into:
+ *    - Ib(t): odd-numbered bits (1,3,5...) @ 150 bps → I channel
+ *    - Qb(t): even-numbered bits (2,4,6...) @ 150 bps → Q channel
+ * 2. Each bit spread with 256-chip PRN segment:
+ *    - Ci(t): I-channel PRN @ 38.4 kchips/s (LFSR init 0x000001)
+ *    - Cq(t): Q-channel PRN @ 38.4 kchips/s (LFSR init 0x000041)
+ * 3. DSSS spreading: data bit XORs with PRN (bit 0 → invert, bit 1 → unchanged)
+ * 4. Q channel delayed by 1/2 chip period (OQPSK offset)
+ * 5. I/Q modulated onto cos/sin carriers and summed
+ *
+ * Result: Constant-envelope signal S(t) with max 90° phase shift
+ */
 void oqpsk_transmit_frame(uint8_t* info_bits) {
     // No logging here - called during LED ON period
 
@@ -463,11 +478,10 @@ void oqpsk_transmit_frame(uint8_t* info_bits) {
     generate_prn_sequence_i(oqpsk_state_2g.chip_buffer_a_i, PRN_MODE_NORMAL);
     generate_prn_sequence_q(oqpsk_state_2g.chip_buffer_a_q, PRN_MODE_NORMAL);
 
-    // DSSS spreading for bit 0
-    for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
-        if(!data_bit) {
+    // T.018 OQPSK: Bit 0 is bit #1 in T.018 numbering (odd) → modulate I only
+    if(!data_bit) {
+        for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
             oqpsk_state_2g.chip_buffer_a_i[i] = -oqpsk_state_2g.chip_buffer_a_i[i];
-            oqpsk_state_2g.chip_buffer_a_q[i] = -oqpsk_state_2g.chip_buffer_a_q[i];
         }
     }
 
@@ -580,11 +594,21 @@ void transmission_task_2g(void) {
     generate_prn_sequence_i(target_i, PRN_MODE_NORMAL);
     generate_prn_sequence_q(target_q, PRN_MODE_NORMAL);
 
-    // T.018 DSSS spreading: XOR data bit with PRN chips
+    // T.018 OQPSK: Split D(t) into Ib(t) and Qb(t)
+    // Bit numbering starts at 1 per T.018: bit 1, 2, 3, 4...
+    // Odd bits (1, 3, 5...) → I channel (indices 0, 2, 4...)
+    // Even bits (2, 4, 6...) → Q channel (indices 1, 3, 5...)
     if(!data_bit) {
-        for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
-            target_i[i] = -target_i[i];
-            target_q[i] = -target_q[i];
+        if(bit_to_generate % 2 == 0) {
+            // Odd bit number (1, 3, 5...) → modulate I channel only
+            for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
+                target_i[i] = -target_i[i];
+            }
+        } else {
+            // Even bit number (2, 4, 6...) → modulate Q channel only
+            for(int i = 0; i < PRN_CHIPS_PER_BIT; i++) {
+                target_q[i] = -target_q[i];
+            }
         }
     }
 
