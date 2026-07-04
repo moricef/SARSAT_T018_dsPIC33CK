@@ -1,7 +1,7 @@
 # COSPAS-SARSAT T.018 - Balise 2G (dsPIC33CK)
 
 [![T.018 Compliant](https://img.shields.io/badge/T.018-100%25%20Compliant-brightgreen)](https://cospas-sarsat.int)
-[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-orange)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 > Générateur de trames COSPAS-SARSAT 2G conforme T.018 pour formation ADRASEC sur 403 MHz
 > 
@@ -124,7 +124,13 @@ Voir dossier `Docs/` pour :
 
 ## Licence
 
-CC BY-NC-SA 4.0 - Usage non commercial - Attribution requise
+Le code source de ce projet est distribué sous licence MIT. Voir [LICENSE](LICENSE).
+
+Les documents techniques tiers conservés dans `Docs/` restent soumis à leurs licences et droits d'origine.
+
+## Avertissement RF
+
+Ce projet est destiné à la formation ADRASEC, aux essais de conformité et à la validation de décodeurs. Les utilisateurs doivent respecter la réglementation radio applicable. La génération de fausses alertes de détresse est interdite.
 
 ---
 
